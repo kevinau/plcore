@@ -1,0 +1,47 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: IO field types
+Bundle-SymbolicName: org.plcore.type
+Bundle-Version: 1.0.0
+Bundle-Vendor: Kevin Holloway
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Service-Component: OSGI-INF/org.plcore.type.TypeRegistry.xml,
+ OSGI-INF/org.plcore.type.builtin.StringType.xml,
+ OSGI-INF/org.plcore.type.builtin.PrimitiveIntType.xml,
+ OSGI-INF/org.plcore.type.builtin.ByteType.xml,
+ OSGI-INF/org.plcore.type.builtin.PercentType.xml,
+ OSGI-INF/org.plcore.type.builtin.PrimitiveLongType.xml,
+ OSGI-INF/org.plcore.type.builtin.LocalDateType.xml,
+ OSGI-INF/org.plcore.type.builtin.PrimitiveDoubleType.xml,
+ OSGI-INF/org.plcore.type.builtin.PrimitiveShortType.xml,
+ OSGI-INF/org.plcore.type.builtin.BigDecimalType.xml,
+ OSGI-INF/org.plcore.type.builtin.DoubleType.xml,
+ OSGI-INF/org.plcore.type.builtin.FloatType.xml,
+ OSGI-INF/org.plcore.type.builtin.VersionTimeType.xml,
+ OSGI-INF/org.plcore.type.builtin.BooleanType.xml,
+ OSGI-INF/org.plcore.type.builtin.PrimitiveByteType.xml,
+ OSGI-INF/org.plcore.type.builtin.PrimitiveBooleanType.xml,
+ OSGI-INF/org.plcore.type.builtin.SqlDateType.xml,
+ OSGI-INF/org.plcore.type.builtin.IntegerType.xml,
+ OSGI-INF/org.plcore.type.builtin.LongType.xml,
+ OSGI-INF/org.plcore.type.builtin.PrimitiveFloatType.xml,
+ OSGI-INF/org.plcore.type.builtin.CharacterType.xml,
+ OSGI-INF/org.plcore.type.builtin.ShortType.xml,
+ OSGI-INF/org.plcore.type.builtin.DateType.xml,
+ OSGI-INF/org.plcore.type.builtin.VoidType.xml,
+ OSGI-INF/org.plcore.type.builtin.DecimalType.xml,
+ OSGI-INF/org.plcore.type.builtin.EntityLifeType.xml,
+ OSGI-INF/org.plcore.type.builtin.PrimitiveCharType.xml,
+ OSGI-INF/org.plcore.type.builtin.BigIntegerType.xml
+Bundle-ActivationPolicy: lazy
+Export-Package: org.plcore.type,
+ org.plcore.type.builtin
+Import-Package: org.osgi.framework;version="1.8.0",
+ org.osgi.service.component;version="1.3.0",
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.plcore.math,
+ org.plcore.osgi,
+ org.plcore.time,
+ org.plcore.todo,
+ org.plcore.value
+

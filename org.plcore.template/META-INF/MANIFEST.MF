@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - Pebble template support
+Bundle-SymbolicName: org.plcore.template
+Bundle-Version: 1.0.0
+Export-Package: org.plcore.template
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: com.mitchellbosecke.pebble,
+ com.mitchellbosecke.pebble.error,
+ com.mitchellbosecke.pebble.extension,
+ com.mitchellbosecke.pebble.loader,
+ com.mitchellbosecke.pebble.template,
+ com.mitchellbosecke.pebble.tokenParser,
+ org.osgi.framework,
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.slf4j
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/org.plcore.template.impl.TemplateEngineFactory.xml
+Eclipse-BuddyPolicy: global

@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - Source documents
+Bundle-SymbolicName: org.plcore.srcdoc
+Bundle-Version: 1.0.0
+Bundle-Vendor: Kevin Holloway
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.plcore.srcdoc
+Import-Package: org.plcore.math,
+ org.slf4j
+Bundle-ActivationPolicy: lazy
