@@ -1,0 +1,31 @@
+{% macro button(id,label,show) %}
+<button class="action{% if show != "always" %} hidden{% endif %}" type="button" value="{{id}}" 
+{% if show == "always" %}data-show="always"{% endif %}
+        onclick="window.websocket.sendClick('{{id}}',this.value)">{{label}}</button>
+{% endmacro %}
+
+<form id="node{{id}}" onsubmit="event.preventDefault(); false;">
+<table class="entity">
+<caption>
+<div class="title">{{title}}</div>
+{% if description is not empty %}
+<p>{{description}}</p>
+{% endif %}
+</caption>
+<tbody class="entityContent" id="contentHere{{id}}">
+<tr class="item">
+<th>&nbsp;</th>
+<td class="input">{{ button("START_ADD", "Add", show="always") }}</td>
+</tr>
+{% block entityContent %}{% endblock %}
+</tbody>
+<tfoot>
+<tr class="item">
+<th>&nbsp;</th>
+<td class="input">{{ button("CONFIRM_ADD", "Add", show="available") }}
+                  {{ button("CLEAR", "Clear", show="available") }}
+                  {{ button("CANCEL", "Cancel", show="available") }}</td>
+</tr>
+</tfoot>
+</table>
+</form>

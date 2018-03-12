@@ -1,0 +1,166 @@
+$labelFont : Helvetica, Arial, sans-serif;
+$fontSize: 16px;
+$height: 24px;
+$paddingLeft: 6px;
+$baseColour: rgba(255, 140, 0, 1);
+
+.searchInput {
+  font-family: $labelFont;
+  font-size: $fontSize;
+  position: relative;
+  display: inline-block;
+  height: ($height + 2px);
+  background-color: transparent;
+}
+
+.searchInput input {
+  font-family: $labelFont;
+  font-size: $fontSize;
+  height: $height;
+  padding: 0 $paddingLeft;
+  border: 1px solid #000;
+  position: relative;
+}
+
+.searchInput input.error {
+  border: 1px solid red;
+}
+.searchInput input.required,
+.searchInput input.incomplete {
+  border: 1px solid $baseColour;
+}
+.searchInput input:focus {
+  border-style: dashed;
+}
+
+.searchInput input.visible {
+  background: transparent;
+  display: inline;
+  vertical-align: top;
+  line-height: $height; /* the same value as height */
+  outline: none;
+}
+.searchInput input.shadow {
+  position: absolute;
+  left: -9999px;
+}
+.searchInput div.inputBackground {
+  height: $height;
+  font-size: $fontSize;
+  position: absolute;
+  top: 0;
+  /* line-height: $height; */  /* height (26) less top and bottom border (2 x 1) */
+  border: 1px solid #ffffff;
+  padding: 0;
+  margin: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-left: $paddingLeft;
+  background-color: #fff;
+}
+.searchInput div.inputBackground span {
+  font-size: $fontSize;
+  color: #aaa;
+  line-height: $height;
+  background-color: #fff;
+}
+
+.searchInput div.dropList {
+  display: none;
+  font-size: $fontSize;
+  border: 0.5px solid $baseColour;
+  background: #fff;
+  margin: 0;
+  position: absolute;
+  top: ($height + 1px);
+  line-height: $height;  /* some figure yet to be determined */
+  z-index: 200;
+  cursor: pointer;
+}
+.searchInput div.dropList div {
+  white-space: nowrap;
+  padding: 0 $paddingLeft;
+  z-index: 200;
+}
+.searchInput div.dropList.calcSize div {
+  display: block !IMPORTANT;
+}
+.searchInput > div.dropList.calcSize {
+  display: block !IMPORTANT;
+  position: absolute;
+  left: -9999px;
+}
+.searchInput.active div.dropList.allShowing,
+.searchInput.active div.dropList.someShowing {
+  display: block;
+}
+
+.searchInput.active div.dropList.allShowing div {
+  display: block;
+  padding: 0 $paddingLeft;
+}
+.searchInput.active div.dropList.someShowing div {
+  display: none;
+  padding: 0 $paddingLeft;
+}
+.searchInput.active div.dropList.someShowing div.show {
+  display: block;
+  padding: 0 $paddingLeft;
+}
+.searchInput.active div.dropList>div {
+  font-size: $fontSize;
+  padding: 0;
+  padding: 0 $paddingLeft;
+}
+.searchInput.active div.dropList>div:hover {
+  background-color: #FFE2BF;
+  padding: 0 $paddingLeft;
+}
+.searchInput.active div.dropList>div.highlight {
+  background-color: #FFC57F;
+  padding: 0 $paddingLeft;
+}
+
+.searchInput button.upDownButton {
+  display: none;
+  line-height: $height; /* height (26) less top and bottom border (2 x 1) */
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+.searchInput.active button.upDownButton {
+  font-size: $fontSize;
+  display: inline;
+  width: ($height + 2px);
+  height: ($height + 2px);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  vertical-align: top;
+}
+.searchInput.active button.upDownButton:disabled {
+  cursor: default;
+}
+.searchInput.active button.upDownButton:before {
+  position: relative;
+  display: block;
+  width: $height;
+  height: $height;
+  content: url(downArrow.svg);
+}
+.searchInput.active button.upDownButton:disabled:before {
+  opacity: 0.4;
+}
+.searchInput.active button.upDownButton.up:before {
+  content: url(upArrow.svg);
+}
+.searchInput.active button.upDownButton.upAndFilter:before {
+  content: url(upAndFilter.svg);
+}
+.searchInput img {
+  margin-left: -26px;
+}

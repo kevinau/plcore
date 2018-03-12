@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - User io plans used in form data entry
+Bundle-SymbolicName: org.plcore.userio
+Bundle-Version: 1.0.0
+Bundle-Vendor: Kevin Holloway
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Eclipse-BuddyPolicy: global
+Import-Package: org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.plcore.todo,
+ org.plcore.type,
+ org.plcore.type.builtin,
+ org.plcore.util,
+ org.plcore.value
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/org.plcore.userio.plan.PlanFactory.xml
+Export-Package: org.plcore.userio,
+ org.plcore.userio.path,
+ org.plcore.userio.plan

@@ -1,0 +1,120 @@
+options {
+  JDK_VERSION = "1.5";
+  STATIC = false;
+  LOOKAHEAD = 1;
+  FORCE_LA_CHECK = false;
+}
+
+
+PARSER_BEGIN(NodePathParser)
+package org.plcore.userio.path.parser;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import org.plcore.userio.path.DescendentStep;
+import org.plcore.userio.path.IndexedElementStep;
+import org.plcore.userio.path.EndStep;
+import org.plcore.userio.path.NamedElementStep;
+import org.plcore.userio.path.IPathExpression;
+import org.plcore.userio.path.PathExpression;
+import org.plcore.userio.path.WildcardStep;
+
+public class NodePathParser {
+
+  private static class NullInputStream extends InputStream {
+    @Override
+    public int read() {
+      return 0;
+    }
+  }
+    
+//  public static void main(String args[]) throws ParseException 
+//  {
+//    NodePathParser parser = new NodePathParser(System.in);
+//    while (true) {
+//      parser.parse();
+//    }
+//  }
+    
+  public NodePathParser () {
+    this(new NullInputStream());
+  } 
+    
+  public IPathExpression parse(String s) throws ParseException {
+    ReInit(new ByteArrayInputStream(s.getBytes()));
+    PathExpression ex = new PathExpression(s);
+    parse(ex);
+    return ex;
+  }      
+}
+
+
+PARSER_END(NodePathParser)
+
+TOKEN:
+{
+	< HYPHEN: "-" >
+  | < SEPARATOR: "/" >
+  | < WILDCARD: "*" >
+  | < WILDCARDX2: "**" >
+  | < NUMBER: (<DIGIT>)+ >
+  | < #DIGIT: ["0"-"9"] >
+  | < #LETTER: ["a"-"z", "A"-"Z"] >
+  | < NAME: <LETTER> ("_" | <LETTER> | <DIGIT>)* >
+}
+
+void parse(PathExpression parent) :
+{
+    PathExpression ex;
+}
+{
+    ex = parseStep(parent)
+    (
+      <SEPARATOR>
+      ex = parseStep(ex)
+    )*
+    
+    {
+      ex = new EndStep(ex);
+    }
+}
+
+
+PathExpression parseStep(PathExpression parent) :
+{
+  Token n = null;
+  PathExpression ex;
+}
+{
+  (
+      <WILDCARDX2> 
+      {
+          ex = new DescendentStep(parent);
+      }      
+  | 
+      <WILDCARD> 
+      {
+          ex = new WildcardStep(parent);
+      }      
+  | 
+      n=<NAME>
+      {
+          ex = new NamedElementStep(parent, n.toString());
+      } 
+  |
+  	  <HYPHEN>
+  	  n=<NUMBER>     
+      { 
+     	  ex = new IndexedElementStep(parent, n.toString(), false);
+      }
+  |
+  	  n=<NUMBER>     
+      { 
+     	  ex = new IndexedElementStep(parent, n.toString(), true);
+      }
+  )
+  {
+  	return ex;
+  }
+}

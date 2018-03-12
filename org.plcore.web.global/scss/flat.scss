@@ -1,0 +1,238 @@
+/* roboto-mono-regular - latin */
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Roboto Mono'), local('RobotoMono-Regular'),
+       url('/global/fonts/roboto-mono-v5-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('/global/fonts/roboto-mono-v5-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* roboto-mono-italic - latin */
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Roboto Mono Italic'), local('RobotoMono-Italic'),
+       url('/gobal/fonts/roboto-mono-v5-latin-italic.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('/gobal/fonts/roboto-mono-v5-latin-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+// Fonts
+$infoFont: "Helvetica Neue", Helvetica, sans-serif;
+$inputFont: 'Roboto Mono', monospace;
+$inputFontSize: 1.4rem;
+$inputFontWeight: 400;
+$inputColor: #000000;
+$formColor: #4682b4;
+
+$errorColor: rgba(255, 0, 0, 0.75);
+$incompleteColor: #ffa500;
+$requiredColor: $incompleteColor;
+
+*:focus {
+  outline: none;
+}
+
+* { 
+  box-sizing: content-box;
+}
+
+input[type=text]::-ms-clear {
+  width : 0;
+  height: 0;
+}
+
+// Start of form css
+
+html {
+	font-size: 62.5%;
+	font-family: $infoFont;
+	padding: 0;
+	margin: 0;
+}
+
+body {
+  padding: 0;
+  margin: 1em;
+}
+
+// Entity styling
+form table.entity {
+  width: 100%;
+}
+
+form table.entity caption {
+  text-align: left;
+  font-family: $infoFont;
+  padding: 0 0 1em 0;
+  width: 100%;
+}
+
+form table.entity caption div.title {
+  font-size: 2.4rem;
+  font-weight: 400;
+  padding: 0;
+  margin: 0 0 0.125em 0;
+  color: $formColor;
+}
+
+form table.entity caption p {
+  font-size: 1.2rem;
+  opacity: 0.625;
+  padding: 0;
+  margin: 0 0.25em;
+  color: $formColor;
+}
+
+form table.entity th {
+  width: 20%;
+  height: 4ex;
+  box-sizing: border-box;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  color: $formColor;
+  padding-right: 1em;
+  text-align: right;
+}
+
+form table.entity td {
+  width: 80%;
+  height: 4ex;
+  box-sizing: border-box;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+// Item styling
+
+form input {
+  font-family: $inputFont;
+  font-size: $inputFontSize;
+  font-weight: $inputFontWeight;
+  color: $inputColor;
+  border: none;
+  background-clip: padding-box;
+  border-bottom: solid 1px transparentize($formColor,0.5);
+  width: 100%;
+}
+
+form tr.item.hidden {
+  display: none;
+}
+
+form td,
+form th {
+  vertical-align: text-bottom;
+}
+
+form td.input[data-status=ERROR] input {
+  border-bottom: solid 1px $errorColor;
+}
+
+form input:focus {
+  border-bottom: solid 1px transparentize($formColor,0.25);
+  box-shadow: 0px 1px 0px 0px transparentize($formColor,0.5);
+}
+
+form td.input[data-status=ERROR] input:focus {
+  border-bottom: solid 1px $errorColor;
+  box-shadow: 0px 1px 0px 0px transparentize($errorColor,0.25);
+}
+
+form label span.label {
+	font-size: 1.4rem;
+	font-weight: 400;
+	color: $formColor;
+	line-height: 100%;
+}
+
+form label > span.desc {
+	font-size: 1.1rem;
+	font-weight: 400;
+ 	color: $formColor;
+	line-height: 100%;
+}
+
+form td.input div.status {
+	padding-top: 0.25em;
+	font-size: 1.1rem;
+	line-height: 1;
+	min-height: 1.1rem;
+}
+
+form td.input div.status span.hint {
+	display: none;
+}
+
+form td.input[data-status] div.status span.hint {
+	display: none;
+}
+
+form td.input input:focus + div.status span.hint {
+	display: inline;
+	color: $formColor;
+	padding-right: 0.5em;
+}
+
+form td.input[data-status] input:focus + div.status span.hint {
+	display: none;
+}
+
+form td.input[data-status=REQUIRED] input:focus + div.status span.hint {
+	display: inline;
+	color: $formColor;
+	padding-right: 0.5em;
+}
+
+form td.input div.status span.message {
+	display: none;
+}
+
+form td.input[data-status] div.status span.message {
+	display: inline;
+	font-size: 1.1rem;
+	line-height: 1;
+}
+
+form td.input[data-status=ERROR] div.status span.message {
+	color: $errorColor;
+}
+
+form td.input[data-status=INCOMPLETE] div.status span.message {
+	color: $incompleteColor;
+}
+
+form td.input[data-status=REQUIRED] div.status span.message {
+	color: $requiredColor;
+}
+
+button {
+    color: #333;
+	background: lighten($formColor, 30);
+	border: 1px solid $formColor;
+	border-radius: 3px;
+	padding: 0.2em 0.6em;
+	cursor: default;
+}
+
+button.hidden {
+	display: none;
+}
+
+button:disabled,
+button:disabled:hover {
+    color: $formColor;
+	background: #fff;
+	cursor: default;
+}
+
+button:hover {
+	cursor: pointer;
+}
+
+button:active {
+    color: #000;
+	background: lighten($formColor, 20);
+	cursor: pointer;
+}
