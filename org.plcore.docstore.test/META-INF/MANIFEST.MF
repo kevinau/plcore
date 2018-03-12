@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test document store
+Bundle-SymbolicName: org.gyfor.docstore.test
+Bundle-Version: 1.0.0
+Bundle-Vendor: Kevin Holloway
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.osgi.service.component;version="1.3.0",
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.plcore.docstore,
+ org.plcore.srcdoc
+Service-Component: OSGI-INF/org.plcore.docstore.test.SimpleTest.xml
+Bundle-ActivationPolicy: lazy

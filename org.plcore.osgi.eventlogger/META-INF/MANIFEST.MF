@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - OSGi event logger
+Bundle-SymbolicName: org.plcore.osgi.eventlogger
+Bundle-Version: 1.0.0
+Bundle-Vendor: Kevin Holloway
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.osgi.service.event
+Service-Component: OSGI-INF/org.plcore.osgi.eventlogger.EventLogger.xml
+Bundle-ActivationPolicy: lazy

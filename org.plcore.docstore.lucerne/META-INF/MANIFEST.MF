@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Lucerne search engine indexing Docstore documents
+Bundle-SymbolicName: org.plcore.docstore.lucerne
+Bundle-Version: 1.0.0
+Bundle-Vendor: Kevin Holloway
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.osgi.service.component;version="1.2.0",
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.plcore.docstore,
+ org.plcore.home,
+ org.plcore.srcdoc,
+ org.slf4j;version="1.7.21"
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/org.plcore.docstore.lucerne.LuceneSearchEngine.xml
+Bundle-ClassPath: lib/lucene-core-6.6.0.jar,
+ lib/lucene-queryparser-6.6.0.jar,
+ .
+Export-Package: org.apache.lucene,
+ org.apache.lucene.document
