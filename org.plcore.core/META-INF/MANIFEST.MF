@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - Common code used in all PennyLedger code
+Bundle-SymbolicName: org.plcore.core
+Bundle-Version: 1.0.0
+Export-Package: org.plcore.math,
+ org.plcore.nio,
+ org.plcore.text,
+ org.plcore.time,
+ org.plcore.util,
+ org.plcore.value
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Kevin Holloway

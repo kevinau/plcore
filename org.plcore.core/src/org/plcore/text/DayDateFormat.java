@@ -1,0 +1,185 @@
+/*******************************************************************************
+ * Copyright (C) 2018 Kevin Holloway (kholloway@pennyledger.org)
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+package org.plcore.text;
+
+import java.text.DateFormatSymbols;
+
+import org.plcore.time.DayDate;
+
+
+public class DayDateFormat implements IFormat {
+	private final String format;
+	private DateFormatSymbols symbols = null;
+	
+	
+	public static final DayDateFormat ISO = new DayDateFormat("yyyy-MM-dd");
+	
+
+	public DayDateFormat (String format) {
+		this.format = format;
+	}
+	
+
+	@Override
+	public String toString (Object date) {
+		if (symbols == null) {
+			symbols = new DateFormatSymbols();
+		}
+		StringBuffer buffer = new StringBuffer();
+		char[] fx = format.toCharArray();
+		String nx = null;
+		boolean priorQuote = false;
+		
+		int i = 0;
+		while (i < fx.length) {
+			int runLength = 1;
+			if (Character.isLetter(fx[i])) {
+				int j = i + 1;
+				while (j < fx.length && fx[j] == fx[i]) {
+					j++;
+				}
+				runLength = j - i;
+			}
+			switch (fx[i]) {
+			case 'y' :
+			  int year = ((DayDate)date).getYear();
+				if (runLength <= 2) {
+				    nx = Integer.toString(year % 100);
+				} else {
+					nx = Integer.toString(year);
+				}
+				i += runLength;
+				priorQuote = false;
+				break;
+			case 'M' :
+			  int month = ((DayDate)date).getMonth() - 1;
+			  switch (runLength) {
+				case 1 :
+				case 2 :
+					nx = Integer.toString(month + 1);
+					break;
+				case 3 :
+					buffer.append(symbols.getShortMonths()[month]);
+					break;
+				default :
+					buffer.append(symbols.getMonths()[month]);
+				    break;
+			    }
+				i += runLength;
+				priorQuote = false;
+				break;
+			case 'd' :
+			  int day = ((DayDate)date).getDay();
+				nx = Integer.toString(day);
+				i += runLength;
+				priorQuote = false;
+				break;
+			case 'E' :
+			  int weekday = ((DayDate)date).getWeekday();
+				if (runLength >= 4) {
+					buffer.append(symbols.getWeekdays()[weekday + 1]);
+				} else {
+					buffer.append(symbols.getShortWeekdays()[weekday + 1]);
+				}
+				i += runLength;
+				priorQuote = false;
+				break;
+			case '\'' :
+				if (priorQuote) {
+					buffer.append('\'');
+				}
+				i++;
+				int j = i;
+				while (j < fx.length && fx[j] != '\'') {
+					j++;
+				}
+				if (j == i) {
+					buffer.append('\'');
+					priorQuote = false;
+				} else {
+					buffer.append(fx, i, j - i);
+					priorQuote = true;
+				}
+				i = j + 1;
+				break;
+			default :
+				buffer.append(fx[i]);
+			    i++;
+				priorQuote = false;
+			}
+			if (nx != null) {
+				while (runLength > nx.length()) {
+					buffer.append('0');
+					runLength--;
+				}
+				buffer.append(nx);
+				nx = null;
+			}
+		}
+		return buffer.toString();
+	}
+	
+	
+  @Override
+  public String toString () {
+    return format;
+  }
+
+
+//	public static void main (String[] args) {
+//		String[] fxx = new String[] {
+//				"yy",
+//				"yyyy",
+//				"M",
+//				"MM",
+//				"MMM",
+//				"MMMM",
+//				"d",
+//				"dd",
+//				"EEE",
+//				"EEEE",
+//				"'abc'",
+//				"''",
+//				"''''",
+//				"''''''",
+//				"'o''clock'",
+//				"'''clock'",
+//		};
+//		
+//	    Calendar calendar = new GregorianCalendar();
+//	    int day = calendar.get(Calendar.DAY_OF_MONTH);
+//	    int month = calendar.get(Calendar.MONTH);
+//	    int year = calendar.get(Calendar.YEAR);
+//	
+//		for (int f = 0; f < fxx.length; f++) {
+//				String fx = fxx[f];
+//				DayDateFormat format1 = new DayDateFormat(fx);
+//				DateFormat format0 = new SimpleDateFormat(fx);
+//		
+//				DayDate d1 = new DayDate(year, month, day);
+//			//String x1 = format1.format(year, month, day, weekday);
+//				String x1 = format1.format(d1);
+//				String x0 = format0.format(calendar.getTime());
+//		}
+//		DayDateFormat fx = new DayDateFormat("yyyy-MM-dd yyyy-MMM-dd EEE");
+//		DayDate d1 = new DayDate();
+//		for (int f = 0; f < 40; f++) {
+//				String x0 = fx.format(d1);
+//				d1 = d1.plus(1);
+//		}
+//	}
+}
