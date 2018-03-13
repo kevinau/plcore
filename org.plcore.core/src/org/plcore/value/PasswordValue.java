@@ -15,7 +15,16 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Random;
 
-
+/**
+ * A hashed password.  This value contains a randomly generated salt, and a MessageDigest hash
+ * of a password.  A clear text version of the password is not stored.
+ * 
+ * This implementation uses a SHA1 algorithum to calculate the hash.  Other algorithums can 
+ * easily be used.
+ * 
+ * The randomly generated salt is used to ensure that rainbow tables cannot be used to determine
+ * what password was used to generate the hashs.
+ */
 public class PasswordValue implements Serializable {
 
   private static final long serialVersionUID = 7369016814827844772L;

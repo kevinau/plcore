@@ -9,25 +9,32 @@
  ******************************************************************************/
 package org.plcore.value;
 
+/**
+ * An enum that captures the life of an entity within an application. An entity
+ * has the following life stages:
+ */
 public enum EntityLife {
 
   /**
-   * The entity can be referenced by other entities without restriction.
+   * The entity is actively used within the application. It can be
+   * viewed and changed.
    */
   ACTIVE,
-  
+
   /**
-   * The entity may be still referenced by other entities, but it should not be referenced by new entities.
-   * Existing entities cannot be changed to reference a retired entity.
-   * <p>
-   * A retired entity will be made history when it is not longer referenced by any other entity.
+   * The entity is no longer actively used. In Java
+   * terms, it is "deprecated". Retired entities can be viewed, but not editied.
+   * No new references to Retired entities can be created. When all references to
+   * a Retired entity have been removed, the Retired entity should be removed or 
+   * changed to History. A Retired entity can be changed back to Active. 
    */
   RETIRED,
-  
+
   /**
-   * The entity is not referenced by any other entity and can no longer be used.  It is kept only for
-   * historical reference.
+   * The entity is not actively used, and no other entity references it.
+   * It can safely be removed, or it can be retained for historical reference. A
+   * History entity cannot be changed back to Active or Retired.
    */
   HISTORY;
-  
+
 }

@@ -14,7 +14,12 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-
+/**
+ * A date and time that is used as a version for entities.  It is based on a Instant.
+ * 
+ * This value includes a toString method that returns an ISO 8601 formatted string.  
+ * It shows the time to micro second accuracy.
+ */
 public class VersionTime {
 
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
