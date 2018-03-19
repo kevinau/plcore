@@ -24,21 +24,20 @@ public class TypeRegistry {
     synchronized (namedTypes) {
       synchronized (inferredTypes) {
         String name = (String)props.get("name");
-        if (name == null) {
-          name = (String)props.get("component.name");
+        if (name != null) {
+          IType<?> oldType = namedTypes.putIfAbsent(name, type);
+          if (oldType != null) {
+            throw new RuntimeException("Duplicate IType with the same name: " + name);
+          }
         }
-        IType<?> oldType = namedTypes.putIfAbsent(name, type);
-        if (oldType != null) {
-          // This error should never happen
-          throw new RuntimeException("Duplicate IType with the same component.name: " + name);
-        }
-
+        
         Class<?> fieldClass = type.getFieldClass();
-        oldType = inferredTypes.putIfAbsent(fieldClass, type);
-        if (oldType != null) {
-          throw new RuntimeException("Duplicate IType with the same target class: " + fieldClass.getSimpleName());
+        if (fieldClass != null) {
+          IType<?> oldType = inferredTypes.putIfAbsent(fieldClass, type);
+          if (oldType != null) {
+            throw new RuntimeException("Duplicate IType with the same target class: " + fieldClass.getSimpleName());
+          }
         }
-        inferredTypes.put(fieldClass, type);
       }
     }
   }
@@ -48,15 +47,14 @@ public class TypeRegistry {
     synchronized (namedTypes) {
       synchronized (inferredTypes) {
         String name = (String)props.get("name");
-        if (name == null) {
-          name = (String)props.get("component.name");
-        }
         if (name != null) {
           namedTypes.remove(name);
         }
 
         Class<?> fieldClass = type.getFieldClass();
-        inferredTypes.remove(fieldClass);
+        if (fieldClass != null) {
+          inferredTypes.remove(fieldClass);
+        }
       }
     }
   }
@@ -99,19 +97,19 @@ public class TypeRegistry {
   // }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public IType<?> getType(Class<?> nodeClass) {
+  public IType<?> getByFieldClass(Class<?> fieldClass) {
     synchronized (inferredTypes) {
-      IType<?> type = inferredTypes.get(nodeClass);
+      IType<?> type = inferredTypes.get(fieldClass);
       if (type != null) {
         return type;
       } else {
-        if (nodeClass.isEnum()) {
+        if (fieldClass.isEnum()) {
           // Special case
-          return new EnumType(nodeClass);
+          return new EnumType(fieldClass);
         }
-        if (ICode.class.isAssignableFrom(nodeClass)) {
+        if (ICode.class.isAssignableFrom(fieldClass)) {
           // Special case
-          return new CodeType(nodeClass);
+          return new CodeType(fieldClass);
         }
         return null;
       }
@@ -119,16 +117,7 @@ public class TypeRegistry {
   }
 
 
-  /**
-   * Does this node class identify an item node. That is, is this node class an
-   * atomic item.
-   */
-  public boolean isItemType(Class<?> nodeClass) {
-    return getType(nodeClass) != null;
-  }
-
-
-  public IType<?> getTypeByName(String name) {
+  public IType<?> getByName(String name) {
     synchronized (namedTypes) {
       return namedTypes.get(name);
     }

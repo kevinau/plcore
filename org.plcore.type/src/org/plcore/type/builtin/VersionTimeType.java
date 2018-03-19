@@ -24,8 +24,6 @@ import org.plcore.value.VersionTime;
 @Component(service = IType.class)
 public class VersionTimeType extends StringBasedType<VersionTime> {
 
-  private static final String REQUIRED_MESSAGE = "a date/time is required";
-  
   private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS");
 
   
@@ -36,12 +34,6 @@ public class VersionTimeType extends StringBasedType<VersionTime> {
   
   public VersionTimeType (VersionTimeType type) {
     super (type);
-  }
-  
-  
-  @Override
-  public String getRequiredMessage () {
-    return REQUIRED_MESSAGE;
   }
   
   

@@ -57,20 +57,21 @@ public abstract class Type<T> implements IType<T> {
       if (nullable) {
         return null;
       } else {
-        throw new UserEntryException(getRequiredMessage(), UserEntryException.Type.REQUIRED);
+        throw UserEntryException.REQUIRED;
       }
     }
-    return createFromString(fillValue, source);
+    return createFromString(fillValue, creating, source);
   }
     
   
-  protected T createFromString (T fillValue, String source) throws UserEntryException {
-    return createFromString(source);
+  public T createFromString (T fillValue, boolean creating, String source) throws UserEntryException {
+    return createFromString(creating, source);
   }
   
   
-  @Override
-  public abstract String getRequiredMessage (); 
+  public T createFromString (boolean creating, String source) throws UserEntryException {
+    return createFromString(source);
+  }
   
   
   @Override 
@@ -114,7 +115,7 @@ public abstract class Type<T> implements IType<T> {
       if (nullable) {
         return;
       } else {
-        throw new UserEntryException(getRequiredMessage(), UserEntryException.Type.REQUIRED);
+        throw UserEntryException.REQUIRED;
       }
     }
     validate(value);

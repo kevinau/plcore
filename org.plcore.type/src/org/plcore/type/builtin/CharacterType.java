@@ -89,12 +89,6 @@ public class CharacterType extends Type<Character> implements ICaseSettable {
 
   
   @Override
-  public String getRequiredMessage () {
-    return "Required";
-  }
-
-  
-  @Override
   public Character newInstance (String source) {
     return source.charAt(0);
   }

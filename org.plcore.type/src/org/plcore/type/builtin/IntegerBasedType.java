@@ -141,12 +141,6 @@ public abstract class IntegerBasedType<T extends Comparable<T>> extends Type<T> 
 
 
   @Override
-  public String getRequiredMessage() {
-    return "number required (in the range " + min + " to " + max + ")";
-  }
-  
-  
-  @Override
   public abstract T newInstance (String source);
 
 
@@ -155,35 +149,26 @@ public abstract class IntegerBasedType<T extends Comparable<T>> extends Type<T> 
 
 
   protected void validateIntegerSource (String source) throws UserEntryException {
-    int i = 0;
     int length = source.length();
     
     if (length == 0) {
-      throw new UserEntryException(getRequiredMessage(), UserEntryException.Type.REQUIRED);
+      throw UserEntryException.REQUIRED;
     }
     
     /* Get the sign, but don't check it yet. */
-    if (i < length) {
-      char signChar = source.charAt(i);
-      switch (signChar) {
-      case '+' :
-      case '-' :
-        if (min >= 0) {
-          throw new UserEntryException("no sign allowed");
-        }
-        i++;
-        if (i == length) {
-          String msg;
-          if (min >= 0) {
-            msg = "not a number";
-            throw new UserEntryException(msg);
-          } else {
-            msg = "not a signed number";
-            throw new UserEntryException(msg, UserEntryException.Type.INCOMPLETE);
-          }
-        }
-        break;
+    int i = 0;
+    char signChar = source.charAt(i);
+    switch (signChar) {
+    case '+' :
+    case '-' :
+      if (min >= 0) {
+        throw new UserEntryException("no sign allowed");
       }
+      i++;
+      if (i == length) {
+        throw new UserEntryException("not a signed number", UserEntryException.Type.INCOMPLETE);
+      }
+      break;
     }
     /* Check the digits first.  What they have entered should always be
      * checked before reporting on what they have not entered. */

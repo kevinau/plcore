@@ -124,25 +124,6 @@ public abstract class DecimalBasedType<T> extends Type<T> implements IType<T>, I
   
   
   @Override
-  public String getRequiredMessage() {
-//    if (decimals == 0) {
-//      if (sign == NumberSign.SIGNED) {
-//        return "Number required (it may be signed, but with no decimal digits)";
-//      } else {
-//        return "Number required (it must be unsigned and with no decimal digits)";
-//      }
-//    } else {
-//      if (sign == NumberSign.SIGNED) {
-//        return "Number required (it may be signed and have up to " + decimals + " decimal digits)";
-//      } else {
-//        return "Number required (it must be unsigned but can have up to " + decimals + " decimal digits)";
-//      }
-//    }
-    return "Required";
-  }
-  
-  
-  @Override
   public abstract T newInstance (String source);
 
 
@@ -186,7 +167,7 @@ public abstract class DecimalBasedType<T> extends Type<T> implements IType<T>, I
     int leadingDigits = precision - decimals;
     
     if (length == 0) {
-      throw new UserEntryException(getRequiredMessage(), UserEntryException.Type.REQUIRED);
+      throw UserEntryException.REQUIRED;
     }
     
     /* Get the sign, but don't check it yet. */
@@ -201,13 +182,8 @@ public abstract class DecimalBasedType<T> extends Type<T> implements IType<T>, I
         i++;
         if (i == length) {
           String msg;
-          if (sign == NumberSign.UNSIGNED) {
-            msg = "not a decimal number";
-            throw new UserEntryException(msg);
-          } else {
-            msg = "not a signed decimal number";
-            throw new UserEntryException(msg, UserEntryException.Type.INCOMPLETE);
-          }
+          msg = "not a decimal number";
+          throw new UserEntryException(msg, UserEntryException.Type.INCOMPLETE);
         }
         break;
       }
@@ -239,7 +215,7 @@ public abstract class DecimalBasedType<T> extends Type<T> implements IType<T>, I
       i++;
     }
     if (count > leadingDigits) {
-      throw new UserEntryException("no more than " + leadingDigits + " leading digits are allowed");
+      throw new UserEntryException("no more than " + leadingDigits + " digits are allowed before decimal point");
     }
     if (decimalSeen && length - decimalOffset > decimals) {
       if (decimals == 0) {
@@ -264,9 +240,9 @@ public abstract class DecimalBasedType<T> extends Type<T> implements IType<T>, I
     int leftDigits = precision - decimals;
     if (i > leftDigits) {
       if (decimals == 0) {
-        throw new UserEntryException("only " + leftDigits + " digits are allowed");
+        throw new UserEntryException("no more than " + leftDigits + " digits are allowed");
       } else {
-        throw new UserEntryException("only " + leftDigits + " digits are allowed before the decimal point");
+        throw new UserEntryException("no more than " + leftDigits + " digits are allowed before decimal point");
       }
     }
   }

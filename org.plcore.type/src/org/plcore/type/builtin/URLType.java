@@ -20,9 +20,6 @@ import org.plcore.type.builtin.StringBasedType;
 
 
 public class URLType extends StringBasedType<URL> {
-
-  private static final String REQUIRED_MESSAGE = "Internet address required";
-  
   
   public URLType () {
     super (128);
@@ -35,13 +32,7 @@ public class URLType extends StringBasedType<URL> {
   
   
   @Override
-  public String getRequiredMessage () {
-    return REQUIRED_MESSAGE;
-  }
-  
-  
-  @Override
-  public URL createFromString (URL fillValue, String source) throws UserEntryException {
+  public URL createFromString (URL fillValue, boolean creating, String source) throws UserEntryException {
     try {
       String sv = source.trim();
       URL value;

@@ -44,7 +44,7 @@ public abstract class StringBasedType<T> extends Type<T> implements ILengthSetta
       String msg = MessageFormat.format("more than {0} characters", Integer.toString(maxLength));
       throw new UserEntryException(msg);
     }
-    switch (allowedCase) {
+    switch (getAllowedCase()) {
     case UPPER:
       source = source.toUpperCase();
       break;
@@ -65,15 +65,14 @@ public abstract class StringBasedType<T> extends Type<T> implements ILengthSetta
   }
 
   
+  protected TextCase getAllowedCase() {
+    return this.allowedCase;
+  }
+  
+  
   @Override
   public void setMaxLength (int maxLength) {
     this.maxLength = maxLength;
-  }
-
-  
-  @Override
-  public String getRequiredMessage () {
-    return "Required";
   }
 
   

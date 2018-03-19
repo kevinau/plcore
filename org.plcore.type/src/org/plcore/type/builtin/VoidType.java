@@ -54,10 +54,6 @@ public class VoidType implements IType<Void> {
   public void validate(Void value, boolean nullable) throws UserEntryException {
   }
 
-  @Override
-  public String getRequiredMessage() {
-    return null;
-  }
 
   @Override
   public int getFieldSize() {

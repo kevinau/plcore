@@ -18,8 +18,6 @@ import org.plcore.type.UserEntryException;
 @Component(service = IType.class)
 public class BooleanType extends Type<Boolean> implements IType<Boolean> {
   
-  private static final String REQUIRED_MESSAGE = "must be checked (Yes/1) or un-checked (No/0)";
-  
   private final String checkedLabel;
   
   
@@ -42,12 +40,6 @@ public class BooleanType extends Type<Boolean> implements IType<Boolean> {
   @Override
   public Boolean primalValue() {
     return Boolean.FALSE;
-  }
-
-
-  @Override
-  public String getRequiredMessage() {
-    return REQUIRED_MESSAGE;
   }
 
 
@@ -98,7 +90,7 @@ public class BooleanType extends Type<Boolean> implements IType<Boolean> {
       value = Boolean.FALSE;
       break;
     default:
-      throw new UserEntryException("not checked (Yes/1) or un-checked (No/0)");
+      throw new UserEntryException("not Yes/Y/1 or No/N/0");
     }
     return value;
   }

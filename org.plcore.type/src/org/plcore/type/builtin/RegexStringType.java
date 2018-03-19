@@ -23,9 +23,15 @@ import org.plcore.type.UserEntryException;
 public class RegexStringType extends StringBasedType<String> implements IPatternSettable {
   
   private String pattern;
+  private TextCase patternCase;
   private Pattern re;
   private String targetName;
-
+  private boolean specifiedCase = false;
+  
+  
+  public RegexStringType () {
+  }
+  
   
   public RegexStringType (int maxSize, String pattern, String targetName) {
     super (maxSize);
@@ -42,6 +48,13 @@ public class RegexStringType extends StringBasedType<String> implements IPattern
 
   
   @Override
+  public void setAllowedCase(TextCase allowedCase) {
+    this.specifiedCase = true;
+    super.setAllowedCase(allowedCase);
+  }
+  
+  
+  @Override
   public void setPattern (String pattern, String targetName) {
     this.pattern = pattern;
     this.targetName = targetName;
@@ -55,15 +68,23 @@ public class RegexStringType extends StringBasedType<String> implements IPattern
         x |= 2;
       }
     }
-    TextCase allowedCase;
     if (x == 1) {
-      allowedCase = TextCase.LOWER;
+      patternCase = TextCase.LOWER;
     } else if (x == 2) {
-      allowedCase = TextCase.UPPER;
+      patternCase = TextCase.UPPER;
     } else {
-      allowedCase = TextCase.MIXED;
+      patternCase = TextCase.MIXED;
     }
-    setAllowedCase(allowedCase);
+  }
+  
+  
+  @Override
+  public TextCase getAllowedCase() {
+    if (specifiedCase) {
+      return super.getAllowedCase();
+    } else {
+      return patternCase;
+    }
   }
   
   

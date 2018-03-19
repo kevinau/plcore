@@ -23,8 +23,6 @@ import org.plcore.type.UserEntryException;
 
 public class DirectoryType extends StringBasedType<File> implements IType<File>, ILengthSettable {
 
-  private static final String REQUIRED_MESSAGE = "a directory path is required";
-  
   private final static int DIALOG_SIZE = 40;
   private final static String DIALOG_NAME = "Select directory";
   
@@ -64,12 +62,6 @@ public class DirectoryType extends StringBasedType<File> implements IType<File>,
 //  public IViewControl createViewControl (Composite parent) {
 //    return new TextViewControl(parent, viewSize);
 //  }
-  
-  
-  @Override
-  public String getRequiredMessage () {
-    return REQUIRED_MESSAGE;
-  }
   
   
   @Override

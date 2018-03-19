@@ -56,8 +56,6 @@ public interface IType<T> {
 
   public void validate (T value, boolean nullable) throws UserEntryException;
 
-  public String getRequiredMessage();
-  
   public int getFieldSize();
 
   public default boolean isPrimitive() {

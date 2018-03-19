@@ -234,7 +234,7 @@ public class EnumType<E extends Enum<E>> extends Type<E> implements IType<E> {
     } else {
       for (int i = 0; i < values.length; i++) {
         if (i == 0) {
-          msg.append("one of ");
+          msg.append("not one of: ");
         } else if (i + 1 < values.length) {
           msg.append(", ");
         } else {
@@ -242,7 +242,6 @@ public class EnumType<E extends Enum<E>> extends Type<E> implements IType<E> {
         }
         msg.append(values[i].getCode());
       }
-      msg.append(" required");
     }
     return msg.toString();
   }
@@ -256,7 +255,7 @@ public class EnumType<E extends Enum<E>> extends Type<E> implements IType<E> {
       String[] codes = getCodes();
       for (int i = 0; i < values.length; i++) {
         if (i == 0) {
-          msg.append("one of ");
+          msg.append("not one of: ");
         } else if (i + 1 < values.length) {
           msg.append(", ");
         } else {
@@ -269,7 +268,6 @@ public class EnumType<E extends Enum<E>> extends Type<E> implements IType<E> {
 //        }
         msg.append(codes[i]);
       }
-      msg.append(" required");
     }
     return msg.toString();
   }
@@ -293,12 +291,6 @@ public class EnumType<E extends Enum<E>> extends Type<E> implements IType<E> {
   public E primalValue () {
     E[] values = enumClass.getEnumConstants();
     return values[0];
-  }
-
-
-  @Override
-  public String getRequiredMessage() {
-    return "a value is required";
   }
 
 

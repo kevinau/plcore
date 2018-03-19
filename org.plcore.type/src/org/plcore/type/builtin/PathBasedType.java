@@ -19,8 +19,6 @@ import org.plcore.type.UserEntryException;
 
 public abstract class PathBasedType<T extends File> extends Type<T> implements IType<T> {
 
-  private static final String REQUIRED_MESSAGE = "a file name is required";
-  
   private final static int DIALOG_SIZE = 40;
   private final static String DIALOG_NAME = "Select file";
   
@@ -131,12 +129,6 @@ public abstract class PathBasedType<T extends File> extends Type<T> implements I
   
   public int getViewSize () {
     return viewSize;
-  }
-
-
-  @Override
-  public String getRequiredMessage() {
-    return REQUIRED_MESSAGE;
   }
 
 

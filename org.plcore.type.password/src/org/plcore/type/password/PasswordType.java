@@ -26,8 +26,6 @@ import org.plcore.value.PasswordValue;
 @Component
 public class PasswordType extends Type<PasswordValue> {
 
-  private static final String REQUIRED_MESSAGE = "Required";
-  
   @Configurable
   private int minimumLength = 8;
   
@@ -74,12 +72,6 @@ public class PasswordType extends Type<PasswordValue> {
   }
   
   
-  @Override
-  public String getRequiredMessage () {
-    return REQUIRED_MESSAGE;
-  }
-
-
   @Override
   public Class<?> getFieldClass() {
     return PasswordValue.class;

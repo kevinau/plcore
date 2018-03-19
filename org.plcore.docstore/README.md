@@ -1,3 +1,5 @@
+# Document store
+
 A place were source documents are parsed and stored.
 
 The document store itself is represented by the `IDocumentStore` interface.

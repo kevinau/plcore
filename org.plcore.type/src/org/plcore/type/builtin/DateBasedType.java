@@ -23,8 +23,6 @@ public abstract class DateBasedType<T> extends Type<T> implements IType<T> {
 
   protected static final Calendar tzCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 
-  private static final String REQUIRED_MESSAGE = "Required";
-  
   //private static final DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
   
   protected DateBasedType () {
@@ -122,13 +120,7 @@ public abstract class DateBasedType<T> extends Type<T> implements IType<T> {
   
   
   @Override
-  public String getRequiredMessage () {
-    return REQUIRED_MESSAGE;
-  }  
-  
-  
-  @Override
-  protected T createFromString (T fillValue, String source) throws UserEntryException {
+  public T createFromString (T fillValue, boolean creating, String source) throws UserEntryException {
     T dx = null;
     if (source.equals("0100-01-01") || source.equals("0000-01-01")) {
       dx = primalValue();
@@ -156,7 +148,7 @@ public abstract class DateBasedType<T> extends Type<T> implements IType<T> {
   
   @Override
   public T createFromString (String source) throws UserEntryException {
-    return createFromString(today(), source);
+    return createFromString(today(), true, source);
   }
 
   

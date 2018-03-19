@@ -20,7 +20,7 @@ public class UserEntryException extends Exception {
     /**
      * The user entry is OK
      */
-    OK (null),
+    OK ("OK"),
     
     /**
      * No user entry has been provided, but some characters are required.  
@@ -74,6 +74,9 @@ public class UserEntryException extends Exception {
   private final Type type;
   private final String completion;
 
+  public static final UserEntryException OK = new UserEntryException(null, Type.OK);
+  public static final UserEntryException REQUIRED = new UserEntryException("required", Type.REQUIRED);
+  
   
   public UserEntryException (String message, Type type, String remainder) {
     super (message);

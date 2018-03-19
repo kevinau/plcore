@@ -10,14 +10,14 @@
 package org.plcore.time;
 
 import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.plcore.text.DayDateFormat;
 
 
 public abstract class DateFactory {
 
-  private static final String REQUIRED_MESSAGE = "a date is required";
-  
   public static final DayDateFormat entryDateFormat = new DayDateFormat("dd/MM/yy");
   
   //private static final DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -27,17 +27,20 @@ public abstract class DateFactory {
   public static final int INCOMPLETE = 2;
   public static final int ERROR = 3;
   
-  private static String[] months = new String[] {
+  private static String[] months = {
     "january", "february", "march", "april", "may", "june",
     "july", "august", "september", "october", "november", "december",
   };
-  private static int[] normalMthDays = new int[] {
+  private static int[] normalMthDays = {
     31, 28, 31, 30, 31, 30, 
     31, 31, 30, 31, 30, 31,
   };
-  private static int[] leapMthDays = new int[] {
+  private static int[] leapMthDays = {
     31, 29, 31, 30, 31, 30, 
     31, 31, 30, 31, 30, 31,
+  };
+  private static String[] ordinals = {
+    "st", "nd", "rd", "th",
   };
   
 
@@ -141,273 +144,491 @@ public abstract class DateFactory {
     int month = fillYMD[1];
     int day = fillYMD[2];
     
-    char[] x = source.toCharArray();
-    if (x.length == 0) {
+    char[] c = source.toCharArray();
+    if (c.length == 0) {
       completion[0] = entryDateFormat(year, month, day);
-      msg[0] = REQUIRED_MESSAGE;
+      msg[0] = null;
       return REQUIRED;
     }
     completion[0] = null;
     
-    int leadingDigitCount = 0;
-    for (int i = 0; i < x.length; i++) {
-      if (!Character.isDigit(x[i])) {
-        break;
-      }
-      leadingDigitCount++;
+    State state = new State();
+    parseString(source, state);
+    if (state.type == ERROR) {
+      msg[0] = "invalid date";
+      return ERROR;
     }
-    if (leadingDigitCount == x.length) {
-      // all digits
-      if (x.length > 8) {
-        msg[0] = "invalid date: too many digits";
-        return ERROR;
-      }
-      int n = 0;
-      n = Integer.parseInt(source);
-      switch (x.length) {
-      case 1 :
-        msg[0] = "length 1";
-        return INCOMPLETE;
-      case 3 :
-        n /= 10;
-        /* Drop through */
-      case 2 :
-        day = n;
-        if (day < 1 || day > 31) {
-          msg[0] = "invalid date: bad day (" + day + ")"; 
-          return ERROR;
-        }
-        if (x.length == 2) {
-          completion[0] = mmyyDateFormat(year, month);
-        }
-        msg[0] = "length 2/3";
-        return INCOMPLETE;
-      case 5 :
-        n /= 10;
-        /* Drop through */ 
-      case 4 : 
-        day = n / 100;
-        month = n % 100;
-        if (month < 1 || month > 12) {
-          msg[0] = "invalid date: bad month (" + month + ")"; 
-          return ERROR;
-        }
-        month--;
-        if (day < 1 || day > leapMthDays[month]) {
-          msg[0] = "invalid date: bad day (" + day + ") for month " + (month + 1); 
-          return ERROR;
-        }
-        if (x.length == 4) {
-          completion[0] = yyDateFormat(year);
-        }
-        msg[0] = "length 4/5";
-        return INCOMPLETE;
-      case 6 :
-      case 8 :
-        if (x.length == 6) {
-          day = n / 10000;
-          n %= 10000;
-          month = n / 100;
-          year = n % 100;
-          if (year < 50) {
-            year += 2000;
-          } else {
-            year += 1900;
-          }
-        } else {
-          day = n / 1000000;
-          n %= 1000000;
-          month = n / 10000;
-          year = n % 10000;
-        }
-        if (month < 1 || month > 12) {
-          msg[0] = "invalid date: bad month (" + month + ")"; 
-          return ERROR;
-        }
-        month--;
-        if ((year & 3) == 0) {      
-          if (day < 1 || day > leapMthDays[month]) {
-            msg[0] = "invalid date: bad day (" + day + ") for month " + (month + 1); 
-            return ERROR;
-          }
-        } else {
-          if (day < 1 || day > normalMthDays[month]) {
-            msg[0] = "invalid date: bad day (" + day + ") for month " + (month + 1); 
-            return ERROR;
-          }
-        }
-        break;
-      default :
-        msg[0] = "invalid date: too many digits"; 
-        return ERROR;
-      }
-    } else if (leadingDigitCount == 4) {
-      if (x.length == 10 && x[4] == '-' && x[7] == '-') {
-        // Special case, ISO date
-        year = 0;
-        for (int i = 0; i < 4; i++) {
-          year = year * 10 + Character.getNumericValue(x[i]);
-        }
-        month = 0;
-        for (int i = 5; i < 7; i++) {
-          month = month * 10 + Character.getNumericValue(x[i]);
-        }
-        month--;
-        day = 0;
-        for (int i = 8; i < 10; i++) {
-          day = day * 10 + Character.getNumericValue(x[i]);
-        }
-      } else {
-        msg[0] = "invalid date: starts with yyyy but not an ISO date";
-        return ERROR;
-      }
-    } else {      
-      /* Assuming date starts with day. */
-      int i = 0;
-      day = 0;
-      while (Character.isDigit(x[i])) {
-        day = day * 10 + Character.getNumericValue(x[i]);
-        i++;
-      }
-      if (i > 2 || day < 1 || day > 31) {
-        msg[0] = "invalid date: bad day (" + day + ")"; 
-        return ERROR;
-      }
-      String fillChar = "";
-      while (i < x.length && !Character.isLetterOrDigit(x[i])) {
-        fillChar = Character.toString(x[i]);
-        i++;
-      }
-      if (i == x.length) {
-        /* No month or year. */
-        completion[0] = mmDateFormat(month) + fillChar + yyDateFormat(year);
-        msg[0] = "no month or year";
-        return INCOMPLETE;
-      }
-      int monthCount;
-      if (Character.isDigit(x[i])) {
-        int i0 = i;
-        month = 0;
-        while (i < x.length && Character.isDigit(x[i])) {
-          month = month * 10 + Character.getNumericValue(x[i]);
-          i++;
-        }
-        if (i < x.length && Character.isLetter(x[i])) {
-          msg[0] = "invalid characters following month: " + source.substring(i);
-          return ERROR;
-        }
-        if (i - i0 > 2 || month < 1 || month > 12) {
-          msg[0] = "invalid date: bad month (" + month + ")"; 
-          return ERROR;
-        }
-        month--;
-        monthCount = 1;
-      } else {
-        int i0 = i;
-        while (i < x.length && Character.isLetter(x[i])) {
-          i++;
-        }
-        month = 0;
-        monthCount = 0;
-        String mmm = new String(x, i0, i - i0).toLowerCase();
-        for (int m = 0; m < months.length; m++) {
-          if (months[m].startsWith(mmm)) {
-            month = m;
-            monthCount++;
-          }
-        }
-        if (monthCount == 0) {
-          /* Month not recognized */
-          msg[0] = "invalid date: bad month (" + mmm + ")"; 
-          return ERROR;
-        }
-      }
-      if (day > leapMthDays[month]) {
-        msg[0] = "invalid date: bad day (" + day + ") for month " + (month + 1); 
-        return ERROR;
-      }
-      if (i == x.length) {
-        if (monthCount == 1) {
-          completion[0] = fillChar + yyDateFormat(year);
-        }
-        msg[0] = "no year";
-        return INCOMPLETE;
-      }
-      if (monthCount > 1) {
-        msg[0] = "invalid date: ambiguous month"; 
-        return ERROR;
-      }
-      while (i < x.length && !Character.isDigit(x[i])) {
-        i++;
-      }
-      if (i == x.length) {
-        /* No year */
-        completion[0] = yyDateFormat(year);
-        msg[0] = "no year following delimiter";
-        return INCOMPLETE;
-      }
-      int i0 = i;
-      year = 0;
-      while (i < x.length && Character.isDigit(x[i])) {
-        year = year * 10 + Character.getNumericValue(x[i]);
-        i++;
-      }
-      if (i < x.length) {
-        msg[0] = "invalid date: too many characters"; 
-        return ERROR;
-      }
-      switch (i - i0) {
-      case 2 :
-        /* Year in the form yy */
-        if (year < 50) {
-          year += 2000;
-        } else {
-          year += 1900;
-        }
-        break;
-      case 4 :
-        /* Year in the form yyyy */
-        break;
-      default :
-        /* Year not the right length */
-        msg[0] = "invalid date: year not 2 or 4 digits";
-        return x.length - i < 2 ? INCOMPLETE : ERROR;
-      }
-      if (year % 4 != 0) {
-        /* Not a leap year */
-        if (day > normalMthDays[month]) {
-          msg[0] = "invalid date: bad day (" + day + ") for month " + (month + 1); 
-          return ERROR;
-        }
-      }
+    if (state.type == INCOMPLETE) {
+      msg[0] = "invalid date";
+      // TODO completion not set
+      return INCOMPLETE;
     }
-    resultYMD[0] = year;
-    resultYMD[1] = month + 1;
-    resultYMD[2] = day;
+    
+    resultYMD[0] = state.year;
+    resultYMD[1] = state.month + 1;
+    resultYMD[2] = state.day;
     return OK; 
   }
   
   
-//  public static int[] createFromString (String source, int[] fillYMD) throws UserEntryException {
-//    if (source.equals("0100-01-01") || source.equals("0000-01-01")) {
-//      return null;
-//    } else {
-//      int[] resultYMD = new int[3];
-//      String[] completion = new String[1];
-//      String[] msg = new String[1];
-//      int result = validate(source, fillYMD, msg, resultYMD, completion);
-//      switch (result) {
-//      case OK :
-//        return resultYMD;
-//      case INCOMPLETE :
-//        throw new UserEntryException(msg[0], UserEntryException.Type.INCOMPLETE, completion[0]);
-//      case REQUIRED :
-//        throw new UserEntryException(msg[0], UserEntryException.Type.REQUIRED, completion[0]);
-//      default :
-//        throw new UserEntryException(msg[0]);
-//      }
+  private static final Pattern isoPattern = Pattern.compile("([12]\\d\\d\\d)-(\\d\\d)-(\\d\\d)");
+
+  private static final int NOTPARSED = Integer.MIN_VALUE;
+  
+
+  
+  private static boolean parseISODate (String s, State state) {
+    Matcher matcher = isoPattern.matcher(s);
+    if (matcher.lookingAt()) {
+      // Get year, month and day values
+      state.year = Integer.parseInt(matcher.group(1));
+      state.month = Integer.parseInt(matcher.group(2)) - 1;
+      state.day = Integer.parseInt(matcher.group(3));
+      state.cursor = 10;
+      state.validateDayMonthYear();
+      return true;
+    } else {
+      if (matcher.hitEnd()) {
+        state.incompleteISO = true;
+      } else {
+        state.incompleteISO = false;
+      }
+      return false;
+    }
+  }
+  
+  private static boolean parseNNOrdinalDay (char[] c, State state) {
+    int i = state.cursor;
+    if (i == c.length) {
+      state.type = INCOMPLETE;
+      return false;
+      
+    }
+    int i0 = i;
+    if (Character.isDigit(c[i])) {
+      int n = 0;
+      while (i < c.length && i < i0 + 2 && Character.isDigit(c[i])) {
+        n = n * 10 + Character.digit(c[i], 10);
+        i++;
+      }
+      if (i == i0 + 2) {
+        if (n < 1 || n > 31) {
+          state.type = ERROR;
+          state.message = "bad day (" + n + ")";
+          return true;
+        }
+      }
+      if (i < c.length && Character.isLetter(c[i])) {
+        int cursor[] = new int[1];
+        int index[] = new int[1];
+        int match = matchAlpha(c, i, ordinals, cursor, index);
+        switch (match) {
+        case OK :
+          state.cursor = cursor[0];
+          state.isOrdinal = true;
+          state.day = n;
+          //state.validateDayMonthYear();
+         break;
+        case INCOMPLETE :
+          state.type = INCOMPLETE;
+          break;
+        case ERROR :
+          // Its not an ordinal, but it is an NN
+          state.cursor = i;
+          state.isOrdinal = false;
+          state.day = n;
+          //state.validateDayMonthYear();
+          break;
+        }
+      } else {
+        state.cursor = i;
+        state.isOrdinal = false;
+        state.day = n;
+        //state.validateDayMonthYear();
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  
+  private static void parsePunctuation1 (char[] c, State state) {
+    int i = state.cursor;
+    if (i == c.length) {
+      state.type = INCOMPLETE;
+      return;
+    }
+    
+//    state.validateDayMonthYear();
+//    if (state.type == ERROR) {
+//      return;
 //    }
-//  }
+    
+    switch (c[i]) {
+    case '-' :
+    case '/' :
+    case '.' :
+    case ',' :
+    case ' ' :
+      state.firstPunctuation = c[i];
+      i++;
+      while (i < c.length && c[i] == ' ') {
+        i++;
+      }
+      state.cursor = i;
+      break;
+    default :
+      if (Character.isLetterOrDigit(c[i])) {
+        state.firstPunctuation = 0;
+      } else {
+        state.type = ERROR;
+        state.message = "unknown character after '" + new String(c, 0, i) + "'";
+      }
+      break;
+    }
+  }
   
   
+  private static void parsePunctuation2 (char[] c, State state) {
+    int i = state.cursor;
+    switch (state.firstPunctuation) {
+    case 0 :
+      if (state.isAlphaMonth) {
+        parsePunctuation1(c, state);
+      } else {
+        state.validateDayMonthYear();
+      }
+      break;
+    case ' ' :
+      if (i == c.length) {
+        state.type = INCOMPLETE;
+        return;
+      }
+      
+      state.validateDayMonthYear();
+      if (state.type == ERROR) {
+        return;
+      }
+      
+      if (c[i] == ',' || c[i] == ' ') {
+        i++;
+        while (i < c.length && c[i] == ' ') {
+          i++;
+        }
+        state.cursor = i;
+      } else if (Character.isDigit(c[i])) {
+        // No delimiter
+      } else {
+        state.type = ERROR;
+        state.message = "expecting ',' or spaces after '" + new String(c, 0, i) + "'";
+      }
+      break;
+    default :
+      if (i == c.length) {
+        state.type = INCOMPLETE;
+        return;
+      }
+
+      state.validateDayMonthYear();
+      if (state.type == ERROR) {
+        return;
+      }
+      
+      if (c[i] == state.firstPunctuation) {
+        i++;
+        state.cursor = i;
+      } else {
+        state.type = ERROR;
+        state.message = "expecting '" + state.firstPunctuation + "' after '" + new String(c, 0, i) + "'";
+      }
+      break;
+    }
+  }
+  
+  
+  private static void parseNNAlphaMonth (char[] c, State state) {
+    int i = state.cursor;
+    if (i == c.length) {
+      state.type = INCOMPLETE;
+      return;
+    }
+
+    int i0 = i;
+    int n = 0;
+    if (Character.isDigit(c[i])) {
+      while (i < c.length && i < i0 + 2 && Character.isDigit(c[i])) {
+        n = n * 10 + Character.digit(c[i], 10);
+        i++;
+      }
+      if (i == i0 + 2) {
+        if (n <= 0 || n > 12) {
+          state.type = ERROR;
+          state.message = "bad month (" + n + ")";
+        }
+      }
+      if (state.firstPunctuation == 0 && i == c.length && i < i0 + 2) {
+        state.type = INCOMPLETE;
+        return;
+      }
+      state.cursor = i;
+      state.isAlphaMonth = false;
+      state.month = n - 1;
+      //state.validateDayMonthYear();
+    } else {
+      parseAlphaMonth(c, state);
+    }
+  }
+      
+  
+  private static boolean parseAlphaMonth (char[] c, State state) {
+    int i = state.cursor;
+    int i0 = i;
+    if (i < c.length && Character.isLetter(c[i])) {
+      int cursor[] = new int[1];
+      int index[] = new int[1];
+      int match = matchAlpha(c, i, months, cursor, index);
+      switch (match) {
+      case OK :
+        state.cursor = cursor[0];
+        state.isAlphaMonth = true;
+        state.month = index[0];
+        //state.validateDayMonthYear();
+        break;
+      case INCOMPLETE :
+        state.type = INCOMPLETE;
+        break;
+      case ERROR :
+        state.type = ERROR;
+        state.message = "expecting named month but found '" + new String(c, i0, i - i0) + "'";
+        break;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+      
+  
+  private static void parseYear (char[] c, State state) {
+    int i = state.cursor;
+    int i0 = i;
+    
+    if (i == c.length) {
+      state.type = INCOMPLETE;
+      return;
+    }
+    int n = 0;
+    if (Character.isDigit(c[i])) {
+      while (i < c.length && i < i0 + 4) {
+        if (Character.isDigit(c[i])) {
+          n = n * 10 + Character.digit(c[i], 10);
+          i++;
+        } else {
+          state.type = ERROR;
+          return;
+        }
+      }
+      switch (i - i0) {
+      case 1 :
+      case 3 :
+        state.type = INCOMPLETE;
+        break;
+      case 2 :
+        if (n < 50) {
+          n += 2000;
+        } else {
+          n += 1900;
+        }
+        state.cursor = i;
+        state.year = n;
+        state.validateDayMonthYear();
+        break;
+      case 4 :
+        state.cursor = i;
+        state.year = n;
+        state.validateDayMonthYear();
+        break;
+      }
+    } else {
+      state.type = ERROR;
+      state.message = "expecting 2 or 4 digit year after '" + new String(c, 0, i0) + "'";
+    }
+  }
+      
+  
+  private static int matchAlpha(char[] c, int i, String[] alphas, int[] cursor, int[] index) {
+    int i0 = i;
+    while (i < c.length && Character.isLetter(c[i])) {
+      i++;
+    }
+    int alpha = 0;
+    int alphaCount = 0;
+    String aaa = new String(c, i0, i - i0).toLowerCase();
+    for (int a = 0; a < alphas.length; a++) {
+      if (alphas[a].startsWith(aaa)) {
+        alpha = a;
+        alphaCount++;
+      }
+    }
+    switch (alphaCount) {
+    case 0 :
+      // Alphabetic characters not recognized
+      return ERROR;
+    case 1 :
+      // Single string of alphabetic characters recognized
+      cursor[0] = i;
+      index[0] = alpha;
+      return OK;
+    default :
+      // Multiple strings of alphabetic characters recognised
+      if (i == c.length) {
+        return INCOMPLETE;
+      } else {
+        return ERROR;
+      }
+    }
+  }
+  
+
+  private static void parseEnd(char[] c, State state) {
+    int i = state.cursor;
+    if (i < c.length) {
+      state.type = ERROR;
+      state.message = "excess characters '" + new String(c, i, c.length - i) + "' after date";
+    }
+  }
+  
+
+  private static class State {
+    int type = OK;
+    int cursor;
+    boolean incompleteISO;
+    boolean isOrdinal;
+    boolean isAlphaMonth;
+    int day = NOTPARSED;
+    int month = NOTPARSED;
+    int year = NOTPARSED;
+    char firstPunctuation;
+    String message;
+    
+    private void validateDayMonthYear () {
+      System.out.println("validate " + day + " / " + month + " / " + year);
+      //if (day != NOTPARSED && month != NOTPARSED) {
+        int[] mthDays;
+        if (year == NOTPARSED) {
+          mthDays = leapMthDays;
+        } else if ((year % 4) == 0) {
+          mthDays = leapMthDays;
+        } else {
+          mthDays = normalMthDays;
+        }
+        if (day > mthDays[month]) {
+          type = ERROR;
+          message = "bad day (" + day + ") for month " + (month + 1); 
+          return;
+        }
+      //}
+    }
+    
+  }
+  
+  
+  private static void parseString (String source, State state) {
+    char[] c = source.toCharArray();
+
+    boolean matched = parseISODate(source, state);
+    if (matched) {
+      if (state.type != OK) {
+        return;
+      }
+      parseEnd(c, state);
+      return;
+    }
+    
+    System.out.println(">>>>>>>>>>>>> " + source);
+    parseString2 (c, state);
+    if (state.type == ERROR && state.incompleteISO) {
+      state.type = INCOMPLETE;
+    }
+  }
+  
+  
+  private static void parseString2 (char[] c, State state) {
+    // The source has not matched a ISO 8601 date, so try ddmmyy or similar.
+    // At the start of the date, we are looking for digits (day or month), or ordinal
+    boolean matched = parseNNOrdinalDay(c, state);
+    if (matched) {
+      if (state.type != OK) {
+        return;
+      }
+      if (state.isOrdinal) {
+        parsePunctuation1(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseNNAlphaMonth(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parsePunctuation2(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseYear(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseEnd(c, state);
+        return;
+      } else {
+        parsePunctuation1(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseNNAlphaMonth(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parsePunctuation2(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseYear(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseEnd(c, state);
+        return;
+      }
+    } else {
+      matched = parseAlphaMonth(c, state);
+      if (matched) {
+        if (state.type != OK) {
+          return;
+        }
+        parsePunctuation1(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseNNOrdinalDay(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parsePunctuation2(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseYear(c, state);
+        if (state.type != OK) {
+          return;
+        }
+        parseEnd(c, state);
+        return;
+      }
+    }
+    state.type = ERROR;
+    return;
+  }
+    
 }

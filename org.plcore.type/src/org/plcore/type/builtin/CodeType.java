@@ -13,17 +13,23 @@ package org.plcore.type.builtin;
 import java.util.Collections;
 import java.util.List;
 
+import org.plcore.type.ICaseSettable;
+import org.plcore.type.ILengthSettable;
+import org.plcore.type.IPatternSettable;
 import org.plcore.type.IType;
+import org.plcore.type.TextCase;
 import org.plcore.type.Type;
 import org.plcore.type.UserEntryException;
-import org.plcore.value.Code;
 import org.plcore.value.ICode;
 
 
-public class CodeType<T extends ICode> extends Type<T> implements IType<T> {
+public class CodeType<T extends ICode> extends Type<T> implements IType<T>, ICaseSettable, ILengthSettable, IPatternSettable {
 
   // TODO is codeClass required?  It is not used.
   private final Class<T> codeClass;
+  
+  private RegexStringType stringType = new RegexStringType();
+    
   private List<T> values;
 
   public CodeType () {
@@ -81,15 +87,28 @@ public class CodeType<T extends ICode> extends Type<T> implements IType<T> {
   // }
 
   @Override
-  public T createFromString(String source) throws UserEntryException {
-    for (T cv : getValues()) {
-      String code = cv.getCode();
-      if (code.equals(source)) {
-        return cv;
+  public T createFromString(boolean creating, String source) throws UserEntryException {
+    if (creating) {
+      String cx = stringType.createFromString(source);
+      return createFromString(cx);
+    } else {
+      for (T cv : getValues()) {
+        String code = cv.getCode();
+        if (code.equals(source)) {
+          return cv;
+        }
       }
+      throw new UserEntryException(getOneOfMessage(true));
     }
-    throw new UserEntryException("not one of the allowed values");
   }
+
+  
+  @Override
+  public T createFromString(String source) throws UserEntryException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 
   @Override
   public T createFromString(T fillValue, boolean nullable, boolean creating, String source) throws UserEntryException {
@@ -97,37 +116,39 @@ public class CodeType<T extends ICode> extends Type<T> implements IType<T> {
       if (nullable) {
         return null;
       } else {
-        throw new UserEntryException(getRequiredMessage(), UserEntryException.Type.REQUIRED);
-      }
-    }
-
-    int incompl = 0;
-    String incomplx = null;
-
-    for (T cv : getValues()) {
-      String code = cv.getCode();
-      if (code.equals(source)) {
-        return cv;
-      }
-      if (code.startsWith(source)) {
-        // This is a possible incomplete
-        if (incompl == 0) {
-          incomplx = code.substring(source.length());
-        }
-        incompl++;
+        throw UserEntryException.REQUIRED;
       }
     }
 
     if (creating) {
-      // TODO need to sort this out
-    }
-    switch (incompl) {
-    case 0 :
-      throw new UserEntryException("not one of the allowed values");
-    case 1 :
-      throw new UserEntryException(getRequiredMessage(), UserEntryException.Type.INCOMPLETE, incomplx);
-    default :
-      throw new UserEntryException(getRequiredMessage(), UserEntryException.Type.INCOMPLETE);
+      String cx = stringType.createFromString(fillValue.toString(), nullable, source);
+      return createFromString(cx);
+    } else {
+      int incompl = 0;
+      String incomplx = null;
+
+      for (T cv : getValues()) {
+        String code = cv.getCode();
+        if (code.equals(source)) {
+          return cv;
+        }
+        if (code.startsWith(source)) {
+          // This is a possible incomplete
+          if (incompl == 0) {
+            incomplx = code.substring(source.length());
+          }
+          incompl++;
+        }
+      }
+
+      switch (incompl) {
+      case 0 :
+        throw new UserEntryException(getOneOfMessage(true));
+      case 1 :
+        throw new UserEntryException(getOneOfMessage(false), UserEntryException.Type.INCOMPLETE, incomplx);
+      default :
+        throw new UserEntryException(getOneOfMessage(false), UserEntryException.Type.INCOMPLETE);
+      }
     }
   }
 
@@ -202,10 +223,12 @@ public class CodeType<T extends ICode> extends Type<T> implements IType<T> {
     throw new RuntimeException("Illegal value: " + code);
   }
 
-  @Override
-  public String getRequiredMessage() {
+  private String getOneOfMessage(boolean isError) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append("must be one of the values: ");
+    if (isError) {
+      buffer.append("not ");
+    }
+    buffer.append("one of: ");
     int i = 0;
     List<T> values = getValues();
     int n = values.size() - 1;
@@ -218,6 +241,9 @@ public class CodeType<T extends ICode> extends Type<T> implements IType<T> {
         }
       }
       buffer.append(cv.getCode());
+    }
+    if (!isError) {
+      buffer.append(" is required");
     }
     return buffer.toString();
   }
@@ -271,6 +297,24 @@ public class CodeType<T extends ICode> extends Type<T> implements IType<T> {
   @Override
   protected void validate(T value) throws UserEntryException {
     // Nothing to do?
+  }
+
+  
+  @Override
+  public void setAllowedCase(TextCase allowedCase) {
+    stringType.setAllowedCase(allowedCase);
+  }
+
+  
+  @Override
+  public void setPattern (String pattern, String targetName) {
+    stringType.setPattern(pattern, targetName);
+  }
+  
+  
+  @Override
+  public void setMaxLength(int maxLength) {
+    stringType.setMaxLength(maxLength);
   }
 
 }
