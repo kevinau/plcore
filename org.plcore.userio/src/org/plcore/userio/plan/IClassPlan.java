@@ -12,7 +12,7 @@ public interface IClassPlan<T> extends IContainerPlan {
 
   public List<IRuntimeFactoryProvider> getRuntimeFactoryProviders();
 
-  public List<IRuntimeImplementationProvider> getRuntimeImplementationProviders();
+  //public List<IRuntimeImplementationProvider> getRuntimeImplementationProviders();
 
   //public List<IRuntimeLabelProvider> getRuntimeLabelProviders();
 

@@ -20,6 +20,7 @@ import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.plan.IItemPlan;
 import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.IValidationMethod;
+import org.plcore.value.ICode;
 
 public class ItemModel extends NodeModel implements EffectiveEntryModeListener, IItemModel {
 
@@ -266,6 +267,11 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   
   void setInitialValues () {
     Object value = valueRef.getValue();
+    
+    // Special case for ICode values.  Identity equality (==) is correct here
+    if (value == ICode.DEFAULT_MARKER) {
+      value = type.primalValue();
+    }
     setValue(value);
     defaultValue = currentValue;
     defaultSource = currentSource;

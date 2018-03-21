@@ -140,27 +140,26 @@ public abstract class DateFactory {
           today.get(Calendar.DAY_OF_MONTH),
       };
     }
-    int year = fillYMD[0];
-    int month = fillYMD[1];
-    int day = fillYMD[2];
+    int fillYear = fillYMD[0];
+    int fillMonth = fillYMD[1];
+    int fillDay = fillYMD[2];
     
     char[] c = source.toCharArray();
     if (c.length == 0) {
-      completion[0] = entryDateFormat(year, month, day);
+      completion[0] = entryDateFormat(fillYear, fillMonth, fillDay);
       msg[0] = null;
       return REQUIRED;
     }
     completion[0] = null;
     
     State state = new State();
-    parseString(source, state);
+    parseString(source, state, fillYear, fillMonth, fillDay);
     if (state.type == ERROR) {
       msg[0] = "invalid date";
       return ERROR;
     }
     if (state.type == INCOMPLETE) {
       msg[0] = "invalid date";
-      // TODO completion not set
       return INCOMPLETE;
     }
     
@@ -231,6 +230,7 @@ public abstract class DateFactory {
          break;
         case INCOMPLETE :
           state.type = INCOMPLETE;
+          state.completion = null;
           break;
         case ERROR :
           // Its not an ordinal, but it is an NN
@@ -369,6 +369,7 @@ public abstract class DateFactory {
       }
       if (state.firstPunctuation == 0 && i == c.length && i < i0 + 2) {
         state.type = INCOMPLETE;
+        state.completion = null;
         return;
       }
       state.cursor = i;
@@ -397,6 +398,7 @@ public abstract class DateFactory {
         break;
       case INCOMPLETE :
         state.type = INCOMPLETE;
+        state.completion = null;
         break;
       case ERROR :
         state.type = ERROR;
@@ -416,6 +418,7 @@ public abstract class DateFactory {
     
     if (i == c.length) {
       state.type = INCOMPLETE;
+      state.completion = null;
       return;
     }
     int n = 0;
@@ -433,6 +436,7 @@ public abstract class DateFactory {
       case 1 :
       case 3 :
         state.type = INCOMPLETE;
+        state.completion = null;
         break;
       case 2 :
         if (n < 50) {
@@ -452,7 +456,7 @@ public abstract class DateFactory {
       }
     } else {
       state.type = ERROR;
-      state.message = "expecting 2 or 4 digit year after '" + new String(c, 0, i0) + "'";
+      state.message = "expecting 2 or 4 digit year";
     }
   }
       
@@ -495,7 +499,7 @@ public abstract class DateFactory {
     int i = state.cursor;
     if (i < c.length) {
       state.type = ERROR;
-      state.message = "excess characters '" + new String(c, i, c.length - i) + "' after date";
+      state.message = "excess characters";
     }
   }
   
@@ -511,9 +515,9 @@ public abstract class DateFactory {
     int year = NOTPARSED;
     char firstPunctuation;
     String message;
+    String completion;
     
     private void validateDayMonthYear () {
-      System.out.println("validate " + day + " / " + month + " / " + year);
       //if (day != NOTPARSED && month != NOTPARSED) {
         int[] mthDays;
         if (year == NOTPARSED) {
@@ -534,7 +538,7 @@ public abstract class DateFactory {
   }
   
   
-  private static void parseString (String source, State state) {
+  private static void parseString (String source, State state, int fillYear, int fillMonth, int fillDay) {
     char[] c = source.toCharArray();
 
     boolean matched = parseISODate(source, state);
@@ -546,15 +550,14 @@ public abstract class DateFactory {
       return;
     }
     
-    System.out.println(">>>>>>>>>>>>> " + source);
-    parseString2 (c, state);
+    parseString2 (c, state, fillYear, fillMonth, fillDay);
     if (state.type == ERROR && state.incompleteISO) {
       state.type = INCOMPLETE;
     }
   }
   
   
-  private static void parseString2 (char[] c, State state) {
+  private static void parseString2 (char[] c, State state, int fillYear, int fillMonth, int fillDay) {
     // The source has not matched a ISO 8601 date, so try ddmmyy or similar.
     // At the start of the date, we are looking for digits (day or month), or ordinal
     boolean matched = parseNNOrdinalDay(c, state);

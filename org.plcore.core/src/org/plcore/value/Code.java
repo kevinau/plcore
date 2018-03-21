@@ -15,12 +15,14 @@ public class Code implements ICode, Serializable {
 
   private static final long serialVersionUID = -4174110261045376592L;
 
+  private final String code;
   private final String description;
   private final boolean obsolete;
   private final boolean selfDescribing; 
 
   
 	public Code (String code, String description, boolean obsolete) {
+	  this.code = code;
 		this.description = description;
 		this.obsolete = obsolete;
     this.selfDescribing = code.equals(description);
@@ -39,7 +41,7 @@ public class Code implements ICode, Serializable {
   
   @Override
   public String getCode () {
-    return super.toString();
+    return code;
   }
   
   

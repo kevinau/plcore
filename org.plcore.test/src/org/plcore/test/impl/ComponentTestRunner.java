@@ -1,17 +1,11 @@
 package org.plcore.test.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -56,14 +50,14 @@ public class ComponentTestRunner {
       resultSet.dump(0);
       
       // Now shutodwn OSGi
-      pause();
-      System.out.println("Shutting down...");
-      try {
-        Bundle systemBundle = bundleContext.getBundle(0);
-        systemBundle.stop();
-      } catch (BundleException ex) {
-        // Do nothing
-      }
+//      pause();
+//      System.out.println("Shutting down...");
+//      try {
+//        Bundle systemBundle = bundleContext.getBundle(0);
+//        systemBundle.stop();
+//      } catch (BundleException ex) {
+//        // Do nothing
+//      }
     }
     
   };

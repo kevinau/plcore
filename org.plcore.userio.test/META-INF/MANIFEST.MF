@@ -26,8 +26,7 @@ Service-Component: OSGI-INF/org.plcore.userio.test.EntityKeyDataTest.xml,
  OSGI-INF/org.plcore.userio.model.test.QualifiedNameTest.xml,
  OSGI-INF/org.plcore.userio.path.test.ParthParserTests.xml,
  OSGI-INF/org.plcore.type.test.IntegerTypeTests.xml,
- OSGI-INF/org.plcore.type.test.LongTypeTests.xml,
- OSGI-INF/org.plcore.type.test.TypesAllTest.xml
+ OSGI-INF/org.plcore.type.test.LongTypeTests.xml
 Import-Package: org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
  org.plcore.math,
  org.plcore.type,

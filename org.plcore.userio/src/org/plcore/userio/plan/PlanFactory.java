@@ -81,14 +81,14 @@ public class PlanFactory implements IPlanFactory {
     
     String namedType = fieldAnn.type();
     if (namedType.length() > 0) {
-      type = typeRegistry.getTypeByName(namedType);
+      type = typeRegistry.getByName(namedType);
       if (type == null) {
         throw new RuntimeException("Field " + fieldName + " expects a named type '" + namedType + "'. No type found");
       }
       return type;
     }
     
-    type = typeRegistry.getType(fieldClass);
+    type = typeRegistry.getByFieldClass(fieldClass);
     if (type == null) {
       return null;
     }

@@ -23,4 +23,28 @@ public interface ICode {
     return false;
   }
   
+  
+  static ICode DEFAULT_MARKER = new ICode() {
+    @Override
+    public String getCode() {
+      return "";
+    }
+
+    @Override
+    public String getDescription() {
+      return "";
+    }
+    
+    @Override
+    public String toString() {
+      return "ICode[DEFAULT_MARKER]";
+    }
+  };
+  
+  
+  public static ICode defaultValue() {
+    return DEFAULT_MARKER;
+  }
+  
+  
 }

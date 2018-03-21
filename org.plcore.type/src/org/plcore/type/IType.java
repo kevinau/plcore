@@ -57,7 +57,7 @@ public interface IType<T> {
   public void validate (T value, boolean nullable) throws UserEntryException;
 
   public int getFieldSize();
-
+  
   public default boolean isPrimitive() {
     return false;
   }

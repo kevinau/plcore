@@ -14,7 +14,7 @@ public interface INameMappedPlan extends IContainerPlan, INameMappedNode {
 
   public List<IRuntimeFactoryProvider> getRuntimeFactoryProviders();
 
-  public List<IRuntimeImplementationProvider> getRuntimeImplementationProviders();
+  //public List<IRuntimeImplementationProvider> getRuntimeImplementationProviders();
 
   //public List<IRuntimeLabelProvider> getRuntimeLabelProviders();
 

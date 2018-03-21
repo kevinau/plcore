@@ -117,9 +117,10 @@ public class TypeRegistry {
   }
 
 
-  public IType<?> getByName(String name) {
+  @SuppressWarnings("unchecked")
+  public <X> IType<X> getByName(String name) {
     synchronized (namedTypes) {
-      return namedTypes.get(name);
+      return (IType<X>)namedTypes.get(name);
     }
   }
 }

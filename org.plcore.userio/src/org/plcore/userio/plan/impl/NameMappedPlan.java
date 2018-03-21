@@ -20,7 +20,6 @@ import org.plcore.userio.FactoryFor;
 import org.plcore.userio.INameMappedNode;
 import org.plcore.userio.INode;
 import org.plcore.userio.IOField;
-import org.plcore.userio.ImplementationFor;
 import org.plcore.userio.MappedSuperclass;
 import org.plcore.userio.Mode;
 import org.plcore.userio.ModeFor;

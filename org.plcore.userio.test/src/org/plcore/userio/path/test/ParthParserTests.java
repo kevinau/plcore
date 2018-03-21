@@ -3,10 +3,10 @@ package org.plcore.userio.path.test;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.osgi.service.component.annotations.Component;
+import org.plcore.test.Assert;
 import org.plcore.test.ITestCase;
+import org.plcore.test.Test;
 import org.plcore.userio.path.IPathExpression;
 import org.plcore.userio.path.ParseException;
 import org.plcore.userio.path.PathParser;
