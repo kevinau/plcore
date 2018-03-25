@@ -29,6 +29,7 @@ public class NodePlanFactory {
   public static INodePlan getNodePlan (PlanFactory planFactory, Type fieldType, MemberValueGetterSetter field, String name, EntryMode entryMode, int dimension, boolean optional) {
     INodePlan nodePlan;
     
+    System.out.println("DDDDD " + name);
     if (fieldType instanceof GenericArrayType) {
       Type type1 = ((GenericArrayType)fieldType).getGenericComponentType();
       nodePlan = new ArrayPlan(planFactory, field, (Class<?>)type1, name, entryMode, dimension);
@@ -51,11 +52,15 @@ public class NodePlanFactory {
         Type type1 = klass.getComponentType();
         nodePlan = new ArrayPlan(planFactory, field, (Class<?>)type1, name, entryMode, dimension);
       } else {
+        System.out.println("DDDDD1 " + name);
         nodePlan = getNodePlanPart2(planFactory, field, fieldType, name, entryMode, dimension);
+        System.out.println("DDDDD2 " + name);
+        System.out.println("DDDDD3 " + nodePlan.getName());
       }
     } else {
       throw new IllegalArgumentException("Unsupported type: " + fieldType);
     }
+    System.out.println("CCCCCC " + nodePlan.getName());
     return nodePlan;
 
 //    
@@ -91,6 +96,7 @@ public class NodePlanFactory {
       
     }
   
+    System.out.println("EEEEE " + name);
     // Is there a named IType for the field (via type parameter of the ItemField annotation),
     // or does the field type match one of the build in field types
     IType<?> type = planFactory.lookupAndResolveType(fieldClass, name, itemFieldAnn);
@@ -117,7 +123,12 @@ public class NodePlanFactory {
             // The Embeddable annotation on the field class also identifies a class type.
             boolean emblAnn = fieldClass.isAnnotationPresent(Embeddable.class);
             if (emblAnn) {
+              System.out.println("EEEEE1 " + name);
+              System.out.println("EEEEE2 " + field.getName());
               nodePlan = planFactory.getEmbeddedPlan(field, fieldClass, field.getName(), entryMode);
+              System.out.println("EEEEE3 " + name);
+              System.out.println("EEEEE4 " + field.getName());
+              System.out.println("EEEEE5 " + nodePlan.getName());
             } else if (fieldClass.isInterface()) {
               nodePlan = new InterfacePlan(planFactory, field, fieldType, name, entryMode);
             } else {

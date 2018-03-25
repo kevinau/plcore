@@ -41,6 +41,7 @@ public class EntityModel extends NameMappedModel implements IEntityModel {
     x.entityCreated(this);
   }
 
+  
   @Override
   public void setValue (Object value) {
     valueRef.setValue(value);
@@ -80,12 +81,6 @@ public class EntityModel extends NameMappedModel implements IEntityModel {
   }
   
   
-  @Override
-  public <X> X newInstance() {
-    return entityPlan.newInstance();
-  }
-  
-
   @Override
   public void dump(int level) {
     indent (level);

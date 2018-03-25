@@ -8,8 +8,6 @@ import org.plcore.value.VersionTime;
 
 public interface IEntityModel extends INameMappedModel, IEntityNode {
 
-  public <X> X newInstance();
-  
   public void setValue(Object value);
   
   public void setEntityId(int id);

@@ -42,8 +42,7 @@ public class NewObjectEventTest implements ITestCase {
     EventCounter eventCounter = new EventCounter();
     model.addContainerChangeListener(eventCounter);
 
-    Party party = model.newInstance();
-    model.setValue(party);
+    model.setNew();
     
     Assert.assertEquals(7, eventCounter.childAddedCount);
     Assert.assertEquals(0, eventCounter.childRemovedCount);

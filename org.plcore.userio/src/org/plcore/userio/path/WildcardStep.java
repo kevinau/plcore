@@ -28,7 +28,7 @@ public class WildcardStep extends PathExpression implements IPathExpression {
         super.matches(child, trail, consumer);
       }
     } else {
-      consumer.accept(node);
+      throw new IllegalArgumentException("Wildcard (*) can only be applied to IContainerNode");
     }
   }
 
@@ -44,7 +44,7 @@ public class WildcardStep extends PathExpression implements IPathExpression {
         }
       }
     } else {
-      result[0] = true;
+      throw new IllegalArgumentException("Wildcard (*) can only be applied to IContainerNode");
     }
   }
 

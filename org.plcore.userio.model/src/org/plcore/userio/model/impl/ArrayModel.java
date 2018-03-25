@@ -17,6 +17,29 @@ public class ArrayModel extends RepeatingModel {
   }
 
   
+  @SuppressWarnings("unchecked")
+  @Override
+  public Object[] setNew() {
+    // Remove any existing members and notify listeners
+    for (INodeModel element : elements) {
+      elements.remove(element);
+      fireChildRemoved(this, element);
+    }
+    
+    int minOccurs = arrayPlan.getMinOccurs();
+    Object[] value = new Object[minOccurs];
+    
+    for (int i = 0; i < minOccurs; i++) {
+      IValueReference elementValueRef = new ArrayValueReference(valueRef, i);
+      INodeModel element = buildNodeModel(this, elementValueRef, arrayPlan.getElementPlan());
+      elements.add(element);
+      element.setNew();
+      value[i] = elementValueRef.getValue();
+    }
+    return value;
+  }
+
+
   @Override
   public void syncValue(Object value) {
     if (value == null) {

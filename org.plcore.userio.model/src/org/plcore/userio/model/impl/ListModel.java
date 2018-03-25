@@ -1,5 +1,6 @@
 package org.plcore.userio.model.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.plcore.userio.model.INodeModel;
@@ -18,6 +19,29 @@ public class ListModel extends RepeatingModel {
   }
 
   
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<?> setNew() {
+    // Remove any existing members and notify listeners
+    for (INodeModel element : elements) {
+      elements.remove(element);
+      fireChildRemoved(this, element);
+    }
+    
+    int minOccurs = listPlan.getMinOccurs();
+    List<Object> value = new ArrayList<>(minOccurs);
+    
+    for (int i = 0; i < minOccurs; i++) {
+      IValueReference elementValueRef = new ListValueReference(valueRef, i);
+      INodeModel element = buildNodeModel(this, elementValueRef, listPlan.getElementPlan());
+      elements.add(element);
+      element.setNew();
+      value.add(elementValueRef.getValue());
+    }
+    return value;
+  }
+
+
   @Override
   public void syncValue(Object value) {
     if (value == null) {

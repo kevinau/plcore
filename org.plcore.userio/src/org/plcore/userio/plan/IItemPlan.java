@@ -36,6 +36,8 @@ public interface IItemPlan<T> extends INodePlan, INode {
   @Override
   public <X> X getFieldValue(Object instance);
 
+//  public T getFieldDefaultValue();
+  
   @Override
   public void setFieldValue(Object instance, Object value);
 

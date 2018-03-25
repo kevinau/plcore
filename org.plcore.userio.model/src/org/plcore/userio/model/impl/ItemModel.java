@@ -65,10 +65,40 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
     this.type = (IType<Object>)itemPlan.getType();
     // Add event listener so this field can react to effective mode changes
     // addEffectiveModeListener(this);
-    setInitialValues();
+    
+//    // Setup default values
+//    defaultValue = itemPlan.getFieldDefaultValue();
+//    // Special case for ICode values.  Identity equality (==) is correct here
+//    if (defaultValue == ICode.DEFAULT_MARKER) {
+//      defaultValue = type.primalValue();
+//    }
+//    defaultSource = type.toEntryString(defaultValue, null);
   }
 
+  
+  @SuppressWarnings("unchecked")
+  @Override
+  public Object setNew() {
+    comparisonBasis = ComparisonBasis.DEFAULT;
+    
+    currentValue = defaultValue;
+    currentSource = defaultSource;
+    isComparedValueEqual = true;
+    isComparedSourceEqual = true;
+    
+    fireSourceChange(this);
+    fireSourceEqualityChange(this, isComparedSourceEqual);
+    fireValueChange(this);
+    fireValueEqualityChange(this, isComparedValueEqual);
+    try {
+      type.validate(currentValue, itemPlan.isNullable());
+    } catch (UserEntryException ex) {
+      noteValidationError (ex);
+    }
+    return currentValue;
+  }
 
+  
   @Override
   public void syncValue(Object value) {
     setValue(value);
@@ -265,21 +295,13 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   }
   
   
-  void setInitialValues () {
-    Object value = valueRef.getValue();
-    
-    // Special case for ICode values.  Identity equality (==) is correct here
-    if (value == ICode.DEFAULT_MARKER) {
-      value = type.primalValue();
-    }
-    setValue(value);
-    defaultValue = currentValue;
-    defaultSource = currentSource;
-  }
-  
-  
   @Override
   public void setDefaultValue (Object value) {
+    // Special case for ICode values.  Identity equality (==) is correct here
+    if (value == ICode.defaultValue()) {
+      value = type.primalValue();
+    }
+
     boolean defaultWasShowing = false;
     if (comparisonBasis == ComparisonBasis.DEFAULT) {
       //Object currentValue = valueRef.getValue();
@@ -291,7 +313,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       if (defaultWasShowing) {
         setRawValue(value, null, true);
       } else {
-        testAndFireSourceEqualityChange(false);
+        testAndFireSourceEqualityChange();
         if (validationErrors.isEmpty()) {
           testAndFireValueEqualityChange();
         }
@@ -312,7 +334,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       if (referenceWasShowing) {
         setRawValue(value, null, true);
       } else {
-        testAndFireSourceEqualityChange(false);
+        testAndFireSourceEqualityChange();
         if (validationErrors.isEmpty()) {
           testAndFireValueEqualityChange();
         }
@@ -354,7 +376,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       currentSource = source;
       fireSourceChange(this);
     }
-    testAndFireSourceEqualityChange(true);
+    testAndFireSourceEqualityChange();
     try {
       //boolean creating = true;
       type.validate(value, itemPlan.isNullable());
@@ -374,6 +396,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   }
   
   
+  @Deprecated
   public void setValueFromPrime () {
     Object primalValue = itemPlan.getType().primalValue();
     String source = type.toEntryString(primalValue, null);
@@ -384,7 +407,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       fireSourceChange(this);
     }
     
-    testAndFireSourceEqualityChange(true);
+    testAndFireSourceEqualityChange();
     try {
       boolean creating = true;
       Object newValue = type.createFromString(null, itemPlan.isNullable(), creating, source);
@@ -406,7 +429,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       fireSourceChange(this);
     }
     
-    testAndFireSourceEqualityChange(true);
+    testAndFireSourceEqualityChange();
     try {
       boolean creating = true;
       Object newValue = type.createFromString(null, itemPlan.isNullable(), creating, source);
@@ -428,7 +451,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       fireSourceChange(this);
     }
     
-    testAndFireSourceEqualityChange(true);
+    testAndFireSourceEqualityChange();
     try {
       boolean creating = true;
       Object newValue = type.createFromString(null, itemPlan.isNullable(), creating, source);
@@ -472,7 +495,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       currentSource = source;
     }
     
-    testAndFireSourceEqualityChange(true);
+    testAndFireSourceEqualityChange();
     try {
       Object newValue = type.createFromString(null, itemPlan.isNullable(), creating, source);
       setRawValue (newValue, self, true);
@@ -563,7 +586,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   }
   
   
-  private void testAndFireSourceEqualityChange (boolean isSourceTrigger) {
+  private void testAndFireSourceEqualityChange () {
     boolean cs;
     switch (comparisonBasis) {
     case DEFAULT :
@@ -593,7 +616,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
     if (priorAllowEntryEvents != newAllowEntryEvents) {
       if (newAllowEntryEvents) {
         // Fire all initial events
-        testAndFireSourceEqualityChange(false);
+        testAndFireSourceEqualityChange();
         testAndFireValueEqualityChange();
 //        if (errorStateChange) {
 //          if (validationErrors.isEmpty()) {
@@ -640,7 +663,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       this.comparisonBasis = comparisonBasis;
 
       // Set the showing and equality based on the new comparison basis
-      testAndFireSourceEqualityChange(false);
+      testAndFireSourceEqualityChange();
       testAndFireValueEqualityChange();
     }
   }

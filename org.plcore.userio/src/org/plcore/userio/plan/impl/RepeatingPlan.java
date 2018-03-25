@@ -28,6 +28,7 @@ public abstract class RepeatingPlan extends ContainerPlan implements IRepeatingP
   
   public RepeatingPlan (PlanFactory planFactory, MemberValueGetterSetter field, Class<?> elemClass, String name, EntryMode entryMode, int dimension) {
     super (field, name, entryMode);
+    
     elemPlan = NodePlanFactory.getNodePlan(planFactory, elemClass, field, name, entryMode, dimension + 1, false);
     this.elemClass = elemClass;
     this.dimension = dimension;

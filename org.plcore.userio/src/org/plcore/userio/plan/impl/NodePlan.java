@@ -1,6 +1,7 @@
 package org.plcore.userio.plan.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.Mode;
@@ -49,6 +50,28 @@ public abstract class NodePlan implements INodePlan {
   }
   
   
+  protected static Object defaultInstance(Class<?> klass) {
+    Object instance;
+    try {
+      instance = klass.newInstance();
+    } catch (InstantiationException | IllegalAccessException ex) {
+      throw new RuntimeException(ex);
+    }
+    return instance;
+  }
+  
+  
+  protected static Object getDefaultFieldValue(Field field, Object instance) {
+    Object defaultFieldValue;
+    try {
+      defaultFieldValue = field.get(instance);
+    } catch (IllegalArgumentException | IllegalAccessException ex) {
+      throw new RuntimeException(ex);
+    }
+    return defaultFieldValue;
+  }
+  
+ 
   public NodePlan (MemberValueGetterSetter field, String name, EntryMode entryMode) {
     this.field = field;
     this.name = name;

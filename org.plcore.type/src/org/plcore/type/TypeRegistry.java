@@ -7,8 +7,34 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.plcore.type.builtin.BigDecimalType;
+import org.plcore.type.builtin.BigIntegerType;
+import org.plcore.type.builtin.BooleanType;
+import org.plcore.type.builtin.ByteType;
+import org.plcore.type.builtin.CharacterType;
 import org.plcore.type.builtin.CodeType;
+import org.plcore.type.builtin.DateType;
+import org.plcore.type.builtin.DecimalType;
+import org.plcore.type.builtin.DoubleType;
+import org.plcore.type.builtin.EntityLifeType;
 import org.plcore.type.builtin.EnumType;
+import org.plcore.type.builtin.FloatType;
+import org.plcore.type.builtin.IntegerType;
+import org.plcore.type.builtin.LocalDateType;
+import org.plcore.type.builtin.LongType;
+import org.plcore.type.builtin.PercentType;
+import org.plcore.type.builtin.PrimitiveBooleanType;
+import org.plcore.type.builtin.PrimitiveByteType;
+import org.plcore.type.builtin.PrimitiveCharType;
+import org.plcore.type.builtin.PrimitiveDoubleType;
+import org.plcore.type.builtin.PrimitiveFloatType;
+import org.plcore.type.builtin.PrimitiveIntType;
+import org.plcore.type.builtin.PrimitiveLongType;
+import org.plcore.type.builtin.PrimitiveShortType;
+import org.plcore.type.builtin.ShortType;
+import org.plcore.type.builtin.SqlDateType;
+import org.plcore.type.builtin.StringType;
+import org.plcore.type.builtin.VersionTimeType;
 import org.plcore.value.ICode;
 
 
@@ -59,6 +85,41 @@ public class TypeRegistry {
     }
   }
 
+  
+  /** 
+   * For testing, add all non-configured builtins.  For normal operation,
+   * these types are added as components within OSGi.
+   */
+  public void addZeroConfigurationBuiltins () {
+    Map<String, Object> props = new HashMap<>();
+    addType (new PrimitiveBooleanType(), props);
+    addType (new PrimitiveByteType(), props);
+    addType (new PrimitiveCharType(), props);
+    addType (new PrimitiveDoubleType(), props);
+    addType (new PrimitiveFloatType(), props);
+    addType (new PrimitiveIntType(), props);
+    addType (new PrimitiveLongType(), props);
+    addType (new PrimitiveShortType(), props);
+
+    addType (new BigDecimalType(), props);
+    addType (new BigIntegerType(), props);
+    addType (new BooleanType(), props);
+    addType (new ByteType(), props);
+    addType (new CharacterType(), props);
+    addType (new DateType(), props);
+    addType (new DecimalType(), props);
+    addType (new DoubleType(), props);
+    addType (new EntityLifeType(), props);
+    addType (new FloatType(), props);
+    addType (new IntegerType(), props);
+    addType (new LocalDateType(), props);
+    addType (new LongType(), props);
+    addType (new PercentType(), props);
+    addType (new ShortType(), props);
+    addType (new SqlDateType(), props);
+    addType (new StringType(), props);
+    addType (new VersionTimeType(), props);
+}
 
   // static {
   // typeMap.put(BigDecimal.class, BigDecimalType.class);

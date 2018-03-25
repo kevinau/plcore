@@ -121,6 +121,42 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
   }
   
   
+  @SuppressWarnings("unchecked")
+  @Override
+  public Object setNew () {
+    // Remove any existing members and notify listeners
+    INodePlan[] memberPlans = classPlan.getMembers();
+    for (INodePlan memberPlan : memberPlans) {
+      String fieldName = memberPlan.getName();
+      INodeModel member = members.remove(fieldName);
+      if (member != null) {
+        fireChildRemoved(this, member);
+      }
+    }
+    
+    Object newValue = classPlan.newInstance();
+    valueRef.setValue(newValue);
+
+    // Add new members
+    for (INodePlan memberPlan : memberPlans) {
+      String fieldName = memberPlan.getName();
+      IValueReference memberValueRef = new ClassValueReference(valueRef, memberPlan);
+      INodeModel member = buildNodeModel(this, memberValueRef, memberPlan);
+      members.put(fieldName, member);
+      if (member instanceof IItemModel) {
+        Object defaultValue = memberValueRef.getValue();
+        // Deal with ICode values
+        ((IItemModel)member).setDefaultValue(defaultValue);
+        // Member value may be overridden by setupRuntimeDefaults
+        setupRuntimeDefaults((IItemModel)member);
+      }
+      member.setNew();
+      fireChildAdded(this, member);
+    }
+    return newValue;
+  }
+
+  
   @Override
   public void syncValue (Object nameMappedValue) {
     if (nameMappedValue == null) {
@@ -157,6 +193,7 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
       }
     }
   }
+
 
   @Override
   public void dump(int level) {

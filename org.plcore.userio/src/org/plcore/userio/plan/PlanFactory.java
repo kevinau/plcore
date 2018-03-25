@@ -79,13 +79,15 @@ public class PlanFactory implements IPlanFactory {
   public IType<?> lookupAndResolveType (Class<?> fieldClass, String fieldName, IOField fieldAnn) {
     IType<?> type;
     
-    String namedType = fieldAnn.type();
-    if (namedType.length() > 0) {
-      type = typeRegistry.getByName(namedType);
-      if (type == null) {
-        throw new RuntimeException("Field " + fieldName + " expects a named type '" + namedType + "'. No type found");
+    if (fieldAnn != null) {
+      String namedType = fieldAnn.type();
+      if (namedType.length() > 0) {
+        type = typeRegistry.getByName(namedType);
+        if (type == null) {
+          throw new RuntimeException("Field " + fieldName + " expects a named type '" + namedType + "'. No type found");
+        }
+        return type;
       }
-      return type;
     }
     
     type = typeRegistry.getByFieldClass(fieldClass);

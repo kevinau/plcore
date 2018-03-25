@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Standard password data entry type
 Bundle-SymbolicName: org.plcore.type.password
+Automatic-Module-Name: org.plcore.type.password
 Bundle-Version: 1.0.0
 Bundle-Vendor: Kevin Holloway
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

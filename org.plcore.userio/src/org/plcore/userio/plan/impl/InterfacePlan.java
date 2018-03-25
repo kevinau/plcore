@@ -3,8 +3,8 @@ package org.plcore.userio.plan.impl;
 import java.lang.reflect.Type;
 
 import org.plcore.userio.EntryMode;
+import org.plcore.userio.plan.EmbeddedLabelGroup;
 import org.plcore.userio.plan.IInterfacePlan;
-import org.plcore.userio.plan.ItemLabelGroup;
 import org.plcore.userio.plan.MemberValueGetterSetter;
 import org.plcore.userio.plan.PlanFactory;
 import org.plcore.userio.plan.PlanStructure;
@@ -16,7 +16,7 @@ public class InterfacePlan extends NodePlan implements IInterfacePlan{
   private final PlanFactory planFactory;
   
   private final Type fieldType;
-  private final ItemLabelGroup labels;
+  private final EmbeddedLabelGroup labels;
   
   
   public InterfacePlan (PlanFactory planFactory, MemberValueGetterSetter field, Type fieldType, String name, EntryMode entryMode) {
@@ -26,7 +26,7 @@ public class InterfacePlan extends NodePlan implements IInterfacePlan{
       throw new IllegalArgumentException("Type argument cannot be null");
     }
     this.fieldType = fieldType;
-    this.labels = new ItemLabelGroup(field, name);
+    this.labels = new EmbeddedLabelGroup(field, name);
   }
   
 
@@ -38,7 +38,7 @@ public class InterfacePlan extends NodePlan implements IInterfacePlan{
   
   @SuppressWarnings("unchecked")
   @Override
-  public ItemLabelGroup getLabels () {
+  public EmbeddedLabelGroup getLabels () {
     return labels;
   }
   

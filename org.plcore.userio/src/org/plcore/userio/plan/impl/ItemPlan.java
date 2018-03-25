@@ -16,7 +16,7 @@ public class ItemPlan<T> extends NodePlan implements IItemPlan<T> {
   private final ItemLabelGroup labels;
   //private final boolean describing;
   //private final Field lastEntryField;
-  //private final Object staticDefaultValue;
+  //private final T fieldDefaultValue;
   
   
   public ItemPlan (MemberValueGetterSetter field, String name, EntryMode entryMode, IType<T> type) {
@@ -28,6 +28,8 @@ public class ItemPlan<T> extends NodePlan implements IItemPlan<T> {
     this.type = type;
 
     this.labels = new ItemLabelGroup(field, name);
+    
+    //this.fieldDefaultValue = fieldValue;
     
     //Describing describingAnn = field.getAnnotation(Describing.class);
     //this.describing = (describingAnn != null);
@@ -62,8 +64,8 @@ public class ItemPlan<T> extends NodePlan implements IItemPlan<T> {
 
 
 //  @Override
-//  public Object getStaticDefaultValue () {
-//    return staticDefaultValue;
+//  public T getFieldDefaultValue () {
+//    return fieldDefaultValue;
 //  }
 
 

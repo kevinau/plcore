@@ -15,6 +15,8 @@ public interface INodeModel extends INode {
   
   public int getNodeId();
   
+  public <X> X setNew();
+
   public void syncValue(Object value);
 
   public void setParent(IContainerModel parent);

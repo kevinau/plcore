@@ -23,6 +23,7 @@ import org.plcore.userio.IOField;
 import org.plcore.userio.MappedSuperclass;
 import org.plcore.userio.Mode;
 import org.plcore.userio.ModeFor;
+import org.plcore.userio.NotIOField;
 import org.plcore.userio.OccursFor;
 import org.plcore.userio.Optional;
 import org.plcore.userio.Validation;
@@ -245,6 +246,7 @@ public abstract class NameMappedPlan<T> extends ContainerPlan implements INameMa
       MappedSuperclass msc = superKlass.getAnnotation(MappedSuperclass.class);
       addClassFields(factory, superKlass, msc != null);
     }
+    //Object defaultInstance = defaultInstance(klass);
     
     FieldDependency fieldDependency = new FieldDependency();
     fieldDependency.parseClass(klass.getName());
@@ -282,14 +284,19 @@ public abstract class NameMappedPlan<T> extends ContainerPlan implements INameMa
 //        }
 //      }
 
-      // Look for fields with IOField annotation
+      // Look for fields with IOField or io field like annotation
       for (Field field : fields) {
-        IOField ioFieldAnn = field.getAnnotation(IOField.class);
-        if (ioFieldAnn == null) {
+        int modifiers = field.getModifiers();
+        if ((modifiers & (Modifier.STATIC | Modifier.FINAL | Modifier.VOLATILE)) != 0) {
+          // Note.  Transient fields are NOT excluded
+          continue;
+        }
+        if (field.isAnnotationPresent(NotIOField.class)) {
           continue;
         }
         
         String name = field.getName();
+        System.out.println("aaaaaaaaaaa " + name);
         
         Class<?> fieldType = field.getType();
         Type fieldGenericType = field.getGenericType();
@@ -319,9 +326,13 @@ public abstract class NameMappedPlan<T> extends ContainerPlan implements INameMa
 
 //        Field lastEntryField = lastEntryFields.get(field.getName());
 
+        // Use the field value for setting up defaults only
         INodePlan nodePlan = NodePlanFactory.getNodePlan(factory, fieldGenericType, ioField, name, entryMode, 0, optional);
+        System.out.println("SSSSS " + ioField.getName());
+        System.out.println("SSSSS " + nodePlan.getName());
         memberPlans.put(name, nodePlan);
         memberFields.put(name, ioField);
+        System.out.println("Aaaa " + memberPlans);
       }
       
       // Now look for methods with IOField annotation

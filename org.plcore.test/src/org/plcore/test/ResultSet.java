@@ -8,7 +8,7 @@ public class ResultSet implements IResultSet {
   private final Map<String, IResultSet> children = new HashMap<>();
   private final String name;
   
-  private Status status = null;
+  private Status status = Status.OK;
   private Throwable throwable = null;
   
   
@@ -67,7 +67,21 @@ public class ResultSet implements IResultSet {
     for (int i = 0; i < n; i++) {
       System.out.print("  ");
     }
-    System.out.println(name);
+    System.out.print(name);
+    if (status != null) {
+      switch (status) {
+      case FAILURE :
+        System.out.print(" \u2718");
+        break;
+      case OK :
+        System.out.print(" \u2714");
+        break;
+      case SKIPPED :
+        System.out.print(" -");
+        break;
+      }
+    }
+    System.out.println();
     if (throwable != null) {
       throwable.printStackTrace();
     }
