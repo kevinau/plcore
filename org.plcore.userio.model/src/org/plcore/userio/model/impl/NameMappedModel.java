@@ -65,7 +65,7 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
   
   
   //@SuppressWarnings("unchecked")
-  private void setupRuntimeDefaults(IItemModel itemModel) {
+  private void addRuntimeDefaultHandlers(IItemModel itemModel) {
     for (IRuntimeDefaultProvider defaultProvider : classPlan.getRuntimeDefaultProviders()) {
       if (defaultProvider.isRuntime()) {
         for (IPathExpression expr : defaultProvider.getDependsOn()) {
@@ -86,34 +86,34 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
         }
       }
     }
-
-    // In addition, run all the runtime default providers to set up
+  }
+  
+  
+  private void runRuntimeDefaults () {
+    // Run all the runtime default providers to set up
     // the defaults.  After this setup, the runtime event handlers 
     // will keep them up to date.
+    List<?> xxx = classPlan.getRuntimeDefaultProviders();
     for (IRuntimeDefaultProvider defaultProvider : classPlan.getRuntimeDefaultProviders()) {
-      Object defaultValue = null;
-      boolean defaultCalculated = false;
-      for (IPathExpression expr : defaultProvider.getAppliesTo()) {
-        if (itemModel.matches(this, (IPathExpression)expr)) {
-          // Are there valid values for all dependencys
-          boolean inError = false;
-          
-          loop:
-          for (IPathExpression expr2 : defaultProvider.getDependsOn()) {
-            List<IItemModel> dependents = selectItemModels((IPathExpression)expr2);
-            for (IItemModel dependent : dependents) {
-              if (dependent.isInError()) {
-                inError = true;
-                break loop;
-              }
-            }
+      // Check that all dependencies are error free
+      boolean inError = false;
+      loop:
+      for (IPathExpression expr2 : defaultProvider.getDependsOn()) {
+        List<IItemModel> dependents = selectItemModels((IPathExpression)expr2);
+        for (IItemModel dependent : dependents) {
+          if (dependent.isInError()) {
+            inError = true;
+            break loop;
           }
-          if (!inError) {
-            if (!defaultCalculated) {
-              defaultValue = defaultProvider.getDefaultValue(getValue());
-              defaultCalculated = true;
-            }
-            itemModel.setDefaultValue(defaultValue);
+        }
+      }
+      if (!inError) {
+        Object defaultValue = defaultProvider.getDefaultValue(getValue());
+
+        for (IPathExpression expr : defaultProvider.getAppliesTo()) {
+          List<IItemModel> targets = selectItemModels((IPathExpression)expr);
+          for (IItemModel target : targets) {
+            target.setDefaultValue(defaultValue);
           }
         }
       }
@@ -124,41 +124,14 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
   @SuppressWarnings("unchecked")
   @Override
   public Object setNew () {
-    // Remove any existing members and notify listeners
-    INodePlan[] memberPlans = classPlan.getMembers();
-    for (INodePlan memberPlan : memberPlans) {
-      String fieldName = memberPlan.getName();
-      INodeModel member = members.remove(fieldName);
-      if (member != null) {
-        fireChildRemoved(this, member);
-      }
-    }
-    
     Object newValue = classPlan.newInstance();
-    valueRef.setValue(newValue);
-
-    // Add new members
-    for (INodePlan memberPlan : memberPlans) {
-      String fieldName = memberPlan.getName();
-      IValueReference memberValueRef = new ClassValueReference(valueRef, memberPlan);
-      INodeModel member = buildNodeModel(this, memberValueRef, memberPlan);
-      members.put(fieldName, member);
-      if (member instanceof IItemModel) {
-        Object defaultValue = memberValueRef.getValue();
-        // Deal with ICode values
-        ((IItemModel)member).setDefaultValue(defaultValue);
-        // Member value may be overridden by setupRuntimeDefaults
-        setupRuntimeDefaults((IItemModel)member);
-      }
-      member.setNew();
-      fireChildAdded(this, member);
-    }
+    syncValue(newValue, true);
     return newValue;
   }
 
   
   @Override
-  public void syncValue (Object nameMappedValue) {
+  public void syncValue (Object nameMappedValue, boolean setFieldDefault) {
     if (nameMappedValue == null) {
       INodePlan[] memberPlans = classPlan.getMembers();
       for (INodePlan memberPlan : memberPlans) {
@@ -169,6 +142,8 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
         }
       }
     } else {
+      valueRef.setValue(nameMappedValue);
+      
       INodePlan[] memberPlans = classPlan.getMembers();
       for (INodePlan memberPlan : memberPlans) {
         String fieldName = memberPlan.getName();
@@ -176,21 +151,18 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
         if (member == null) {
           IValueReference memberValueRef = new ClassValueReference(valueRef, memberPlan);
           member = buildNodeModel(this, memberValueRef, memberPlan);
-          // Apply runtime default providers
           members.put(fieldName, member);
           if (member instanceof IItemModel) {
-            // Member value may be overridden by setupRuntimeDefaults
-            Object memberValue = memberValueRef.getValue();
-            setupRuntimeDefaults((IItemModel)member);
-            ((IItemModel)member).setValue(memberValue);
+            addRuntimeDefaultHandlers((IItemModel)member);
           }
           fireChildAdded(this, member);
         }
         if (memberPlan.isViewOnly() == false) {
           Object memberValue = memberPlan.getFieldValue(nameMappedValue);
-          member.syncValue(memberValue);
+          member.syncValue(memberValue, setFieldDefault);
         }
       }
+      runRuntimeDefaults();
     }
   }
 

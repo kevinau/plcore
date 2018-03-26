@@ -35,7 +35,7 @@ public abstract class NodeModel implements INodeModel {
 
   
   @Override
-  public abstract void syncValue(Object value);
+  public abstract void syncValue(Object value, boolean setFieldDefault);
  
   
   @Override

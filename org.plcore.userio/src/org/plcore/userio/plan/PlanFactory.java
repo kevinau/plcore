@@ -7,9 +7,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.plcore.type.IType;
 import org.plcore.type.TypeRegistry;
-import org.plcore.userio.EntryMode;
 import org.plcore.userio.IOField;
-import org.plcore.userio.plan.impl.EmbeddedPlan;
+import org.plcore.userio.plan.impl.ClassPlan;
 import org.plcore.userio.plan.impl.EntityPlan;
 
 
@@ -19,8 +18,7 @@ public class PlanFactory implements IPlanFactory {
   @Reference
   private TypeRegistry typeRegistry;
   
-  private Map<Class<?>, EntityPlan<?>> entityPlans = new HashMap<>();
-  private Map<Class<?>, EmbeddedPlan<?>> embeddedPlans = new HashMap<>();
+  private Map<Class<?>, ClassPlan<?>> classPlans = new HashMap<>();
 
   
   public PlanFactory () {
@@ -46,29 +44,22 @@ public class PlanFactory implements IPlanFactory {
 
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> IEntityPlan<T> getEntityPlan(Class<T> klass) {
-    EntityPlan<T> plan;
-    synchronized (entityPlans) {
-      plan = (EntityPlan<T>)entityPlans.get(klass);
-      if (plan == null) {
-        plan = new EntityPlan<T>(klass);
-        entityPlans.put(klass, plan);
-        plan.complete(this);
-      }
-    }
+    ClassPlan<T> classPlan = getClassPlan(klass);
+    EntityPlan<T> plan = new EntityPlan<T>(classPlan);
+    //plan.complete(this);
     return plan;
   }
 
   
   @SuppressWarnings("unchecked")
-  public <T> IEmbeddedPlan<T> getEmbeddedPlan(MemberValueGetterSetter field, Class<T> klass, String name, EntryMode entryMode) {
-    EmbeddedPlan<T> plan;
-    synchronized (embeddedPlans) {
-      plan = (EmbeddedPlan<T>)embeddedPlans.get(klass);
+  public <T> ClassPlan<T> getClassPlan(Class<T> klass) {
+    ClassPlan<T> plan;
+    synchronized (classPlans) {
+      plan = (ClassPlan<T>)classPlans.get(klass);
       if (plan == null) {
-        plan = new EmbeddedPlan<T>(field, klass, name, entryMode);
-        embeddedPlans.put(klass, plan);
+        plan = new ClassPlan<T>(klass);
+        classPlans.put(klass, plan);
         plan.complete(this);
       }
     }

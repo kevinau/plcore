@@ -12,8 +12,8 @@ public class EmbeddedPlan<T> extends NameMappedPlan<T> implements IEmbeddedPlan<
   private EmbeddedLabelGroup labels;
   
   
-  public EmbeddedPlan (MemberValueGetterSetter field, Class<T> embeddedClass, String name, EntryMode entryMode) {
-    super (field, embeddedClass, name, entryMode);
+  public EmbeddedPlan (MemberValueGetterSetter field, ClassPlan<T> classPlan, String name, EntryMode entryMode) {
+    super (field, classPlan, name, entryMode);
     this.labels = new EmbeddedLabelGroup(field, name);
   }
   

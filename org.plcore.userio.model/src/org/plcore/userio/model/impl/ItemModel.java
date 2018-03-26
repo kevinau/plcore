@@ -76,31 +76,34 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   }
 
   
-  @SuppressWarnings("unchecked")
-  @Override
-  public Object setNew() {
-    comparisonBasis = ComparisonBasis.DEFAULT;
-    
-    currentValue = defaultValue;
-    currentSource = defaultSource;
-    isComparedValueEqual = true;
-    isComparedSourceEqual = true;
-    
-    fireSourceChange(this);
-    fireSourceEqualityChange(this, isComparedSourceEqual);
-    fireValueChange(this);
-    fireValueEqualityChange(this, isComparedValueEqual);
-    try {
-      type.validate(currentValue, itemPlan.isNullable());
-    } catch (UserEntryException ex) {
-      noteValidationError (ex);
-    }
-    return currentValue;
-  }
+//  @SuppressWarnings("unchecked")
+//  @Override
+//  public Object setNew() {
+//    comparisonBasis = ComparisonBasis.DEFAULT;
+//    
+//    currentValue = defaultValue;
+//    currentSource = defaultSource;
+//    isComparedValueEqual = true;
+//    isComparedSourceEqual = true;
+//    
+//    fireSourceChange(this);
+//    fireSourceEqualityChange(this, isComparedSourceEqual);
+//    fireValueChange(this);
+//    fireValueEqualityChange(this, isComparedValueEqual);
+//    try {
+//      type.validate(currentValue, itemPlan.isNullable());
+//    } catch (UserEntryException ex) {
+//      noteValidationError (ex);
+//    }
+//    return currentValue;
+//  }
 
   
   @Override
-  public void syncValue(Object value) {
+  public void syncValue(Object value, boolean setFieldDefault) {
+    if (setFieldDefault) {
+      setDefaultValue(value);
+    }
     setValue(value);
   }
 

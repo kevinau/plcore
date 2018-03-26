@@ -36,4 +36,6 @@ public interface IContainerModel extends INodeModel, IContainerNode {
 
   public <X extends INodeModel> X getById(int id);
   
+  public <X> X setNew();
+
 }

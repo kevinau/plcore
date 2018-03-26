@@ -20,34 +20,27 @@ public class ArrayModel extends RepeatingModel {
   @SuppressWarnings("unchecked")
   @Override
   public Object[] setNew() {
-    // Remove any existing members and notify listeners
-    for (INodeModel element : elements) {
-      elements.remove(element);
-      fireChildRemoved(this, element);
-    }
-    
     int minOccurs = arrayPlan.getMinOccurs();
     Object[] value = new Object[minOccurs];
     
     for (int i = 0; i < minOccurs; i++) {
-      IValueReference elementValueRef = new ArrayValueReference(valueRef, i);
-      INodeModel element = buildNodeModel(this, elementValueRef, arrayPlan.getElementPlan());
-      elements.add(element);
-      element.setNew();
-      value[i] = elementValueRef.getValue();
+      value[i] = arrayPlan.newInstance();
     }
+    syncValue(value, true);
     return value;
   }
 
 
   @Override
-  public void syncValue(Object value) {
+  public void syncValue(Object value, boolean setFieldDefault) {
     if (value == null) {
       for (INodeModel element : elements) {
         elements.remove(element);
       }
     } else {
       Object[] arrayValues = (Object[])value;
+      valueRef.setValue(arrayValues);
+      
       int i = 0;
       for (Object arrayValue : arrayValues) {
         INodeModel element;
@@ -58,7 +51,7 @@ public class ArrayModel extends RepeatingModel {
           element = buildNodeModel(this, elementValueRef, arrayPlan.getElementPlan());
           elements.add(element);
         }
-        element.syncValue(arrayValue);
+        element.syncValue(arrayValue, setFieldDefault);
         i++;
       }
     }

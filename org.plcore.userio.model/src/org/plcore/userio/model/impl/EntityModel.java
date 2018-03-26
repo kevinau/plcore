@@ -45,7 +45,7 @@ public class EntityModel extends NameMappedModel implements IEntityModel {
   @Override
   public void setValue (Object value) {
     valueRef.setValue(value);
-    syncValue(value);
+    syncValue(value, false);
   }
   
   

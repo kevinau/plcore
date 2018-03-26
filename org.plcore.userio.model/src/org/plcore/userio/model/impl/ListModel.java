@@ -22,28 +22,19 @@ public class ListModel extends RepeatingModel {
   @SuppressWarnings("unchecked")
   @Override
   public List<?> setNew() {
-    // Remove any existing members and notify listeners
-    for (INodeModel element : elements) {
-      elements.remove(element);
-      fireChildRemoved(this, element);
-    }
-    
     int minOccurs = listPlan.getMinOccurs();
     List<Object> value = new ArrayList<>(minOccurs);
     
     for (int i = 0; i < minOccurs; i++) {
-      IValueReference elementValueRef = new ListValueReference(valueRef, i);
-      INodeModel element = buildNodeModel(this, elementValueRef, listPlan.getElementPlan());
-      elements.add(element);
-      element.setNew();
-      value.add(elementValueRef.getValue());
+      value.add(listPlan.newInstance());
     }
+    syncValue(value, true);
     return value;
   }
 
 
   @Override
-  public void syncValue(Object value) {
+  public void syncValue(Object value, boolean setFieldDefault) {
     if (value == null) {
       for (INodeModel element : elements) {
         elements.remove(element);
@@ -51,6 +42,8 @@ public class ListModel extends RepeatingModel {
     } else {
       @SuppressWarnings("unchecked")
       List<Object> listValues = (List<Object>)value;
+      valueRef.setValue(listValues);
+      
       int i = 0;
       for (Object listValue : listValues) {
         INodeModel element;
@@ -61,7 +54,7 @@ public class ListModel extends RepeatingModel {
           element = buildNodeModel(this, elementValueRef, listPlan.getElementPlan());
           elements.add(element);
         }
-        element.syncValue(listValue);
+        element.syncValue(listValue, setFieldDefault);
         i++;
       }
     }

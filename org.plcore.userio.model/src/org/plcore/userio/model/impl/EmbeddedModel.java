@@ -17,7 +17,7 @@ public class EmbeddedModel extends NameMappedModel {
   
   
   public void setValue (Object value) {
-    syncValue(value);
+    syncValue(value, false);
   }
   
   

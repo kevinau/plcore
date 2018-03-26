@@ -14,6 +14,8 @@ import org.plcore.userio.IOField;
 import org.plcore.userio.ManyToOne;
 import org.plcore.userio.OneToOne;
 import org.plcore.userio.plan.impl.ArrayPlan;
+import org.plcore.userio.plan.impl.ClassPlan;
+import org.plcore.userio.plan.impl.EmbeddedPlan;
 import org.plcore.userio.plan.impl.InterfacePlan;
 import org.plcore.userio.plan.impl.ItemPlan;
 import org.plcore.userio.plan.impl.ListPlan;
@@ -29,7 +31,6 @@ public class NodePlanFactory {
   public static INodePlan getNodePlan (PlanFactory planFactory, Type fieldType, MemberValueGetterSetter field, String name, EntryMode entryMode, int dimension, boolean optional) {
     INodePlan nodePlan;
     
-    System.out.println("DDDDD " + name);
     if (fieldType instanceof GenericArrayType) {
       Type type1 = ((GenericArrayType)fieldType).getGenericComponentType();
       nodePlan = new ArrayPlan(planFactory, field, (Class<?>)type1, name, entryMode, dimension);
@@ -52,15 +53,11 @@ public class NodePlanFactory {
         Type type1 = klass.getComponentType();
         nodePlan = new ArrayPlan(planFactory, field, (Class<?>)type1, name, entryMode, dimension);
       } else {
-        System.out.println("DDDDD1 " + name);
         nodePlan = getNodePlanPart2(planFactory, field, fieldType, name, entryMode, dimension);
-        System.out.println("DDDDD2 " + name);
-        System.out.println("DDDDD3 " + nodePlan.getName());
       }
     } else {
       throw new IllegalArgumentException("Unsupported type: " + fieldType);
     }
-    System.out.println("CCCCCC " + nodePlan.getName());
     return nodePlan;
 
 //    
@@ -96,7 +93,6 @@ public class NodePlanFactory {
       
     }
   
-    System.out.println("EEEEE " + name);
     // Is there a named IType for the field (via type parameter of the ItemField annotation),
     // or does the field type match one of the build in field types
     IType<?> type = planFactory.lookupAndResolveType(fieldClass, name, itemFieldAnn);
@@ -117,24 +113,22 @@ public class NodePlanFactory {
           // members are considered as potential entry fields.
           boolean embdAnn = field.isAnnotationPresent(Embedded.class);
           if (embdAnn) {
-            nodePlan = planFactory.getEmbeddedPlan(field, fieldClass, field.getName(), entryMode);
+            ClassPlan<?> classPlan = planFactory.getClassPlan(fieldClass);
+            nodePlan = new EmbeddedPlan(field, classPlan, field.getName(), entryMode);
             //nodePlan = new EmbeddedPlan(planFactory, field, fieldClass, field.getName(), entryMode);
           } else {
             // The Embeddable annotation on the field class also identifies a class type.
             boolean emblAnn = fieldClass.isAnnotationPresent(Embeddable.class);
             if (emblAnn) {
-              System.out.println("EEEEE1 " + name);
-              System.out.println("EEEEE2 " + field.getName());
-              nodePlan = planFactory.getEmbeddedPlan(field, fieldClass, field.getName(), entryMode);
-              System.out.println("EEEEE3 " + name);
-              System.out.println("EEEEE4 " + field.getName());
-              System.out.println("EEEEE5 " + nodePlan.getName());
+              ClassPlan<?> classPlan = planFactory.getClassPlan(fieldClass);
+              nodePlan = new EmbeddedPlan(field, classPlan, field.getName(), entryMode);
             } else if (fieldClass.isInterface()) {
               nodePlan = new InterfacePlan(planFactory, field, fieldType, name, entryMode);
             } else {
               //If within a collection (array or list) any object that is not a item, is an embedded class type.
               if (dimension >= 0) {
-                nodePlan = planFactory.getEmbeddedPlan(field, fieldClass, field.getName(), entryMode);
+                ClassPlan<?> classPlan = planFactory.getClassPlan(fieldClass);
+                nodePlan = new EmbeddedPlan(field, classPlan, field.getName(), entryMode);
               } else {
                 // Otherwise, throw an error.
                 throw new RuntimeException("Field type not recognised: " + name + " " + fieldType);

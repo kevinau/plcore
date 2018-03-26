@@ -38,6 +38,7 @@ public abstract class ContainerModel extends NodeModel implements IContainerMode
     return valueRef.getValue();
   }
   
+  
   @Override
   public String getValueRefName() {
     return valueRef.getName();

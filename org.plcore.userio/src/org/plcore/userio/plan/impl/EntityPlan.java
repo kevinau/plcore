@@ -22,7 +22,7 @@ import org.plcore.value.VersionTime;
 
 public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
 
-  private final Class<T> entityClass;
+  private final ClassPlan<T> classPlan;
   private final String entityName;
   private final EntityLabelGroup labels;
 
@@ -35,11 +35,11 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   private List<IItemPlan<?>[]> uniqueConstraints;
 
   
-  public EntityPlan (Class<T> entityClass) {
-    super (null, entityClass, entityClass.getSimpleName(), entityEntryMode(entityClass));
-    this.entityClass = entityClass;
-    this.entityName = entityClass.getSimpleName();
-    this.labels = new EntityLabelGroup(entityClass);
+  public EntityPlan (ClassPlan<T> classPlan) {
+    super (null, classPlan, classPlan.getSourceClass().getSimpleName(), entityEntryMode(classPlan.getSourceClass()));
+    this.classPlan = classPlan;
+    this.entityName = classPlan.getSourceClass().getSimpleName();
+    this.labels = new EntityLabelGroup(classPlan.getSourceClass());
   }
 
   
@@ -299,6 +299,7 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   
   
   private void findUniqueConstraints() {
+    Class<?> entityClass = classPlan.getSourceClass();
     UniqueConstraint[] ucAnnx = entityClass.getAnnotationsByType(UniqueConstraint.class);
     uniqueConstraints = new ArrayList<>(ucAnnx.length);
     for (UniqueConstraint ucAnn : ucAnnx) {
@@ -398,13 +399,7 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   @SuppressWarnings("unchecked")
   @Override
   public T newInstance() {
-    T instance;
-    try {
-      instance = entityClass.newInstance();
-    } catch (InstantiationException | IllegalAccessException ex) {
-      throw new RuntimeException(ex);
-    }
-    return instance;
+    return classPlan.newInstance();
   }
 
   
