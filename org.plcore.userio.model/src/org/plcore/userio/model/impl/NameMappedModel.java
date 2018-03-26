@@ -93,7 +93,6 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
     // Run all the runtime default providers to set up
     // the defaults.  After this setup, the runtime event handlers 
     // will keep them up to date.
-    List<?> xxx = classPlan.getRuntimeDefaultProviders();
     for (IRuntimeDefaultProvider defaultProvider : classPlan.getRuntimeDefaultProviders()) {
       // Check that all dependencies are error free
       boolean inError = false;

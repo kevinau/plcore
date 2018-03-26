@@ -45,7 +45,7 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   
   @Override
   public void complete (PlanFactory planFactory) {
-    super.complete(planFactory);
+    //super.complete(planFactory);
     
     findEntityItems();
     //findDescriptionItems();

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" immediate="true" name="org.plcore.test.impl.ComponentTestRunner">
-   <reference bind="addTestCase" cardinality="0..n" interface="org.plcore.test.ITestCase" name="TestCase" policy="dynamic" unbind="removeTestCase"/>
-   <implementation class="org.plcore.test.impl.ComponentTestRunner"/>
-</scr:component>

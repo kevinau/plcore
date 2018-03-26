@@ -47,7 +47,7 @@ public class PlanFactory implements IPlanFactory {
   public <T> IEntityPlan<T> getEntityPlan(Class<T> klass) {
     ClassPlan<T> classPlan = getClassPlan(klass);
     EntityPlan<T> plan = new EntityPlan<T>(classPlan);
-    //plan.complete(this);
+    plan.complete(this);
     return plan;
   }
 
