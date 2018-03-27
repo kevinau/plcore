@@ -57,7 +57,18 @@ public class ArrayModel extends RepeatingModel {
     }
   }
 
+  
+  @Override
+  public void addValue (Object elemValue) {
+    int i = elements.size();
+    IValueReference elementValueRef = new ArrayValueReference(valueRef, i);
+    INodeModel element = buildNodeModel(this, elementValueRef, arrayPlan.getElementPlan());
+    elements.add(element);
+    fireChildAdded(this, element);
+    element.syncValue(elemValue, true);
+  }
 
+  
   @SuppressWarnings("unchecked")
   @Override
   public <X extends INodePlan> X getPlan() {

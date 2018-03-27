@@ -5,5 +5,9 @@ import java.lang.reflect.Type;
 public interface IInterfacePlan {
 
   public Type getInterfaceType();
+  
+  public default boolean isInstance(Object value) {
+    return ((Class<?>)getInterfaceType()).isInstance(value);
+  }
 
 }

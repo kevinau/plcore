@@ -61,4 +61,15 @@ public class ListModel extends RepeatingModel {
     
   }
 
+  
+  @Override
+  public void addValue (Object elemValue) {
+    int i = elements.size();
+    IValueReference elementValueRef = new ListValueReference(valueRef, i);
+    INodeModel element = buildNodeModel(this, elementValueRef, listPlan.getElementPlan());
+    elements.add(element);
+    fireChildAdded(this, element);
+    element.syncValue(elemValue, true);
+  }
+
 }

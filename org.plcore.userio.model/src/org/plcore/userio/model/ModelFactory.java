@@ -16,6 +16,7 @@ import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.plan.IArrayPlan;
 import org.plcore.userio.plan.IEmbeddedPlan;
 import org.plcore.userio.plan.IEntityPlan;
+import org.plcore.userio.plan.IInterfacePlan;
 import org.plcore.userio.plan.IItemPlan;
 import org.plcore.userio.plan.IListPlan;
 import org.plcore.userio.plan.INodePlan;
@@ -84,6 +85,8 @@ public class ModelFactory implements IModelFactory {
       return new EntityModel(this, valueRef, (IEntityPlan<?>)nodePlan);  
     case ITEM :
       return new ItemModel(this, valueRef, (IItemPlan<?>)nodePlan);
+    case INTERFACE :
+      return new InterfaceModel(this, valueRef, (IInterfacePlan)nodePlan);
     case LIST :
       return new ListModel(this, valueRef, (IListPlan)nodePlan);
     case REFERENCE :

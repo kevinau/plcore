@@ -1,5 +1,7 @@
 package org.plcore.userio.model.ref;
 
+import java.util.Arrays;
+
 import org.plcore.userio.model.ref.IValueReference;
 
 public class ArrayValueReference implements IValueReference {
@@ -23,6 +25,10 @@ public class ArrayValueReference implements IValueReference {
   @Override
   public <T> void setValue(T value) {
     Object[] container = parentRef.getValue();
+    if (container.length <= index) {
+      container = Arrays.copyOf(container, index + 1);
+      parentRef.setValue(container);
+    }
     container[index] = value;
   }
 

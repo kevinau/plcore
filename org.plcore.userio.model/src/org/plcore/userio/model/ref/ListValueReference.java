@@ -25,6 +25,12 @@ public class ListValueReference implements IValueReference {
   @Override
   public <T> void setValue(T value) {
     List<Object> container = parentRef.getValue();
+    if (container.size() <= index) {
+      while (container.size() <= index) {
+        container.add(null);
+      }
+      parentRef.setValue(container);
+    }
     container.set(index, value);
   }
 

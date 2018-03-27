@@ -8,4 +8,6 @@ public interface IRepeatingModel extends IContainerModel, IRepeatingNode {
   @Override
   public <X extends INodePlan> X getPlan ();
 
+  public void addValue(Object elemValue);
+
 }
