@@ -66,7 +66,7 @@ public class DirectoryWatcher implements AutoCloseable {
   
   
   public static interface IProcessor {
-    public void process (Path path, WatchEvent.Kind<?> kind);
+    public void process (Path path, WatchEvent.Kind<?> kind) throws IOException;
   }
   
   
@@ -238,7 +238,11 @@ public class DirectoryWatcher implements AutoCloseable {
         if (currLength == -1) {
           // Do nothing.  The file has gone.
         } else {
-          processor.process(path, kind);
+          try {
+            processor.process(path, kind);
+          } catch (IOException ex) {
+            throw new RuntimeException(ex);
+          }
         }
       } else {
         timer.schedule(new WaitStableTask(processor, path, kind, currLength), WAIT_TIME);

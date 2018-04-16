@@ -23,6 +23,6 @@ public interface IRuntimeValuesProvider extends IRuntimeProvider {
    * 
    * @return the list of code values for the target fields.
    */
-  public List<ICode> getCodeValues(Object instance);
+  public List<ICode<?>> getCodeValues(Object instance);
 
 }

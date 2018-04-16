@@ -12,6 +12,6 @@ package org.plcore.type;
 
 public interface IPatternSettable {
 
-  public void setPattern (String pattern, String errorMessage);
+  public void setPattern (String pattern, String targetName);
   
 }

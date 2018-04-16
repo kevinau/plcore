@@ -13,8 +13,17 @@ import java.util.List;
 
 
 @FunctionalInterface
-public interface ICodeSource<T extends ICode> {
+public interface ICodeSource<T extends ICode<T>> {
 
   public List<T> values();
 
+  public default T valueOf (String code) {
+    for (T value : values()) {
+      if (value.getCode().equals(code)) {
+        return value;
+      }
+    }
+    return null;
+  }
+  
 }

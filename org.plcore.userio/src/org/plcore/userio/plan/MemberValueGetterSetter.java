@@ -119,6 +119,15 @@ public class MemberValueGetterSetter {
   }
   
   
+  public <A extends Annotation> A[] getAnnotationsByType(Class<A> klass) {
+    if (field != null) {
+      return field.getAnnotationsByType(klass);
+    } else {
+      return annotatedMethod.getAnnotationsByType(klass);
+    }
+  }
+  
+  
   public boolean isAnnotationPresent(Class<? extends Annotation> klass) {
     if (field != null) {
       return field.isAnnotationPresent(klass);

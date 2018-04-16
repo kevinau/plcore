@@ -11,7 +11,7 @@ package org.plcore.value;
 
 import java.io.Serializable;
 
-public class Code implements ICode, Serializable {
+public class Code<T extends ICode<T>> implements ICode<T>, Serializable {
 
   private static final long serialVersionUID = -4174110261045376592L;
 
@@ -62,4 +62,9 @@ public class Code implements ICode, Serializable {
   	return obsolete;
   }
 
+  
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "(" + code + "," + description + ")";
+  }
 }

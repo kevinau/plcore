@@ -11,24 +11,11 @@
 package org.plcore.type.builtin;
 
 
-import java.util.List;
-
-import org.plcore.type.builtin.CodeType;
-import org.plcore.value.ICode;
+import org.plcore.value.TreeValue;
 
 
-public class TreeType extends CodeType<ICode> {
+public class TreeType extends CodeType<TreeValue> {
 
-  public TreeType (Class<ICode> codeClass) {
-    super(codeClass);
-  }
-  
-  
-  public TreeType (Class<ICode> codeClass, List<ICode> valueList) {
-    super(codeClass, valueList);
-  }
-  
-  
   public TreeType (TreeType type) {
     super (type);
   }

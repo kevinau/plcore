@@ -6,165 +6,170 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.plcore.value.ExistingDirectory;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+import org.plcore.value.ExistingDirectory;
 
 
 public class ComponentConfiguration {
 
-  private static class PartialDictionaryMap implements Map<String, Object> {
+  private static interface IProperties {
+    public Object get(String key);
+    
+    public String[] getKeys();
+  }
+  
+  
+  private static class DictionaryProperties implements IProperties {
 
     private final Dictionary<String, Object> dict;
 
-
-    PartialDictionaryMap(Dictionary<String, Object> dict) {
+    DictionaryProperties(Dictionary<String, Object> dict) {
       this.dict = dict;
     }
 
-
     @Override
-    public void clear() {
-      throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public boolean containsKey(Object key) {
-      throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public boolean containsValue(Object value) {
-      throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public Set<Entry<String, Object>> entrySet() {
-      throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public Object get(Object key) {
+    public Object get(String key) {
       return dict.get(key);
     }
 
-
     @Override
-    public boolean isEmpty() {
-      return dict.isEmpty();
-    }
-
-
-    @Override
-    public Set<String> keySet() {
-      Set<String> keys = new HashSet<>();
+    public String[] getKeys() {
+      String[] keys = new String[dict.size()];
+      int i = 0;
       for (Enumeration<String> e = dict.keys(); e.hasMoreElements();) {
         String key = e.nextElement();
-        keys.add(key);
+        keys[i++] = key;
       }
       return keys;
     }
 
+  }
 
-    @Override
-    public Object put(String key, Object value) {
-      throw new UnsupportedOperationException();
+
+  private static class MapProperties implements IProperties {
+
+    private final Map<String, Object> map;
+
+    MapProperties(Map<String, Object> map) {
+      this.map = map;
     }
 
-
     @Override
-    public void putAll(Map<? extends String, ? extends Object> m) {
-      throw new UnsupportedOperationException();
+    public Object get(String key) {
+      return map.get(key);
     }
 
-
     @Override
-    public Object remove(Object key) {
-      throw new UnsupportedOperationException();
+    public String[] getKeys() {
+      String[] keys = new String[map.size()];
+      int i = 0;
+      for (String key : map.keySet()) {
+        keys[i++] = key;
+      }
+      return keys;
     }
 
+  }
 
-    @Override
-    public int size() {
-      return dict.size();
+
+  private static class ServiceReferenceProperties implements IProperties {
+
+    private final ServiceReference<?> serviceRef;
+
+    ServiceReferenceProperties(ServiceReference<?> serviceRef) {
+      this.serviceRef = serviceRef;
     }
 
+    @Override
+    public Object get(String key) {
+      return serviceRef.getProperty(key);
+    }
 
     @Override
-    public Collection<Object> values() {
-      throw new UnsupportedOperationException();
+    public String[] getKeys() {
+      return serviceRef.getPropertyKeys();
     }
+
   }
 
 
   public static void load(Object target, ComponentContext context) {
     if (context != null) {
-      Map<String, Object> props = new PartialDictionaryMap(context.getProperties());
+      IProperties props = new DictionaryProperties(context.getProperties());
       load(target, props);
     }
   }
 
 
-  public static void load(Object target, Map<String, Object> props) {
-    if (props != null) {
-      try {
-        Class<?> klass = target.getClass();
-        Field[] fields = klass.getDeclaredFields();
-        for (Field field : fields) {
-          Configurable configAnn = field.getAnnotation(Configurable.class);
-          if (configAnn != null) {
-            String propertyName = configAnn.name();
-            if (propertyName.length() == 0) {
-              propertyName = field.getName();
-            }
-            Class<?> fieldClass = field.getType();
-            if (fieldClass.isArray()) {
-              ArrayList<Object> list = new ArrayList<>();
-              String prefix = propertyName + ".";
+  public static void load(Object target, ServiceReference<?> serviceRef) {
+    if (serviceRef != null) {
+      IProperties props = new ServiceReferenceProperties(serviceRef);
+      load(target, props);
+    }
+  }
 
-              for (String key : props.keySet()) {
-                if (key.equals(propertyName) || key.startsWith(prefix)) {
-                  String propertyValue = props.get(key).toString();
-                  Object fieldValue = getFieldValue(field.getType(), propertyValue);
-                  list.add(fieldValue);
-                }
+
+  public static void load(Object target, Map<String, Object> map) {
+    if (map != null) {
+      IProperties props = new MapProperties(map);
+      load(target, props);
+    }
+  }
+
+
+  public static void load(Object target, IProperties props) {
+    try {
+      Class<?> klass = target.getClass();
+      Field[] fields = klass.getDeclaredFields();
+      for (Field field : fields) {
+        Configurable configAnn = field.getAnnotation(Configurable.class);
+        if (configAnn != null) {
+          String propertyName = configAnn.name();
+          if (propertyName.length() == 0) {
+            propertyName = field.getName();
+          }
+          Class<?> fieldClass = field.getType();
+          if (fieldClass.isArray()) {
+            ArrayList<Object> list = new ArrayList<>();
+            String prefix = propertyName + ".";
+
+            for (String key : props.getKeys()) {
+              if (key.equals(propertyName) || key.startsWith(prefix)) {
+                String propertyValue = props.get(key).toString();
+                Object fieldValue = getFieldValue(field.getType(), propertyValue);
+                list.add(fieldValue);
               }
-              Object[] array = list.toArray();
+            }
+            Object[] array = list.toArray();
+            field.setAccessible(true);
+            field.set(target, array);
+          } else {
+            Object propertyValue = props.get(propertyName);
+            if (propertyValue != null) {
+              Object fieldValue = getFieldValue(field.getType(), propertyValue.toString());
               field.setAccessible(true);
-              field.set(target, array);
-            } else {
-              Object propertyValue = props.get(propertyName);
-              if (propertyValue != null) {
-                Object fieldValue = getFieldValue(field.getType(), propertyValue.toString());
-                field.setAccessible(true);
-                field.set(target, fieldValue);
-              } else if (configAnn.required()) {
-                System.out.println("Dictionary elements: " + props.size());
-                for (String key : props.keySet()) {
-                  Object value = props.get(key);
-                  System.out.println("Dictionary: " + key + " = " + value);
-                }
-                throw new IllegalConfigurationException(
-                    "Configuration value '" + propertyName + "' required for " + klass.getSimpleName());
+              field.set(target, fieldValue);
+            } else if (configAnn.required()) {
+              System.out.println("Dictionary elements: " + props.getKeys().length);
+              for (String key : props.getKeys()) {
+                Object value = props.get(key);
+                System.out.println("Dictionary: " + key + " = " + value);
               }
+              throw new IllegalConfigurationException(
+                  "Configuration value '" + propertyName + "' required for " + klass.getSimpleName());
             }
           }
         }
-      } catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException
-          | InvocationTargetException | ClassNotFoundException ex) {
-        throw new RuntimeException(ex);
       }
+    } catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException
+           | InvocationTargetException | ClassNotFoundException ex) {
+      throw new RuntimeException(ex);
     }
   }
 

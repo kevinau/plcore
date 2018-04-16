@@ -8,7 +8,7 @@ public interface IRepeatingPlan extends IContainerPlan, IRepeatingMarkerNode {
 
   public int getDimension();
   
-  public INodePlan getElementPlan();
+  public <X extends INodePlan> X getElementPlan();
   
   public Class<?> getElementClass();
 

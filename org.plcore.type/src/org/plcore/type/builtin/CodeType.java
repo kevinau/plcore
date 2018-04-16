@@ -23,7 +23,7 @@ import org.plcore.type.UserEntryException;
 import org.plcore.value.ICode;
 
 
-public class CodeType<T extends ICode> extends Type<T> implements IType<T>, ICaseSettable, ILengthSettable, IPatternSettable {
+public class CodeType<T extends ICode<T>> extends Type<T> implements IType<T>, ICaseSettable, ILengthSettable, IPatternSettable {
 
   // TODO is codeClass required?  It is not used.
   private final Class<T> codeClass;
@@ -103,6 +103,17 @@ public class CodeType<T extends ICode> extends Type<T> implements IType<T>, ICas
   }
 
   
+  public T valueOf (String target) {
+    for (T cv : getValues()) {
+      String code = cv.getCode();
+      if (code.equals(target)) {
+        return cv;
+      }
+    }
+    return null;
+  }
+  
+  
   @Override
   public T createFromString(String source) throws UserEntryException {
     // TODO Auto-generated method stub
@@ -179,7 +190,7 @@ public class CodeType<T extends ICode> extends Type<T> implements IType<T>, ICas
   @Override
   public int getFieldSize() {
     int n = 0;
-    for (ICode cv : getValues()) {
+    for (ICode<T> cv : getValues()) {
       String code = cv.getCode();
       n = Integer.max(n, code.length());
     }

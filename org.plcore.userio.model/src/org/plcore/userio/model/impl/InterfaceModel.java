@@ -1,36 +1,32 @@
 package org.plcore.userio.model.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
-import org.plcore.type.UserEntryException;
-import org.plcore.userio.EntryMode;
 import org.plcore.userio.INode;
 import org.plcore.userio.model.ContainerChangeListener;
-import org.plcore.userio.model.EffectiveEntryMode;
-import org.plcore.userio.model.EffectiveEntryModeListener;
 import org.plcore.userio.model.IContainerModel;
-import org.plcore.userio.model.IEntityModel;
 import org.plcore.userio.model.IItemModel;
 import org.plcore.userio.model.INameMappedModel;
 import org.plcore.userio.model.INodeModel;
-import org.plcore.userio.model.ItemEventListener;
 import org.plcore.userio.model.ModelFactory;
 import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.path.IPathExpression;
 import org.plcore.userio.plan.IInterfacePlan;
 import org.plcore.userio.plan.INodePlan;
 
-public class InterfaceModel implements INameMappedModel {
+public class InterfaceModel extends NodeModel implements INameMappedModel, ContainerChangeListener {
   
   private final ModelFactory modelFactory;
   private final IValueReference valueRef;
   private final IInterfacePlan interfacePlan;
   
+  private final List<ContainerChangeListener> containerChangeListeners = new ArrayList<>();
+
   private INameMappedModel implementedModel = null;
   private Map<String, String> priorValues = new HashMap<>();
   
@@ -53,6 +49,10 @@ public class InterfaceModel implements INameMappedModel {
     
     // Remove all children of the current NameMappedModel
     implementedModel.syncValue(null, false);
+
+    // Remove container change event listener
+    implementedModel.removeContainerChangeListener(this);
+    
     implementedModel = null;
   }
   
@@ -66,6 +66,11 @@ public class InterfaceModel implements INameMappedModel {
     Class<?> newClass = newValue.getClass();
     INodePlan nodePlan = modelFactory.buildNodePlan(newClass);
     implementedModel = modelFactory.buildNodeModel(valueRef, nodePlan);
+    
+    // Add container change event listener
+    implementedModel.addContainerChangeListener(this);
+    
+    // TODO should we do this?
     implementedModel.setValue(newValue);
 
     // Restore any identically named item field values
@@ -108,31 +113,6 @@ public class InterfaceModel implements INameMappedModel {
   }
 
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <X extends INodePlan> X getPlan() {
-    if (implementedModel != null) {
-      return implementedModel.getPlan();
-    } else {
-      return EMPTY_PLAN;
-    }
-  }
-
-
-  @Override
-  public void buildQualifiedNamePart (StringBuilder builder, boolean[] isFirst, int[] repeatCount) {
-    if (isFirst[0] == false) {
-      builder.append('.');
-    }
-    builder.append(getName());
-    isFirst[0] = false;
-    for (int i = 0; i < repeatCount[0]; i++) {
-      builder.append("[]");
-    }
-    repeatCount[0] = 0;
-  }
-
-
   @Override
   public INodeModel[] getMembers() {
     if (implementedModel != null) {
@@ -145,28 +125,41 @@ public class InterfaceModel implements INameMappedModel {
 
   @Override
   public void addContainerChangeListener(ContainerChangeListener x) {
-    // TODO Auto-generated method stub
+    containerChangeListeners.add(x);
   }
-
 
   @Override
   public void removeContainerChangeListener(ContainerChangeListener x) {
-    // TODO Auto-generated method stub
+    containerChangeListeners.remove(x);
   }
 
-
+  
   @Override
   public void fireChildAdded(IContainerModel parent, INodeModel node) {
-    // TODO Auto-generated method stub
+    for (ContainerChangeListener x : containerChangeListeners) {
+      x.childAdded(parent, node);
+    }
+    // Propagate the event upwards
+    IContainerModel parentNode = getParent();
+    if (parentNode != null) {
+      parentNode.fireChildAdded(parent, node);
+    }
   }
 
-
+  
   @Override
   public void fireChildRemoved(IContainerModel parent, INodeModel node) {
-    // TODO Auto-generated method stub
+    for (ContainerChangeListener x : containerChangeListeners) {
+      x.childRemoved(parent, node);
+    }
+    // Propagate the event upwards
+    IContainerModel parentNode = getParent();
+    if (parentNode != null) {
+      parentNode.fireChildRemoved(parent, node);
+    }
   }
 
-
+  
   @Override
   public List<INodeModel> selectNodeModels(String expr) {
     if (implementedModel != null) {
@@ -229,8 +222,11 @@ public class InterfaceModel implements INameMappedModel {
 
   @Override
   public IItemModel selectItemModel(String expr) {
-    // TODO Auto-generated method stub
-    return null;
+    if (implementedModel != null) {
+      return implementedModel.selectItemModel(expr);
+    } else {
+      throw new IllegalArgumentException("No item model matching: " + expr);
+    }
   }
 
 
@@ -257,15 +253,44 @@ public class InterfaceModel implements INameMappedModel {
 
   @Override
   public Collection<? extends INodeModel> getContainerNodes() {
-    // TODO Auto-generated method stub
-    return null;
+    if (implementedModel != null) {
+      return implementedModel.getContainerNodes();
+    } else {
+      return Collections.emptyList();
+    }
   }
 
 
   @Override
-  public int getNodeId() {
+  public void buildQualifiedNamePart(StringBuilder builder, boolean[] isFirst, int[] repeatCount) {
     // TODO Auto-generated method stub
-    return 0;
+    
+  }
+
+
+  @Override
+  public String getValueRefName() {
+    return valueRef.getName();
+  }
+
+
+  @Override
+  public <X extends INode> X getNameMappedNode(String name) {
+    if (implementedModel != null) {
+      return implementedModel.getNameMappedNode(name);
+    } else {
+      return null;
+    }
+  }
+
+
+  @Override
+  public <X extends INodeModel> X getMember(String name) {
+    if (implementedModel != null) {
+      return implementedModel.getMember(name);
+    } else {
+      return null;
+    }
   }
 
 
@@ -277,214 +302,33 @@ public class InterfaceModel implements INameMappedModel {
 
 
   @Override
-  public void setParent(IContainerModel parent) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public <X> X getValue() {
+  public <T> T getValue() {
     // TODO Auto-generated method stub
     return null;
-  }
-
-
-  @Override
-  public void setEntryMode(EntryMode entryMode) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void updateEffectiveEntryMode(EffectiveEntryMode parent) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public EffectiveEntryMode getEffectiveEntryMode() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public String getName() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public void addEffectiveEntryModeListener(EffectiveEntryModeListener x) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void removeEffectiveEntryModeListener(EffectiveEntryModeListener x) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void addItemEventListener(ItemEventListener x) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void removeItemEventListener(ItemEventListener x) {
-    // TODO Auto-generated method stub
-    
   }
 
 
   @Override
   public void dump(int level) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public IContainerModel getParent() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public void walkModel(Consumer<INodeModel> before, Consumer<INodeModel> after) {
+    indent(level);
+    System.out.println("InterfaceModel {" + interfacePlan.getInterfaceType());
     if (implementedModel != null) {
-      implementedModel.walkModel(before, after);
+      implementedModel.dump(level + 1);
     }
+    indent(level);
+    System.out.println("}");
   }
 
 
   @Override
-  public void walkItems(Consumer<IItemModel> consumer) {
-    if (implementedModel != null) {
-      implementedModel.walkItems(consumer);
-    }
+  public void childAdded(IContainerModel parent, INodeModel node) {
+    fireChildAdded(parent, node);
   }
 
 
   @Override
-  public void fireEffectiveModeChange(INodeModel node, EffectiveEntryMode priorMode) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void fireErrorNoted(INodeModel node, UserEntryException ex) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void fireErrorCleared(INodeModel node) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void fireSourceChange(INodeModel node) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void fireSourceEqualityChange(INodeModel node, boolean equal) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void fireValueChange(INodeModel node) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void fireValueEqualityChange(INodeModel node, boolean equal) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void fireComparisonBasisChange(INodeModel node) {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public IEntityModel getParentEntity() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public String getQName() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public String getQName(IContainerModel top) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public String getValueRefName() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public String getQualifiedPlanName() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public boolean matches(INodeModel startingPoint, IPathExpression expr) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-
-  @Override
-  public <X extends INode> X getNameMappedNode(String name) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public <X extends INodeModel> X getMember(String name) {
-    // TODO Auto-generated method stub
-    return null;
+  public void childRemoved(IContainerModel parent, INodeModel node) {
+    fireChildRemoved(parent, node);
   }
 
 }

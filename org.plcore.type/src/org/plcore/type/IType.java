@@ -80,6 +80,8 @@ public interface IType<T> {
     }
   }
   
-  public Class<?> getFieldClass();
+  public default Class<?> getFieldClass() {
+    return null;
+  }
   
 }

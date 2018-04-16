@@ -2,6 +2,7 @@ package org.plcore.userio.plan;
 
 import org.plcore.userio.path.IPathExpression;
 
+
 public interface IRuntimeOccursProvider extends IRuntimeProvider {
 
   /**
@@ -15,7 +16,7 @@ public interface IRuntimeOccursProvider extends IRuntimeProvider {
    */
   @Override
   public IPathExpression[] getAppliesTo();
-  
+
 
   /**
    * Get a list of field names that the getFieldUse method depends on. Some
@@ -28,14 +29,15 @@ public interface IRuntimeOccursProvider extends IRuntimeProvider {
   @Override
   public IPathExpression[] getDependsOn();
 
-  
+
   /**
-   * Get the size for the designated array field. The designated array fields are
-   * those listed by the getAppliesTo method.
+   * Get the minimum and maximum for each dimension of the designated array field. 
+   * The designated array fields are those listed by the getAppliesTo method.
    * 
    * @return the size of the designated array field.
    */
-  public int getOccurs(Object instance);
+  public int[][] getOccurs(Object instance);
+
 
   /**
    * Does this provider return an initial size, or does it only return a 
@@ -45,6 +47,6 @@ public interface IRuntimeOccursProvider extends IRuntimeProvider {
    * @return
    */
   @Override
-  public boolean isRuntime ();
+  public boolean isRuntime();
 
 }

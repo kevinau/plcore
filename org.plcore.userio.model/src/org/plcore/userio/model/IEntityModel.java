@@ -27,5 +27,7 @@ public interface IEntityModel extends INameMappedModel, IEntityNode {
   public void addEntityCreationListener(EntityCreationListener x);
   
   public void destroy();
+
+  public List<ReportableError> getErrors();
   
 }

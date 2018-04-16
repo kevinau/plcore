@@ -11,6 +11,7 @@
 package org.plcore.type.builtin;
 
 
+import com.manavo.libraries.IndefiniteArticle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +24,7 @@ import org.plcore.type.UserEntryException;
 public class RegexStringType extends StringBasedType<String> implements IPatternSettable {
   
   private String pattern;
-  private TextCase patternCase;
+  private TextCase patternCase = TextCase.UNSPECIFIED;
   private Pattern re;
   private String targetName;
   private boolean specifiedCase = false;
@@ -101,9 +102,9 @@ public class RegexStringType extends StringBasedType<String> implements IPattern
       String m;
       if (targetName != null && targetName.length() > 0) {
         if (vs.length() == 0) {
-          m = targetName + " is required";
+          m = "Required";
         } else {
-          m = "not a valid " + targetName;
+          m = "Not " + IndefiniteArticle.get(targetName) + " " + targetName;
         }
       } else {
         int n0 = 0;

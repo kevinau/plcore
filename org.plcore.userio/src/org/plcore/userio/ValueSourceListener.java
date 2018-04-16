@@ -8,6 +8,6 @@ import org.plcore.value.ICode;
 
 public interface ValueSourceListener extends EventListener {
 
-  public void sourceChanged (List<ICode> values);
+  public void sourceChanged (List<ICode<?>> values);
   
 }

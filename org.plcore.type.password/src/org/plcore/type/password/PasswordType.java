@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.plcore.type.password;
 
-import java.util.Map;
-
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.plcore.osgi.ComponentConfiguration;
+import org.osgi.service.component.annotations.Reference;
 import org.plcore.osgi.Configurable;
+import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.todo.NotYetImplementedException;
 import org.plcore.type.Type;
 import org.plcore.type.UserEntryException;
@@ -26,14 +26,15 @@ import org.plcore.value.PasswordValue;
 @Component
 public class PasswordType extends Type<PasswordValue> {
 
+  @Reference
+  private ConfigurationLoader configLoader;
+  
   @Configurable
   private int minimumLength = 8;
   
   @Activate 
-  protected void activate(Map<String, Object> props) {
-    // TODO remove the print line
-    System.out.println("Activating PasswordType");
-    ComponentConfiguration.load(this, props);
+  protected void activate(ComponentContext context) {
+    configLoader.load(this, context);
   }
   
   

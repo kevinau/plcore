@@ -15,7 +15,7 @@ import org.plcore.userio.plan.RepeatingLabelGroup;
 
 public abstract class RepeatingPlan extends ContainerPlan implements IRepeatingPlan {
 
-  private final static int DEFAULT_MAX_OCCURS = 10;
+  private final static int DEFAULT_MAX_OCCURS = -1;
   
   private final INodePlan elemPlan;
   private final Class<?> elemClass;
@@ -33,19 +33,22 @@ public abstract class RepeatingPlan extends ContainerPlan implements IRepeatingP
     this.elemClass = elemClass;
     this.dimension = dimension;
     
-    Occurs occursAnn = field.getAnnotation(Occurs.class);
-    if (occursAnn != null) {
-      int[] minAnn = occursAnn.min();
-      if (dimension < minAnn.length) {
-        this.minOccurs = minAnn[dimension];
-      } else {
-        this.minOccurs = 0;
-      }
-      int[] maxAnn = occursAnn.max();
-      if (dimension < maxAnn.length) {
-        this.maxOccurs = maxAnn[dimension];
-      } else {
-        this.maxOccurs = DEFAULT_MAX_OCCURS;
+    Occurs[] occursAnn = field.getAnnotationsByType(Occurs.class);
+    if (occursAnn.length > 0 && dimension < occursAnn.length) {
+      int[] values = occursAnn[dimension].value();
+      switch (values.length) {
+      case 0 :
+        throw new RuntimeException("No occurs value");
+      case 1 :
+        this.minOccurs = values[0];
+        this.maxOccurs = values[0];
+        break;
+      case 2 :
+        this.minOccurs = values[0];
+        this.maxOccurs = values[1];
+        break;
+      default :
+        throw new RuntimeException("More than two occurs values (min/max)");
       }
     } else {
       this.minOccurs = 0;
@@ -56,9 +59,10 @@ public abstract class RepeatingPlan extends ContainerPlan implements IRepeatingP
   }
   
   
+  @SuppressWarnings("unchecked")
   @Override
-  public INodePlan getElementPlan () {
-    return elemPlan;
+  public <X extends INodePlan> X getElementPlan () {
+    return (X)elemPlan;
   }
   
   

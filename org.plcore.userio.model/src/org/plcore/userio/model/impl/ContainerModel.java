@@ -128,7 +128,7 @@ public abstract class ContainerModel extends NodeModel implements IContainerMode
     List<INodeModel> found = selectNodeModels(expr);
     switch (found.size()) {
     case 0 :
-      throw new IllegalArgumentException("No node models matching: " + expr);
+      throw new IllegalArgumentException("No node model matching: " + expr);
     case 1 :
       return (X)found.get(0);
     default :
@@ -153,7 +153,7 @@ public abstract class ContainerModel extends NodeModel implements IContainerMode
     List<IItemModel> found = selectItemModels(expr);
     switch (found.size()) {
     case 0 :
-      throw new IllegalArgumentException("No item models matching: " + expr);
+      throw new IllegalArgumentException("No item model matching: " + expr);
     case 1 :
       return found.get(0);
     default :

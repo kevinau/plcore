@@ -12,27 +12,18 @@ import org.plcore.type.UserEntryException;
 import org.plcore.userio.model.ComparisonBasis;
 import org.plcore.userio.model.EffectiveEntryMode;
 import org.plcore.userio.model.EffectiveEntryModeListener;
+import org.plcore.userio.model.ErrorInstance;
 import org.plcore.userio.model.IItemModel;
 import org.plcore.userio.model.INodeModel;
 import org.plcore.userio.model.ItemEventListener;
 import org.plcore.userio.model.ModelFactory;
+import org.plcore.userio.model.ReportableError;
 import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.plan.IItemPlan;
 import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.IValidationMethod;
-import org.plcore.value.ICode;
 
 public class ItemModel extends NodeModel implements EffectiveEntryModeListener, IItemModel {
-
-  private static class ErrorInstance {
-    private ItemModel[] models;
-    private UserEntryException exception;
-  
-    private ErrorInstance (ItemModel[] models, UserEntryException exception) {
-      this.models = models;
-      this.exception = exception;
-    }
-  }
 
   private final Map<Object, ErrorInstance> validationErrors = new HashMap<Object, ErrorInstance>();
 
@@ -186,6 +177,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
    * Clear an error identified by the sourceRef.  This method should only
    * be called if the Mode for the field allows entry events.
    */
+  @Override
   public void clearError (Object sourceRef) {
     ErrorInstance error = validationErrors.remove(sourceRef);
     if (error != null && validationErrors.isEmpty()) {
@@ -197,11 +189,11 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   private void clearDependentValidationErrors (Object sourceRef) {
     ErrorInstance error = validationErrors.remove(sourceRef);
     if (error != null) {
-      ItemModel[] mx = error.models;
+      IItemModel[] mx = error.models;
       if (mx == null) {
         clearError(sourceRef);
       } else {
-        for (ItemModel m : mx) {
+        for (IItemModel m : mx) {
           m.clearError(sourceRef);
         }
       }
@@ -247,7 +239,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
    * @param models - an array of field models on which the error is noted.
    * @param userError - the error that is noted.
    */
-  public void noteValidationError (Object sourceRef, ItemModel[] mx, UserEntryException userError) {
+  public void noteValidationError (Object sourceRef, IItemModel[] mx, UserEntryException userError) {
     ErrorInstance error = new ErrorInstance(mx, userError);
     validationErrors.put(sourceRef, error);
     fireErrorNoted(this, userError);
@@ -301,9 +293,9 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   @Override
   public void setDefaultValue (Object value) {
     // Special case for ICode values.  Identity equality (==) is correct here
-    if (value == ICode.defaultValue()) {
-      value = type.primalValue();
-    }
+    //if (value == ICode.defaultValue()) {
+    //  value = type.primalValue();
+    //}
 
     boolean defaultWasShowing = false;
     if (comparisonBasis == ComparisonBasis.DEFAULT) {
@@ -885,7 +877,16 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   }
 
 
-//  @Override
+  @Override
+  public void loadReportableErrors (List<ReportableError> errors) {
+    for (Map.Entry<Object, ErrorInstance> entry : validationErrors.entrySet()) {
+      ReportableError re = new ReportableError(entry.getKey(), entry.getValue());
+      errors.add(re);
+    }
+  }
+
+  
+  //  @Override
 //  public void setLastEntryValue(Object value) {
 //    Field lastEntryField = itemPlan.getLastEntryField();
 //    if (lastEntryField != null) {

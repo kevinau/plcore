@@ -7,6 +7,7 @@ import org.plcore.userio.model.EntityCreationListener;
 import org.plcore.userio.model.IEntityModel;
 import org.plcore.userio.model.INodeModel;
 import org.plcore.userio.model.ModelFactory;
+import org.plcore.userio.model.ReportableError;
 import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.plan.IEntityPlan;
 import org.plcore.userio.plan.INodePlan;
@@ -142,4 +143,12 @@ public class EntityModel extends NameMappedModel implements IEntityModel {
     System.out.println("Entity model: buildQName: " + builder.toString());
   }
  
+  
+  @Override
+  public List<ReportableError> getErrors() {
+    List<ReportableError> errors = new ArrayList<>();
+    walkItems(i -> i.loadReportableErrors(errors));
+    return errors;
+  }
+  
 }

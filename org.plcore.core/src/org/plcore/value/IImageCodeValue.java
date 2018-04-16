@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.plcore.value;
 
-public interface IImageCodeValue extends ICode {
+public interface IImageCodeValue extends ICode<IImageCodeValue> {
 
   public Class<?> getImageClass();
   

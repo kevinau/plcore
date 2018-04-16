@@ -94,20 +94,20 @@ public class TypeResolver {
         int n = fieldAnn.scale();
         if (n != -1) {
           copyType = copy(fieldType, copyType);
-          ((IScaleSettable)fieldType).setScale(n);
+          ((IScaleSettable)copyType).setScale(n);
         }
       }
       if (fieldType instanceof IPatternSettable) {
         String pattern = fieldAnn.pattern();
         if (pattern.length() > 0) {
-          // If pattern is specified, an error message can must also be
+          // If pattern is specified, an targetName can also be
           // specified
-          String errorMessage = fieldAnn.errorMessage();
-          if (errorMessage.length() == 0) {
-            errorMessage = null;
+          String targetName = fieldAnn.targetName();
+          if (targetName.length() == 0) {
+            targetName = null;
           }
           copyType = copy(fieldType, copyType);
-          ((IPatternSettable)copyType).setPattern(pattern, errorMessage);
+          ((IPatternSettable)copyType).setPattern(pattern, targetName);
         }
       }
       if (fieldType instanceof ICaseSettable) {

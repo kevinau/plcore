@@ -13,7 +13,6 @@ package org.plcore.type.builtin;
 
 import java.util.List;
 
-import org.plcore.type.builtin.CodeType;
 import org.plcore.value.IImageCodeValue;
 
 

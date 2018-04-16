@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: gyfor - directory based file finder
-Bundle-SymbolicName: org.gyfor.docfinder.file
+Bundle-SymbolicName: org.plcore.docfinder.file
 Bundle-Version: 1.0.0
 Bundle-Vendor: Kevin Holloway
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

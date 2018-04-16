@@ -18,24 +18,28 @@ import org.plcore.userio.plan.IRuntimeOccursProvider;
 
 public class RuntimeOccursProvider extends RuntimeProvider implements IRuntimeOccursProvider {
 
-  private final int size;
+  private final int[][] sizes;
   
   
   public RuntimeOccursProvider (Class<?> klass, FieldDependency fieldDependency, Method method, String[] appliesTo) {
     super (klass, fieldDependency, method, appliesTo);
-    this.size = 0;
+    this.sizes = new int[][] {
+      {0, Integer.MAX_VALUE},
+    };
   }
 
   
   public RuntimeOccursProvider (Class<?> klass, FieldDependency fieldDependency, Field field, String[] appliesTo) {
     super (klass, fieldDependency, field, appliesTo);
-    this.size = 0;
+    this.sizes = new int[][] {
+      {0, Integer.MAX_VALUE},
+    };
   }
 
   
-  public RuntimeOccursProvider (int size, String[] appliesTo) {
+  public RuntimeOccursProvider (int[][] sizes, String[] appliesTo) {
     super (appliesTo);
-    this.size = size;
+    this.sizes = sizes;
   }
 
   
@@ -49,26 +53,51 @@ public class RuntimeOccursProvider extends RuntimeProvider implements IRuntimeOc
   }
   
   
+  static int[][] resolve (Object rawValue) {
+    int[][] occurs;
+    
+    if (rawValue.getClass().isArray()) {
+      Object[] rawValuex = (Object[])rawValue;
+      Object rawValue1 = rawValuex[0];
+      if (rawValue1.getClass().isArray()) {
+        // The raw value is an array or (an array of 2 integers)
+        occurs = (int[][])rawValue;
+      } else {
+        // The raw value is an array of 2 integers
+        occurs = new int[1][2];
+        occurs[0] = (int[])rawValue;
+      }
+    } else {
+      // THe raw value is a single integer
+      occurs = new int[1][2];
+      occurs[0][0] = (int)rawValue;
+      occurs[0][1] = (int)rawValue;
+    }
+
+    return occurs;
+  }
+  
   /**
    * Get the array size for the designated array fields. The designated fields are
    * those listed by the getAppliesTo method.
    */
   @Override
-  public int getOccurs(Object instance) {
+  public int[][] getOccurs(Object instance) {
     if (isRuntime()) {
       if (instance == null) {
         throw new IllegalArgumentException();
       }
-      return invokeRuntime(instance);
+      Object rawValue = invokeRuntime(instance);
+      return resolve(rawValue);
     } else {
-      return size;
+      return sizes;
     }
   }
   
   
   @Override 
   public String toString () {
-    return "RuntimeOccursProvider [size=" + size + ", " + super.toString() + "]";
+    return "RuntimeOccursProvider [size=" + sizes + ", " + super.toString() + "]";
   }
 
 }

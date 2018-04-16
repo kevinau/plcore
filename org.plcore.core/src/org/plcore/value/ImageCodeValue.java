@@ -11,7 +11,7 @@ package org.plcore.value;
 
 
 
-public class ImageCodeValue extends Code {
+public class ImageCodeValue extends Code<ImageCodeValue> {
 
   private static final long serialVersionUID = 2216265814652748937L;
 

@@ -19,7 +19,7 @@ import org.plcore.value.ICode;
 
 public class RuntimeValuesProvider extends RuntimeProvider implements IRuntimeValuesProvider {
 
-  private final List<ICode> staticCodeValues;
+  private final List<ICode<?>> staticCodeValues;
   
   public RuntimeValuesProvider (Class<?> klass, FieldDependency fieldDependency, Method method, String[] appliesTo) {
     super (klass, fieldDependency, method, appliesTo);
@@ -27,7 +27,7 @@ public class RuntimeValuesProvider extends RuntimeProvider implements IRuntimeVa
   }
 
   
-  public RuntimeValuesProvider (List<ICode> staticCodeValues, String[] appliesTo) {
+  public RuntimeValuesProvider (List<ICode<?>> staticCodeValues, String[] appliesTo) {
     super (appliesTo);
     this.staticCodeValues = staticCodeValues;
   }
@@ -43,7 +43,7 @@ public class RuntimeValuesProvider extends RuntimeProvider implements IRuntimeVa
    * those listed by the getAppliesTo method.
    */
    @Override
-  public List<ICode> getCodeValues(Object instance) {
+  public List<ICode<?>> getCodeValues(Object instance) {
     if (isRuntime()) {
       if (instance == null) {
         throw new IllegalArgumentException();

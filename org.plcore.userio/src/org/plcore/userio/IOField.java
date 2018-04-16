@@ -60,19 +60,12 @@ public @interface IOField {
   
   
   /**
-   * Optional text that is displayed if the data entry field is blank, and the field is not Optional.  If
-   * not specified, a required message is obtained from the IType class of the field.
-   */
-  String requiredMessage() default "";
-  
-  
-  /**
    * Optional text that is displayed if data entry does not match the pattern.  This is only used if a pattern
    * is specified.  If data entry is incomplete, this message is displayed as an incomplete message.  If the
    * data entry does not match the pattern at all, this message is displayed as an error message.  If not 
    * specified, the error/incomplete message is derived from the pattern.
    */
-  String errorMessage() default "";
+  String targetName() default "";
   
   
   NumberSign sign() default NumberSign.UNSPECIFIED;

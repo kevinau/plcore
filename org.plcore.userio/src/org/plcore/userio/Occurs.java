@@ -16,22 +16,21 @@
 package org.plcore.userio;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.plcore.userio.plan.impl.MultipleOccurs;
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
+@Repeatable(MultipleOccurs.class)
 public @interface Occurs {
 
   /**
-   * The minimum number of occurrences for each dimension of an array field.
+   * The minimum and maximum number of occurrences for this dimension of the repeating.
    */
-  int[] min() default {};
-  
-  /**
-   * The maximum number of occurrences for each dimension of an array field.
-   */
-  int[] max() default {};
+  int[] value() default {};
   
 }

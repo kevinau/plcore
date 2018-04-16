@@ -1,5 +1,7 @@
 package org.plcore.userio.model;
 
+import java.util.List;
+
 import org.plcore.type.IType;
 import org.plcore.type.UserEntryException;
 import org.plcore.type.UserEntryException.Type;
@@ -29,6 +31,8 @@ public interface IItemModel extends INodeModel, INode {
 
   public UserEntryException[] getErrors();
 
+  public void loadReportableErrors(List<ReportableError> errors);
+  
   public void setValueFromSource(String source);
   
   public default boolean isId() {
@@ -40,5 +44,7 @@ public interface IItemModel extends INodeModel, INode {
   }
 
   public String getValueAsSource();
+
+  public void clearError(Object sourceRef);
 
 }

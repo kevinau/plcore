@@ -839,8 +839,8 @@ public class ClassPlan<T> {
           int modifier = field.getModifiers();
           if (Modifier.isStatic(modifier)) {
             field.setAccessible(true);
-            int size = (Integer)field.get(null);
-            IRuntimeOccursProvider occursProvider = new RuntimeOccursProvider(size, appliesTo);
+            int[][] sizes = RuntimeOccursProvider.resolve(field.get(null));
+            IRuntimeOccursProvider occursProvider = new RuntimeOccursProvider(sizes, appliesTo);
             runtimeOccursProviders.add(occursProvider);
           } else {
             IRuntimeOccursProvider occursProvider = new RuntimeOccursProvider(klass, fieldDependency, field, appliesTo);
@@ -864,8 +864,8 @@ public class ClassPlan<T> {
           int modifier = method.getModifiers();
           if (Modifier.isStatic(modifier)) {
             method.setAccessible(true);
-            int size = (Integer)method.invoke(null);
-            IRuntimeOccursProvider occursProvider = new RuntimeOccursProvider(size, xpaths);
+            int[][] sizes = RuntimeOccursProvider.resolve(method.invoke(null));
+            IRuntimeOccursProvider occursProvider = new RuntimeOccursProvider(sizes, xpaths);
             runtimeOccursProviders.add(occursProvider);
           } else {
             IRuntimeOccursProvider occursProvider = new RuntimeOccursProvider(klass, fieldDependency, method, xpaths);
@@ -1013,7 +1013,7 @@ public class ClassPlan<T> {
           int modifier = field.getModifiers();
           if (Modifier.isStatic(modifier)) {
             field.setAccessible(true);
-            List<ICode> staticCodeValues = (List<ICode>)field.get(null);
+            List<ICode<?>> staticCodeValues = (List<ICode<?>>)field.get(null);
             IRuntimeValuesProvider valuesProvider = new RuntimeValuesProvider(staticCodeValues, xpaths);
             runtimeValuesProviders.add(valuesProvider);
           }
@@ -1035,7 +1035,7 @@ public class ClassPlan<T> {
           int modifier = method.getModifiers();
           if (Modifier.isStatic(modifier)) {
             method.setAccessible(true);
-            List<ICode> staticCodeValues = (List<ICode>)method.invoke(null);
+            List<ICode<?>> staticCodeValues = (List<ICode<?>>)method.invoke(null);
             IRuntimeValuesProvider valuesProvider = new RuntimeValuesProvider(staticCodeValues, fieldNames);
             runtimeValuesProviders.add(valuesProvider);
           } else {

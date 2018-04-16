@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.plcore.value;
 
-public class TreeValue extends Code {
+public class TreeValue extends Code<TreeValue> {
 
   private static final long serialVersionUID = -3679834723224689234L;
 

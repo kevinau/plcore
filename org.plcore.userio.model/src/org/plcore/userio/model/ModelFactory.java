@@ -8,6 +8,7 @@ import org.plcore.todo.NotYetImplementedException;
 import org.plcore.userio.model.impl.ArrayModel;
 import org.plcore.userio.model.impl.EmbeddedModel;
 import org.plcore.userio.model.impl.EntityModel;
+import org.plcore.userio.model.impl.InterfaceModel;
 import org.plcore.userio.model.impl.ItemModel;
 import org.plcore.userio.model.impl.ListModel;
 import org.plcore.userio.model.impl.ReferenceModel;

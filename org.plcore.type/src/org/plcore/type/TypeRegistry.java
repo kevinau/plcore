@@ -46,7 +46,7 @@ public class TypeRegistry {
 
 
   @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
-  protected void addType(IType<?> type, Map<String, Object> props) {
+  public void addType(IType<?> type, Map<String, Object> props) {
     synchronized (namedTypes) {
       synchronized (inferredTypes) {
         String name = (String)props.get("name");
@@ -69,7 +69,7 @@ public class TypeRegistry {
   }
 
 
-  protected synchronized void removeType(IType<?> type, Map<String, Object> props) {
+  public synchronized void removeType(IType<?> type, Map<String, Object> props) {
     synchronized (namedTypes) {
       synchronized (inferredTypes) {
         String name = (String)props.get("name");
