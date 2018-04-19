@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - Data access objects
+Bundle-SymbolicName: org.plcore.dao;singleton:=true
+Bundle-Version: 1.0.0
+Automatic-Module-Name: org.plcore.dao
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Kevin Holloway
+Bundle-ActivationPolicy: lazy
+Export-Package: org.plcore.dao

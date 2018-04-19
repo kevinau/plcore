@@ -91,7 +91,11 @@ public class ConfigurationLoader {
     } else {
       IType<?> type = typeRegistry.getByFieldClass(fieldClass);
       if (type != null) {
-        value = type.createFromString(propertyValue);
+        try {
+          value = type.createFromString(propertyValue);
+        } catch (UserEntryException ex) {
+          throw new RuntimeException("'" + propertyValue + "' " + ex.getMessage());
+        }
       } else if (ExistingDirectory.class.isAssignableFrom(fieldClass)) {
         value = new ExistingDirectory(Paths.get(propertyValue));
       } else if (Path.class.isAssignableFrom(fieldClass)) {

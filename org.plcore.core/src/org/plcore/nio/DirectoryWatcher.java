@@ -11,6 +11,7 @@ package org.plcore.nio;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import java.io.IOException;
@@ -107,10 +108,18 @@ public class DirectoryWatcher implements AutoCloseable {
           if (kind == OVERFLOW) {
             continue; //loop
           } else if (kind == ENTRY_CREATE || kind == ENTRY_MODIFY) {
-            // A new file was created or modified.  We don't look for deleted files.
+            // A new file was created or modified.
             // Wait for the file to become stable before invoking the processor.
             Path eventFile = (Path)watchEvent.context();
             queueFile (dir.resolve(eventFile), kind);
+          } else if (kind == ENTRY_DELETE) {
+            // Deleted files are deleted.  We don't need (and cannot) wait for them to be stable.
+            Path eventFile = (Path)watchEvent.context();
+            try {
+              processor.process(dir.resolve(eventFile), kind);
+            } catch (IOException ex) {
+              throw new RuntimeException(ex);
+            }
           }
         }
         
@@ -187,7 +196,7 @@ public class DirectoryWatcher implements AutoCloseable {
   
   public void registerDirectory (Path path, boolean recursive) {
     try {
-      WatchKey key = path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY);
+      WatchKey key = path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
       keys.put(key, path);
       
       if (recursive) {

@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - Berkeley DB implementation of DAO
+Bundle-SymbolicName: org.plcore.dao.berkeley;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.plcore.dao.berkeley
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Kevin Holloway
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/je-7.5.11.jar,
+ .
+Service-Component: OSGI-INF/org.plcore.dao.berkeley.DataEnvironment.xml,
+ OSGI-INF/org.plcore.dao.berkeley.DataStore.xml,
+ OSGI-INF/org.plcore.dao.berkeley.DataAccessObject.xml
+Import-Package: org.osgi.service.component;version="1.2.0",
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.plcore.dao,
+ org.plcore.home,
+ org.plcore.math,
+ org.plcore.osgi,
+ org.plcore.util,
+ org.plcore.value,
+ org.slf4j;version="1.7.21"
+Export-Package: com.sleepycat.persist.model
+Eclipse-BuddyPolicy: global

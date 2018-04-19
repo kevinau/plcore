@@ -77,20 +77,21 @@ public class BooleanType extends Type<Boolean> implements IType<Boolean> {
   @Override
   public Boolean createFromString (String source) throws UserEntryException {
     Boolean value;
-    char c = source.charAt(0);
-    switch (c) {
-    case 'Y':
-    case 'y':
-    case '1':
+    switch (source.toUpperCase()) {
+    case "Y" :
+    case "YES" :
+    case "TRUE" :
+    case "1" :
       value = Boolean.TRUE;
       break;
-    case 'N':
-    case 'n':
-    case '0':
+    case "N" :
+    case "NO" :
+    case "FALSE" :
+    case "0" :
       value = Boolean.FALSE;
       break;
     default:
-      throw new UserEntryException("not Yes/Y/1 or No/N/0");
+      throw new UserEntryException("not a boolean value");
     }
     return value;
   }
