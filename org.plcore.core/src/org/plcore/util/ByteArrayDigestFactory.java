@@ -81,20 +81,18 @@ public class ByteArrayDigestFactory implements DigestFactory {
   }
   
   
-  @SuppressWarnings("unchecked")
   @Override
-  public <X extends Digest> X getFileDigest (URL url) {
+  public Digest getFileDigest (URL url) {
     try {
-      return (X)getInputStreamDigest(url.openStream());
+      return getInputStreamDigest(url.openStream());
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
   }
   
   
-  @SuppressWarnings("unchecked")
   @Override
-  public <X extends Digest> X getFileDigest (Path path) {
+  public Digest getFileDigest (Path path) {
     try {
       MessageDigest md = MessageDigest.getInstance(algorithm);
       InputStream fis = Files.newInputStream(path);
@@ -105,7 +103,7 @@ public class ByteArrayDigestFactory implements DigestFactory {
         n = fis.read(dataBytes);
       }
       fis.close();
-      return (X)new ByteArrayDigest(md.digest());
+      return new ByteArrayDigest(md.digest());
     } catch (NoSuchAlgorithmException ex) {
       throw new RuntimeException(ex);
     } catch (FileNotFoundException ex) {

@@ -53,6 +53,13 @@ import org.plcore.value.ExistingDirectory;
  */
 public class DirectoryWatcher implements AutoCloseable {
   
+  public enum EventKind {
+    CREATE,
+    MODIFY,
+    DELETE,
+    EXISTING;
+  }
+  
   private static final int WAIT_TIME = 1000;
   
   private WatchService watchService;
@@ -67,7 +74,7 @@ public class DirectoryWatcher implements AutoCloseable {
   
   
   public static interface IProcessor {
-    public void process (Path path, WatchEvent.Kind<?> kind) throws IOException;
+    public void process (Path path, EventKind kind) throws IOException;
   }
   
   
@@ -107,16 +114,21 @@ public class DirectoryWatcher implements AutoCloseable {
           kind = watchEvent.kind();
           if (kind == OVERFLOW) {
             continue; //loop
-          } else if (kind == ENTRY_CREATE || kind == ENTRY_MODIFY) {
-            // A new file was created or modified.
+          } else if (kind == ENTRY_CREATE) {
+            // A new file was created.
             // Wait for the file to become stable before invoking the processor.
             Path eventFile = (Path)watchEvent.context();
-            queueFile (dir.resolve(eventFile), kind);
+            queueFile (dir.resolve(eventFile), EventKind.CREATE);
+          } else if (kind == ENTRY_MODIFY) {
+            // A new file was modified.
+            // Wait for the file to become stable before invoking the processor.
+            Path eventFile = (Path)watchEvent.context();
+            queueFile (dir.resolve(eventFile), EventKind.MODIFY);
           } else if (kind == ENTRY_DELETE) {
             // Deleted files are deleted.  We don't need (and cannot) wait for them to be stable.
             Path eventFile = (Path)watchEvent.context();
             try {
-              processor.process(dir.resolve(eventFile), kind);
+              processor.process(dir.resolve(eventFile), EventKind.DELETE);
             } catch (IOException ex) {
               throw new RuntimeException(ex);
             }
@@ -144,11 +156,11 @@ public class DirectoryWatcher implements AutoCloseable {
       } else {
         dir2 = registeredDir;
       }
-      // ENd bug fix.
+      // End bug fix.
 
       try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir2)) {
         for (Path fileEntry : stream) {
-          queueFile (fileEntry, ENTRY_CREATE);
+          queueFile (fileEntry, EventKind.EXISTING);
         }
       } catch (IOException ex) {
         throw new UncheckedIOException(ex);
@@ -157,7 +169,7 @@ public class DirectoryWatcher implements AutoCloseable {
   }
   
   
-  private void queueFile (Path path, Kind<?> kind) {
+  private void queueFile (Path path, EventKind kind) {
     String fileName = path.getFileName().toString();
     Matcher matcher = pattern.matcher(fileName);
     if (matcher.find()) {
@@ -218,10 +230,10 @@ public class DirectoryWatcher implements AutoCloseable {
 
     private final IProcessor processor;
     private final Path path;
-    private final Kind<?> kind;
+    private final EventKind kind;
     private final long lastLength;
     
-    private WaitStableTask (IProcessor processor, Path path, Kind<?> kind, long lastLength) {
+    private WaitStableTask (IProcessor processor, Path path, EventKind kind, long lastLength) {
       this.processor = processor;
       this.path = path;
       this.kind = kind;

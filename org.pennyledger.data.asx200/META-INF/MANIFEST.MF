@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PennyLedger - Load ASX 200 data
+Bundle-SymbolicName: org.pennyledger.data.asx200
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.pennyledger.data.asx200
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Kevin Holloway
+Bundle-ActivationPolicy: lazy
+Import-Package: org.osgi.framework;version="1.8.0",
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.plcore.inbox,
+ org.plcore.math,
+ org.plcore.type,
+ org.plcore.userio,
+ org.plcore.userio.model,
+ org.plcore.util
+Bundle-ClassPath: lib/opencsv-2.3.jar,
+ .
+Service-Component: OSGI-INF/ASX200Loader.xml
+Export-Package: org.pennyledger.data.asx200

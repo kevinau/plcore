@@ -2,8 +2,6 @@ package org.plcore.inbox;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent.Kind;
 import java.util.regex.Pattern;
 
 import org.osgi.service.component.ComponentContext;
@@ -14,6 +12,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.plcore.dao.IDataAccessObject;
 import org.plcore.nio.DirectoryWatcher;
+import org.plcore.nio.DirectoryWatcher.EventKind;
 import org.plcore.osgi.Configurable;
 import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.util.MD5DigestFactory;
@@ -83,16 +82,19 @@ public class InboxWatchService {
     // Create a processor to import the documents found in the download directory
     DirectoryWatcher.IProcessor watchProcessor = new DirectoryWatcher.IProcessor() {
       @Override
-      public void process(Path path, Kind<?> kind) throws IOException {
+      public void process(Path path, EventKind kind) throws IOException {
         String fileName = watchDir.relativize(path).toString();
-        if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+        switch (kind) {
+        case EXISTING :
+        case CREATE :
+        case MODIFY :
           String digest = digestFactory.getFileDigest(path).toString();
 
           InboxSeen seen = dao.getByPrimary(fileName);
           if (seen != null) {
             if (digest.equals(seen.digest)) {
               // No change in file.  Already processed.  No action required.
-              logger.info("{}: No change... {} {}, {}", watchDir, kind, watchDir.relativize(path), digest);
+              //logger.info("{}: No change... {} {}, {}", watchDir, kind, watchDir.relativize(path), digest);
             } else {
               // The file has been changed since last processing.
               String firstDigest = firstDigestForFile(digest);
@@ -111,16 +113,16 @@ public class InboxWatchService {
             logger.info("{}: {} {}, {}", watchDir, kind, watchDir.relativize(path), digest);
             conditionallyProcess(path, firstDigest);
           }
-        } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-          InboxSeen seen = dao.getByPrimary(fileName);
-          if (seen == null) {
+          break;
+        case DELETE :
+          InboxSeen seen2 = dao.getByPrimary(fileName);
+          if (seen2 == null) {
             throw new IOException("No 'seen' record for deletion of: " + path);
           }
-          dao.remove(seen);
-          logger.info("{}: {} {}, {}", watchDir, kind, watchDir.relativize(path), seen.digest);
-          conditionallyUnprocess(path, seen.digest);
-        } else {
-          throw new RuntimeException("Unknown watch event kind: " + kind);
+          dao.remove(seen2);
+          logger.info("{}: {} {}, {}", watchDir, kind, watchDir.relativize(path), seen2.digest);
+          conditionallyUnprocess(path, seen2.digest);
+          break;
         }
       }
     };

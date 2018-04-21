@@ -18,9 +18,9 @@ public interface DigestFactory {
   
   public Digest getFileDigest (File file);
   
-  public <X extends Digest> X getFileDigest (Path path);
+  public Digest getFileDigest (Path path);
   
-  public <X extends Digest> X getFileDigest (URL url);
+  public Digest getFileDigest (URL url);
   
   public Digest getInputStreamDigest (InputStream fis);
   
