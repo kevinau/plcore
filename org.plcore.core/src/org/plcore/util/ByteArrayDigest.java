@@ -48,15 +48,15 @@ public class ByteArrayDigest implements Comparable<Digest>, Serializable, Digest
   
   
   public ByteArrayDigest (String s) {
-    value = new byte[16];
+    s = s.replace("-", "");
+    
+    value = new byte[s.length() / 2];
     int j = 0;
     int i = 0;
-    while (j < 16) {
+    while (j < value.length) {
       char c0 = s.charAt(i++);
-      if (c0 != '-') {
-        char c1 = s.charAt(i++);
-        value[j++] = deHex(c0, c1);
-      }
+      char c1 = s.charAt(i++);
+      value[j++] = deHex(c0, c1);
     }
   }
 

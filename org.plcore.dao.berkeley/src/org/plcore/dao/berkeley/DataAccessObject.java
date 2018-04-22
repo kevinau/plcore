@@ -203,7 +203,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
     Transaction transaction = dataStore.beginTransaction();
     try {
       idField.setAccessible(true);
-      Object key = idField.getInt(newValue);
+      Object key = idField.get(newValue);
 
       Object value = primaryIndex.get(key);
       if (versionTimeField != null) {

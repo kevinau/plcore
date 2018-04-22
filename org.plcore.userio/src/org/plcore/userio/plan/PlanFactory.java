@@ -81,7 +81,7 @@ public class PlanFactory implements IPlanFactory {
       }
     }
     
-    type = typeRegistry.getByFieldClass(fieldClass);
+    type = typeRegistry.getByFieldClass(fieldClass, fieldName);
     if (type == null) {
       return null;
     }

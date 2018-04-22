@@ -19,7 +19,7 @@ import org.plcore.userio.model.ReportableError;
 import au.com.bytecode.opencsv.CSVReader;
 
 
-@Component(name = "ASX200Loader", immediate = true)
+@Component(name = "ASX200Loader")
 public class ASX200Loader implements IFileProcessor {
 
   @Reference

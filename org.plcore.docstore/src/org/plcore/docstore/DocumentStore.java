@@ -8,7 +8,6 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,31 +23,37 @@ import org.plcore.docstore.parser.impl.ImageIO;
 import org.plcore.docstore.parser.impl.PDFBoxPDFParser;
 import org.plcore.docstore.parser.impl.TesseractImageOCR;
 import org.plcore.home.IApplication;
+import org.plcore.inbox.IFileProcessor;
 import org.plcore.nio.SafeOutputStream;
-import org.plcore.osgi.ComponentConfiguration;
+import org.plcore.osgi.Configurable;
+import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.srcdoc.ISegment;
 import org.plcore.srcdoc.ISourceDocumentContents;
 import org.plcore.srcdoc.SourceDocument;
 import org.plcore.srcdoc.SourceReference;
-import org.plcore.util.CRC64DigestFactory;
 import org.plcore.util.Digest;
 import org.plcore.util.DigestFactory;
+import org.plcore.util.MD5DigestFactory;
 import org.plcore.util.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@Component(configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true)
-public class DocumentStore implements IDocumentStore {
+@Component(name = "DocumentStore", configurationPolicy = ConfigurationPolicy.OPTIONAL)
+public class DocumentStore implements IDocumentStore, IFileProcessor {
 
   private Logger logger = LoggerFactory.getLogger(DocumentStore.class);
   
-  // This document store uses the CRC64 digest to identify documents
-  private final DigestFactory digestFactory = new CRC64DigestFactory();
+  // This document store uses the MD5 digest to identify documents
+  private final DigestFactory digestFactory = new MD5DigestFactory();
 
+  @Reference
+  private ConfigurationLoader configLoader;
+  
   @Reference
   private IApplication application;
   
+  @Configurable
   private Path baseDir = null;
 
   private static final String IMAGES = "images";
@@ -71,10 +76,8 @@ public class DocumentStore implements IDocumentStore {
   @Activate
   public void activate(ComponentContext context) {
     baseDir = application.getBaseDir();
-    ComponentConfiguration.load(this, context);
-    if (baseDir == null) {
-      baseDir = Paths.get(System.getProperty("user.home"), application.getId());
-    }
+    
+    configLoader.load(this, context);
 
     try {
       sourceDir = baseDir.resolve(SOURCE);
@@ -154,9 +157,12 @@ public class DocumentStore implements IDocumentStore {
   
   @Override
   public String importDocument(Path path) {
-    Digest digest = digestFactory.getFileDigest(path);
-    String hashCode = digest.toString();
-    
+    String hashCode = digestFactory.getFileDigest(path).toString();
+    return importDocument(path, hashCode);
+  }
+  
+  
+  public String importDocument(Path path, String hashCode) {
     Path catalogPath = catalogDir.resolve(hashCode + ".ser");
     if (Files.exists(catalogPath)) {
       logger.info("{} already exists as {}. Not importing", path, hashCode);
@@ -483,4 +489,11 @@ public class DocumentStore implements IDocumentStore {
     DocumentStore docStore = new DocumentStore();
     docStore.rebuildPDF("5dbc-9fbef7c4a0c2", IMAGE_RESOLUTION);
   }
+
+
+  @Override
+  public void process(Path path, String hashCode) {
+    this.importDocument(path, hashCode);
+  }
+  
 }

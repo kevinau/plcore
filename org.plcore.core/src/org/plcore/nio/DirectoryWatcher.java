@@ -160,7 +160,9 @@ public class DirectoryWatcher implements AutoCloseable {
 
       try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir2)) {
         for (Path fileEntry : stream) {
-          queueFile (fileEntry, EventKind.EXISTING);
+          if (Files.isRegularFile(fileEntry)) {
+            queueFile (fileEntry, EventKind.EXISTING);
+          }
         }
       } catch (IOException ex) {
         throw new UncheckedIOException(ex);

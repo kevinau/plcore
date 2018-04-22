@@ -15,8 +15,8 @@ import org.plcore.docstore.parser.IImageParser;
 import org.plcore.docstore.parser.IPDFParser;
 import org.plcore.srcdoc.ISourceDocumentContents;
 import org.plcore.srcdoc.PageImage;
-import org.plcore.util.CRC64DigestFactory;
 import org.plcore.util.DigestFactory;
+import org.plcore.util.MD5DigestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +87,7 @@ public class PDFBoxPDFParser implements IPDFParser {
   
   @Override
   public ISourceDocumentContents parseText(String id, Path pdfPath, int dpi, IDocumentStore docStore) {
-    //DigestFactory digestFactory = new CRC64DigestFactory();
+    //DigestFactory digestFactory = new MD5DigestFactory();
 
     PDDocument pdDocument = null;
 
@@ -124,7 +124,7 @@ public class PDFBoxPDFParser implements IPDFParser {
 
   @Override
   public ISourceDocumentContents parse(Path pdfPath, int dpi) {
-    DigestFactory digestFactory = new CRC64DigestFactory();
+    DigestFactory digestFactory = new MD5DigestFactory();
     String id = digestFactory.getFileDigest(pdfPath).toString();
     
     PDDocument pdDocument = null;

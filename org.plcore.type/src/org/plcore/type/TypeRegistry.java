@@ -1,7 +1,11 @@
 package org.plcore.type;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -41,14 +45,51 @@ import org.plcore.value.ICode;
 @Component(service = TypeRegistry.class, immediate = true)
 public class TypeRegistry {
 
+  private class DeclaredType {
+    private final Pattern pattern;
+    
+    private final Class<?> fieldClass;
+
+    private final IType<?> type;
+    
+    private DeclaredType (String nameRegex, Class<?> fieldClass, IType<?> type) {
+      if (nameRegex == null) {
+        this.pattern = null;
+      } else {
+        this.pattern = Pattern.compile(nameRegex);
+      }
+      this.fieldClass = fieldClass;
+      this.type = type;
+    }
+    
+    private boolean equals (String nameRegex, Class<?> fieldClass) {
+      if (pattern != null) {
+        if (!pattern.pattern().equals(nameRegex)) {
+          return false;
+        }
+      }
+      return this.fieldClass.equals(fieldClass);
+    }
+    
+    private boolean matches (Class<?> fieldClass, String fieldName) {
+      if (pattern != null) {
+        Matcher matcher = pattern.matcher(fieldName);
+        if (!matcher.matches()) {
+          return false;
+        }
+      }
+      return this.fieldClass.isAssignableFrom(fieldClass);
+    }
+  }
+  
   private Map<String, IType<?>> namedTypes = new HashMap<>();
-  private Map<Class<?>, IType<?>> inferredTypes = new HashMap<>();
+  private List<DeclaredType> declaredTypes = new ArrayList<>();
 
 
   @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
   public void addType(IType<?> type, Map<String, Object> props) {
     synchronized (namedTypes) {
-      synchronized (inferredTypes) {
+      synchronized (declaredTypes) {
         String name = (String)props.get("name");
         if (name != null) {
           IType<?> oldType = namedTypes.putIfAbsent(name, type);
@@ -57,13 +98,10 @@ public class TypeRegistry {
           }
         }
         
+        String nameRegex = (String)props.get("matching");
         Class<?> fieldClass = type.getFieldClass();
-        if (fieldClass != null) {
-          IType<?> oldType = inferredTypes.putIfAbsent(fieldClass, type);
-          if (oldType != null) {
-            throw new RuntimeException("Duplicate IType with the same target class: " + fieldClass.getSimpleName());
-          }
-        }
+        DeclaredType declaredType = new DeclaredType(nameRegex, fieldClass, type);
+        declaredTypes.add(declaredType);
       }
     }
   }
@@ -71,15 +109,21 @@ public class TypeRegistry {
 
   public synchronized void removeType(IType<?> type, Map<String, Object> props) {
     synchronized (namedTypes) {
-      synchronized (inferredTypes) {
+      synchronized (declaredTypes) {
         String name = (String)props.get("name");
         if (name != null) {
           namedTypes.remove(name);
         }
 
+        String nameRegex = (String)props.get("matching");
         Class<?> fieldClass = type.getFieldClass();
-        if (fieldClass != null) {
-          inferredTypes.remove(fieldClass);
+        int i = 0;
+        for (DeclaredType declaredType : declaredTypes) {
+          if (declaredType.equals(nameRegex, fieldClass)) {
+            declaredTypes.remove(i);
+            break;
+          }
+          i++;
         }
       }
     }
@@ -158,22 +202,22 @@ public class TypeRegistry {
   // }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public IType<?> getByFieldClass(Class<?> fieldClass) {
-    synchronized (inferredTypes) {
-      IType<?> type = inferredTypes.get(fieldClass);
-      if (type != null) {
-        return type;
-      } else {
-        if (fieldClass.isEnum()) {
-          // Special case
-          return new EnumType(fieldClass);
+  public IType<?> getByFieldClass(Class<?> fieldClass, String fieldName) {
+    synchronized (declaredTypes) {
+      for (DeclaredType declaredType : declaredTypes) {
+        if (declaredType.matches(fieldClass, fieldName)) {
+          return declaredType.type;
         }
-        if (ICode.class.isAssignableFrom(fieldClass)) {
-          // Special case
-          return new CodeType(fieldClass);
-        }
-        return null;
       }
+      if (fieldClass.isEnum()) {
+        // Special case
+        return new EnumType(fieldClass);
+      }
+      if (ICode.class.isAssignableFrom(fieldClass)) {
+        // Special case
+        return new CodeType(fieldClass);
+      }
+      return null;
     }
   }
 

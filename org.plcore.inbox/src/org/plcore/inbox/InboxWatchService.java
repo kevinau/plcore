@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 public class InboxWatchService {
 
   private final Logger logger = LoggerFactory.getLogger(InboxWatchService.class);
+
+  private final MD5DigestFactory digestFactory = new MD5DigestFactory();
   
   @Reference
   private ConfigurationLoader configLoader;
@@ -38,8 +40,7 @@ public class InboxWatchService {
   @Configurable(name = "watch", required = true)
   private ExistingDirectory watchDir;
 
-  private final MD5DigestFactory digestFactory = new MD5DigestFactory();
-  
+  @Configurable(name = "matching")
   private final Pattern pattern = Pattern.compile(".");
   
   private DirectoryWatcher watchService;
@@ -83,6 +84,7 @@ public class InboxWatchService {
     DirectoryWatcher.IProcessor watchProcessor = new DirectoryWatcher.IProcessor() {
       @Override
       public void process(Path path, EventKind kind) throws IOException {
+        logger.info("{}: Processing {}, {}", watchDir, kind, watchDir.relativize(path));
         String fileName = watchDir.relativize(path).toString();
         switch (kind) {
         case EXISTING :

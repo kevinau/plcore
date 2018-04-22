@@ -48,7 +48,7 @@ public class ConfigurationLoader {
               String key = (String)e.nextElement();
               if (key.equals(propertyName) || key.startsWith(prefix)) {
                 String propertyValue = dict.get(key).toString();
-                Object fieldValue = getFieldValue(field.getType(), propertyValue);
+                Object fieldValue = getFieldValue(field.getType(), field.getName(), propertyValue);
                 list.add(fieldValue);
               }
             }
@@ -58,7 +58,7 @@ public class ConfigurationLoader {
           } else {
             Object propertyValue = dict.get(propertyName);
             if (propertyValue != null) {
-              Object fieldValue = getFieldValue(field.getType(), propertyValue.toString());
+              Object fieldValue = getFieldValue(field.getType(), field.getName(), propertyValue.toString());
               field.setAccessible(true);
               field.set(target, fieldValue);
             } else if (configAnn.required()) {
@@ -80,7 +80,7 @@ public class ConfigurationLoader {
   }
 
 
-  private Object getFieldValue(Class<?> fieldClass, String propertyValue) throws InstantiationException,
+  private Object getFieldValue(Class<?> fieldClass, String fieldName, String propertyValue) throws InstantiationException,
                                IllegalAccessException, IllegalArgumentException, 
                                InvocationTargetException, ClassNotFoundException,
                                UserEntryException {
@@ -89,7 +89,7 @@ public class ConfigurationLoader {
     if (fieldClass.isEnum()) {
       value = getPropertyAsEnum(propertyValue, fieldClass);
     } else {
-      IType<?> type = typeRegistry.getByFieldClass(fieldClass);
+      IType<?> type = typeRegistry.getByFieldClass(fieldClass, fieldName);
       if (type != null) {
         try {
           value = type.createFromString(propertyValue);

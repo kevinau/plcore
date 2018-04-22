@@ -61,7 +61,7 @@ public class PDFToImage {
 //  public static void main(String[] args) throws Exception {
 //    PDFToImage review = new PDFToImage();
 //    Path pdfPath = Paths.get("C:/Users/Kevin/Accounts/JH Shares/Telstra/2010-09-24.pdf");
-//    Digest digest = new CRC64DigestFactory().getFileDigest(pdfPath);
+//    Digest digest = new MD5DigestFactory().getFileDigest(pdfPath);
 //    //pdfFile = Paths.get("C:/Users/Kevin/Accounts/AU/Commonwealth/Business Transaction Account/Statement20100730.pdf");
 //    DocumentStore docStore = new DocumentStore();
 //    docStore.activate(null);
