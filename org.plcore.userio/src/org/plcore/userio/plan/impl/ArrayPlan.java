@@ -5,15 +5,15 @@ import java.util.Iterator;
 
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.plan.IArrayPlan;
+import org.plcore.userio.plan.IPlanFactory;
 import org.plcore.userio.plan.MemberValueGetterSetter;
-import org.plcore.userio.plan.PlanFactory;
 import org.plcore.userio.plan.PlanStructure;
 import org.plcore.util.ArrayIterator;
 
 
 public class ArrayPlan extends RepeatingPlan implements IArrayPlan {
 
-  public ArrayPlan (PlanFactory planFactory, MemberValueGetterSetter field, Class<?> elemClass, String name, EntryMode entryMode, int dimension) {
+  public ArrayPlan (IPlanFactory planFactory, MemberValueGetterSetter field, Class<?> elemClass, String name, EntryMode entryMode, int dimension) {
     super (planFactory, field, elemClass, name, entryMode, dimension);
   }
   
@@ -54,11 +54,11 @@ public class ArrayPlan extends RepeatingPlan implements IArrayPlan {
   
   @SuppressWarnings("unchecked")
   @Override
-  public <X> X newInstance(X fromValue) {
+  public <X> X replicate(X fromValue) {
     Object[] fromArray = (Object[])fromValue;
     Object[] toArray = (Object[])Array.newInstance(Object.class, fromArray.length);
     for (int i = 0; i < fromArray.length; i++) {
-      Object v = super.newInstance(fromArray[i]);
+      Object v = getElementPlan().replicate(fromArray[i]);
       toArray[i] = v;
     }
     return (X)toArray;

@@ -1,11 +1,12 @@
 package org.plcore.userio.model.impl;
 
+import org.plcore.userio.model.IEmbeddedModel;
 import org.plcore.userio.model.ModelFactory;
 import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.plan.IEmbeddedPlan;
 import org.plcore.userio.plan.INodePlan;
 
-public class EmbeddedModel extends NameMappedModel {
+public class EmbeddedModel extends NameMappedModel implements IEmbeddedModel {
   
   private final IEmbeddedPlan<?> embeddedPlan;
   
@@ -16,7 +17,9 @@ public class EmbeddedModel extends NameMappedModel {
   }
   
   
+  @Override
   public void setValue (Object value) {
+    valueRef.setValue(value);
     syncValue(value, false);
   }
   

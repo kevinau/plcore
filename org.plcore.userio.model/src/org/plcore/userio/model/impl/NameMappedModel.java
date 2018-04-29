@@ -16,21 +16,21 @@ import org.plcore.userio.model.ModelFactory;
 import org.plcore.userio.model.ref.ClassValueReference;
 import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.path.IPathExpression;
-import org.plcore.userio.plan.IClassPlan;
+import org.plcore.userio.plan.INameMappedPlan;
 import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.IRuntimeDefaultProvider;
 
 
 public abstract class NameMappedModel extends ContainerModel implements INameMappedModel {
 
-  private final IClassPlan<?> classPlan;
+  private final INameMappedPlan nameMappedPlan;
   
   private Map<String, INodeModel> members = new LinkedHashMap<>();
   
   
-  public NameMappedModel (ModelFactory modelFactory, IValueReference valueRef, IClassPlan<?> classPlan) {
-    super (modelFactory, valueRef, classPlan);
-    this.classPlan = classPlan;
+  public NameMappedModel (ModelFactory modelFactory, IValueReference valueRef, INameMappedPlan nameMappedPlan) {
+    super (modelFactory, valueRef, nameMappedPlan);
+    this.nameMappedPlan = nameMappedPlan;
     
 //    // The model has now been constructed.  Set up the value change event handlers.
 //    for (IRuntimeDefaultProvider defaultProvider : classPlan.getRuntimeDefaultProviders()) {
@@ -66,7 +66,7 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
   
   //@SuppressWarnings("unchecked")
   private void addRuntimeDefaultHandlers(IItemModel itemModel) {
-    for (IRuntimeDefaultProvider defaultProvider : classPlan.getRuntimeDefaultProviders()) {
+    for (IRuntimeDefaultProvider defaultProvider : nameMappedPlan.getRuntimeDefaultProviders()) {
       if (defaultProvider.isRuntime()) {
         for (IPathExpression expr : defaultProvider.getDependsOn()) {
           if (itemModel.matches(this, expr)) {
@@ -93,7 +93,7 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
     // Run all the runtime default providers to set up
     // the defaults.  After this setup, the runtime event handlers 
     // will keep them up to date.
-    for (IRuntimeDefaultProvider defaultProvider : classPlan.getRuntimeDefaultProviders()) {
+    for (IRuntimeDefaultProvider defaultProvider : nameMappedPlan.getRuntimeDefaultProviders()) {
       // Check that all dependencies are error free
       boolean inError = false;
       loop:
@@ -123,7 +123,7 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
   @SuppressWarnings("unchecked")
   @Override
   public Object setNew () {
-    Object newValue = classPlan.newInstance();
+    Object newValue = nameMappedPlan.newInstance();
     syncValue(newValue, true);
     return newValue;
   }
@@ -132,7 +132,7 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
   @Override
   public void syncValue (Object nameMappedValue, boolean setFieldDefault) {
     if (nameMappedValue == null) {
-      INodePlan[] memberPlans = classPlan.getMembers();
+      INodePlan[] memberPlans = nameMappedPlan.getMembers();
       for (INodePlan memberPlan : memberPlans) {
         String fieldName = memberPlan.getName();
         INodeModel member = members.remove(fieldName);
@@ -143,7 +143,7 @@ public abstract class NameMappedModel extends ContainerModel implements INameMap
     } else {
       valueRef.setValue(nameMappedValue);
       
-      INodePlan[] memberPlans = classPlan.getMembers();
+      INodePlan[] memberPlans = nameMappedPlan.getMembers();
       for (INodePlan memberPlan : memberPlans) {
         String fieldName = memberPlan.getName();
         INodeModel member = members.get(fieldName);

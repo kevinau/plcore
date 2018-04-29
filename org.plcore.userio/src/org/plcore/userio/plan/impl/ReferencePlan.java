@@ -3,10 +3,10 @@ package org.plcore.userio.plan.impl;
 import org.plcore.type.builtin.IntegerType;
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.plan.IEntityPlan;
+import org.plcore.userio.plan.IPlanFactory;
 import org.plcore.userio.plan.IReferencePlan;
 import org.plcore.userio.plan.ItemLabelGroup;
 import org.plcore.userio.plan.MemberValueGetterSetter;
-import org.plcore.userio.plan.PlanFactory;
 import org.plcore.userio.plan.PlanStructure;
 
 
@@ -16,7 +16,7 @@ public class ReferencePlan<T> extends ItemPlan<Integer> implements IReferencePla
   private final ReferenceLabelGroup labels;
 
   
-  public ReferencePlan(PlanFactory planFactory, MemberValueGetterSetter field, Class<T> referencedClass, String pathName, EntryMode entryMode) {
+  public ReferencePlan(IPlanFactory planFactory, MemberValueGetterSetter field, Class<T> referencedClass, String pathName, EntryMode entryMode) {
     super(field, pathName, entryMode, new IntegerType());
     this.referencedPlan = planFactory.getEntityPlan(referencedClass);
     this.labels = new ReferenceLabelGroup(field, pathName);
@@ -67,7 +67,7 @@ public class ReferencePlan<T> extends ItemPlan<Integer> implements IReferencePla
 
 
   @Override
-  public <X> X newInstance(X fromValue) {
+  public <X> X replicate(X fromValue) {
     return fromValue;
   }
 

@@ -91,7 +91,7 @@ public class BooleanType extends Type<Boolean> implements IType<Boolean> {
       value = Boolean.FALSE;
       break;
     default:
-      throw new UserEntryException("not a boolean value");
+      throw new UserEntryException("not a yes/no value");
     }
     return value;
   }

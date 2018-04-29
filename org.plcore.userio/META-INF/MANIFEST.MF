@@ -13,7 +13,7 @@ Import-Package: org.osgi.service.component.annotations;version="1.3.0";resolutio
  org.plcore.util,
  org.plcore.value
 Bundle-ActivationPolicy: lazy
-Service-Component: OSGI-INF/org.plcore.userio.plan.PlanFactory.xml
+Service-Component: OSGI-INF/org.plcore.userio.plan.impl.PlanFactory.xml
 Export-Package: org.plcore.userio,
  org.plcore.userio.path,
  org.plcore.userio.plan

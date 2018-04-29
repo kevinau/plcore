@@ -40,7 +40,7 @@ public interface INodePlan extends INode {
     }
   }
 
-  public <X> X newInstance(X fromValue);
+  public <X> X replicate(X fromValue);
 
   public <X extends ILabelGroup> X getLabels();
   

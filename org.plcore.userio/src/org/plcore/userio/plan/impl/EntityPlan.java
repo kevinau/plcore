@@ -11,18 +11,19 @@ import org.plcore.userio.Id;
 import org.plcore.userio.UniqueConstraint;
 import org.plcore.userio.Version;
 import org.plcore.userio.plan.EntityLabelGroup;
+import org.plcore.userio.plan.IAugmentedClass;
 import org.plcore.userio.plan.IEntityPlan;
 import org.plcore.userio.plan.IItemPlan;
+import org.plcore.userio.plan.ILabelGroup;
 import org.plcore.userio.plan.INodePlan;
-import org.plcore.userio.plan.PlanFactory;
 import org.plcore.userio.plan.PlanStructure;
 import org.plcore.value.EntityLife;
 import org.plcore.value.VersionTime;
 
 
-public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
+public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
 
-  private final ClassPlan<T> classPlan;
+  private final IAugmentedClass<T> aclass;
   private final String entityName;
   private final EntityLabelGroup labels;
 
@@ -35,11 +36,11 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   private List<IItemPlan<?>[]> uniqueConstraints;
 
   
-  public EntityPlan (ClassPlan<T> classPlan) {
-    super (null, classPlan, classPlan.getSourceClass().getSimpleName(), entityEntryMode(classPlan.getSourceClass()));
-    this.classPlan = classPlan;
-    this.entityName = classPlan.getSourceClass().getSimpleName();
-    this.labels = new EntityLabelGroup(classPlan.getSourceClass());
+  public EntityPlan (IAugmentedClass<T> aclass) {
+    super (aclass);
+    this.aclass = aclass;
+    this.entityName = aclass.getSourceClass().getSimpleName();
+    this.labels = new EntityLabelGroup(aclass.getSourceClass());
   }
 
   
@@ -58,9 +59,8 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   }
 
 
-  @SuppressWarnings("unchecked")
   @Override
-  public EntityLabelGroup getLabels () {
+  public ILabelGroup getLabels () {
     return labels;
   }
   
@@ -299,7 +299,7 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   
   
   private void findUniqueConstraints() {
-    Class<?> entityClass = classPlan.getSourceClass();
+    Class<?> entityClass = aclass.getSourceClass();
     UniqueConstraint[] ucAnnx = entityClass.getAnnotationsByType(UniqueConstraint.class);
     uniqueConstraints = new ArrayList<>(ucAnnx.length);
     for (UniqueConstraint ucAnn : ucAnnx) {
@@ -399,7 +399,7 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   @SuppressWarnings("unchecked")
   @Override
   public T newInstance() {
-    return classPlan.newInstance();
+    return aclass.newInstance();
   }
 
   
@@ -416,6 +416,13 @@ public class EntityPlan<T> extends NameMappedPlan<T> implements IEntityPlan<T> {
   @Override
   public PlanStructure getStructure () {
     return PlanStructure.ENTITY;
+  }
+
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <X> X replicate(X fromValue) {
+    return (X)aclass.replicate(fromValue);
   }
 
 }

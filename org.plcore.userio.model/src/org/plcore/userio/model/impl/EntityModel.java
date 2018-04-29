@@ -14,7 +14,7 @@ import org.plcore.userio.plan.INodePlan;
 import org.plcore.value.EntityLife;
 import org.plcore.value.VersionTime;
 
-public class EntityModel extends NameMappedModel implements IEntityModel {
+public class EntityModel extends EmbeddedModel implements IEntityModel {
   
   private final IValueReference valueRef;
   
@@ -42,13 +42,6 @@ public class EntityModel extends NameMappedModel implements IEntityModel {
     x.entityCreated(this);
   }
 
-  
-  @Override
-  public void setValue (Object value) {
-    valueRef.setValue(value);
-    syncValue(value, false);
-  }
-  
   
   @Override
   public void setEntityId (int id) {

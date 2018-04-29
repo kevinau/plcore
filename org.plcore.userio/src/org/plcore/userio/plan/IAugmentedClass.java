@@ -1,10 +1,18 @@
 package org.plcore.userio.plan;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.plcore.userio.INode;
 
-public interface IClassPlan<T> extends IContainerPlan {
+public interface IAugmentedClass<T> {
+
+  public void complete(IPlanFactory planFactory);
+
+  public Class<?> getSourceClass();
+
+  public void addClassFields(IPlanFactory factory, Class<?> sourceClass, boolean b);
 
   public List<IRuntimeDefaultProvider> getRuntimeDefaultProviders();
 
@@ -24,16 +32,6 @@ public interface IClassPlan<T> extends IContainerPlan {
 
   public Set<IValidationMethod> getValidationMethods();
 
-  public Class<?> getSourceClass();
-
-  @Override
-  public default void dump () {
-    dump (0);
-  }
-
-  @Override
-  public void dump (int level);
-
   public String getClassName();
 
   public INodePlan[] getMembers();
@@ -41,5 +39,15 @@ public interface IClassPlan<T> extends IContainerPlan {
   public <X extends INodePlan> X getMember(String name);
 
   public MemberValueGetterSetter getNodeField(String memberName);
+
+  public Collection<? extends INode> getContainerNodes();
+
+  public INode getNameMappedNode(String name);
+
+  public void dump(int level);
+
+  public T newInstance();
+
+  public T replicate(Object value);
 
 }

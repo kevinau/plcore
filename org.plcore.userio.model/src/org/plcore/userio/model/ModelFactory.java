@@ -61,18 +61,26 @@ public class ModelFactory implements IModelFactory {
   
   @Override
   public IEntityModel buildEntityModel(String entityClassName) throws ClassNotFoundException {
-    if (planFactory == null) {
-      throw new IllegalStateException("No PlanFactory supplied to this model factory");
-    }
-    IEntityPlan<?> entityPlan = planFactory.getEntityPlan(entityClassName);
-    return buildEntityModel(entityPlan);
+    Class<?> klass = Class.forName(entityClassName);
+    return buildEntityModel(klass);
   }
   
   
   @Override
   public IEntityModel buildEntityModel(IEntityPlan<?> entityPlan) {
     IValueReference valueRef = new EntityValueReference();
-    return (IEntityModel)buildNodeModel(valueRef, entityPlan);
+    return new EntityModel(this, valueRef, entityPlan);
+  }
+  
+
+  @Override
+  public IEmbeddedModel buildEmbeddedModel(Class<?> klass) {
+    if (planFactory == null) {
+      throw new IllegalStateException("No PlanFactory supplied to this model factory");
+    }
+    IEmbeddedPlan<?> embeddedPlan = planFactory.getEmbeddedPlan(klass);
+    IValueReference valueRef = new EntityValueReference();
+    return new EmbeddedModel(this, valueRef, embeddedPlan);
   }
   
   
@@ -96,4 +104,11 @@ public class ModelFactory implements IModelFactory {
       throw new NotYetImplementedException("buildNodeModel from a nodePlan: " + nodePlan.getClass());
     }
   }
+
+  
+  @Override
+  public IPlanFactory getPlanFactory() {
+    return planFactory;
+  }
+  
 }

@@ -2,18 +2,27 @@ package org.plcore.userio.plan.impl;
 
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.plan.EmbeddedLabelGroup;
+import org.plcore.userio.plan.IAugmentedClass;
 import org.plcore.userio.plan.IEmbeddedPlan;
+import org.plcore.userio.plan.ILabelGroup;
 import org.plcore.userio.plan.MemberValueGetterSetter;
 import org.plcore.userio.plan.PlanStructure;
 
 
-public class EmbeddedPlan<T> extends NameMappedPlan<T> implements IEmbeddedPlan<T> {
+public class EmbeddedPlan<T> extends NameMappedPlan implements IEmbeddedPlan<T> {
 
+  private final IAugmentedClass<T> aclass;
   private EmbeddedLabelGroup labels;
   
   
-  public EmbeddedPlan (MemberValueGetterSetter field, ClassPlan<T> classPlan, String name, EntryMode entryMode) {
-    super (field, classPlan, name, entryMode);
+  public EmbeddedPlan (IAugmentedClass<T> aclass) {
+    this(null, aclass, aclass.getSourceClass().getSimpleName(), entityEntryMode(aclass.getSourceClass()));
+  }
+  
+
+  public EmbeddedPlan (MemberValueGetterSetter field, IAugmentedClass<T> aclass, String name, EntryMode entryMode) {
+    super (field, aclass, name, entryMode);
+    this.aclass = aclass;
     this.labels = new EmbeddedLabelGroup(field, name);
   }
   
@@ -28,7 +37,7 @@ public class EmbeddedPlan<T> extends NameMappedPlan<T> implements IEmbeddedPlan<
   
   @SuppressWarnings("unchecked")
   @Override
-  public EmbeddedLabelGroup getLabels () {
+  public ILabelGroup getLabels () {
     return labels;
   }
   
@@ -41,6 +50,20 @@ public class EmbeddedPlan<T> extends NameMappedPlan<T> implements IEmbeddedPlan<
   @Override
   public PlanStructure getStructure () {
     return PlanStructure.EMBEDDED;
+  }
+
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <X> X newInstance() {
+    return (X)aclass.newInstance();
+  }
+
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <X> X replicate(X fromValue) {
+    return (X)aclass.replicate(fromValue);
   }
 
 }

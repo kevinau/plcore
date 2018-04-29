@@ -11,7 +11,7 @@ public interface IContainerPlan extends INodePlan, IContainerNode {
 
   public List<IItemPlan<?>> selectItemPlans(String expr);
 
-  public INodePlan selectNodePlan(String expr);
+  public <X extends INodePlan> X selectNodePlan(String expr);
 
   public IItemPlan<?> selectItemPlan(String expr);
 

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.plcore.type.UserEntryException;
+import org.plcore.userio.Computed;
 import org.plcore.userio.DefaultFor;
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.FactoryFor;
@@ -22,14 +23,15 @@ import org.plcore.userio.IOField;
 import org.plcore.userio.MappedSuperclass;
 import org.plcore.userio.Mode;
 import org.plcore.userio.ModeFor;
-import org.plcore.userio.NotIOField;
 import org.plcore.userio.OccursFor;
 import org.plcore.userio.Optional;
 import org.plcore.userio.Validation;
 import org.plcore.userio.ValuesFor;
+import org.plcore.userio.plan.IAugmentedClass;
 import org.plcore.userio.plan.IContainerPlan;
 import org.plcore.userio.plan.IItemPlan;
 import org.plcore.userio.plan.INodePlan;
+import org.plcore.userio.plan.IPlanFactory;
 import org.plcore.userio.plan.IRuntimeDefaultProvider;
 import org.plcore.userio.plan.IRuntimeFactoryProvider;
 //import org.plcore.userio.plan.IRuntimeImplementationProvider;
@@ -38,13 +40,11 @@ import org.plcore.userio.plan.IRuntimeOccursProvider;
 import org.plcore.userio.plan.IRuntimeValuesProvider;
 import org.plcore.userio.plan.IValidationMethod;
 import org.plcore.userio.plan.MemberValueGetterSetter;
-import org.plcore.userio.plan.NodePlanFactory;
-import org.plcore.userio.plan.PlanFactory;
 import org.plcore.util.CamelCase;
 import org.plcore.value.ICode;
 
 
-public class ClassPlan<T> {
+public class AugmentedClass<T> implements IAugmentedClass<T> {
 
   private final Class<T> klass;
 
@@ -81,22 +81,25 @@ public class ClassPlan<T> {
   }
   
 
-  public ClassPlan (Class<T> klass) {
+  public AugmentedClass (Class<T> klass) {
     this.klass = klass;
   }
   
   
-  public void complete (PlanFactory factory) {
+  @Override
+  public void complete (IPlanFactory factory) {
     addClassFields (factory, klass, true);
   }
   
   
-  String getClassName() {
+  @Override
+  public String getClassName() {
     return klass.getCanonicalName();
   }
   
   
-  public void addClassFields (PlanFactory factory, Class<?> klass, boolean include) {
+  @Override
+  public void addClassFields (IPlanFactory factory, Class<?> klass, boolean include) {
     Field[] declaredFields = klass.getDeclaredFields();
     Method[] declaredMethods = klass.getDeclaredMethods();
     
@@ -207,12 +210,12 @@ public class ClassPlan<T> {
   }
 
   
-  private void addClassFields2 (PlanFactory factory, Class<?> klass, Field[] fields, Method[] methods, boolean include) {
+  private void addClassFields2 (IPlanFactory planFactory, Class<?> klass, Field[] fields, Method[] methods, boolean include) {
     // Parse the class hierarchy recursively
     Class<?> superKlass = klass.getSuperclass();
     if (superKlass != null && !superKlass.equals(Object.class)) {
       MappedSuperclass msc = superKlass.getAnnotation(MappedSuperclass.class);
-      addClassFields(factory, superKlass, msc != null);
+      addClassFields(planFactory, superKlass, msc != null);
     }
     //Object defaultInstance = defaultInstance(klass);
     
@@ -259,7 +262,7 @@ public class ClassPlan<T> {
           // Note.  Transient fields are NOT excluded
           continue;
         }
-        if (field.isAnnotationPresent(NotIOField.class)) {
+        if (field.isAnnotationPresent(Computed.class)) {
           continue;
         }
         
@@ -294,7 +297,7 @@ public class ClassPlan<T> {
 //        Field lastEntryField = lastEntryFields.get(field.getName());
 
         // Use the field value for setting up defaults only
-        INodePlan nodePlan = NodePlanFactory.getNodePlan(factory, fieldGenericType, ioField, name, entryMode, 0, optional);
+        INodePlan nodePlan = planFactory.getNodePlan(fieldGenericType, ioField, name, entryMode, 0, optional);
         memberPlans.put(name, nodePlan);
         memberFields.put(name, ioField);
       }
@@ -362,7 +365,7 @@ public class ClassPlan<T> {
         
         boolean optional = calcOptional(memberType, ioField);
 
-        INodePlan nodePlan = NodePlanFactory.getNodePlan(factory, memberGenericType, ioField, name, entryMode, 0, optional);
+        INodePlan nodePlan = planFactory.getNodePlan(memberGenericType, ioField, name, entryMode, 0, optional);
         memberPlans.put(name, nodePlan);
         memberFields.put(name, ioField);
       }
@@ -1142,48 +1145,57 @@ public class ClassPlan<T> {
   }
 
   
-  List<IRuntimeModeProvider> getRuntimeModeProviders() {
+  @Override
+  public List<IRuntimeModeProvider> getRuntimeModeProviders() {
     return runtimeModeProviders;
   }
 
   
-  List<IRuntimeDefaultProvider> getRuntimeDefaultProviders() {
+  @Override
+  public List<IRuntimeDefaultProvider> getRuntimeDefaultProviders() {
     return runtimeDefaultProviders;
   }
 
   
-  List<IRuntimeValuesProvider> getRuntimeValuesProviders() {
+  @Override
+  public List<IRuntimeValuesProvider> getRuntimeValuesProviders() {
     return runtimeValuesProviders;
   }
 
   
-  List<IRuntimeFactoryProvider> getRuntimeFactoryProviders() {
+  @Override
+  public List<IRuntimeFactoryProvider> getRuntimeFactoryProviders() {
     return runtimeFactoryProviders;
   }
 
   
-  Set<IValidationMethod> getValidationMethods() {
+  @Override
+  public Set<IValidationMethod> getValidationMethods() {
     return validationMethods;
   }
 
   
-  List<IRuntimeOccursProvider> getRuntimeOccursProviders() {
+  @Override
+  public List<IRuntimeOccursProvider> getRuntimeOccursProviders() {
     return runtimeOccursProviders;
   }
 
   
+  @Override
   @SuppressWarnings("unchecked")
-  <X extends INodePlan> X getMember(String name) {
+  public <X extends INodePlan> X getMember(String name) {
     return (X)memberPlans.get(name);
   }
 
 
-  INode getNameMappedNode(String name) {
+  @Override
+  public INode getNameMappedNode(String name) {
     return memberPlans.get(name);
   }
 
 
-  INodePlan[] getMembers() {
+  @Override
+  public INodePlan[] getMembers() {
     INodePlan[] mx = new INodePlan[memberPlans.size()];
     int i = 0;
     for (INodePlan m : memberPlans.values()) {
@@ -1193,7 +1205,8 @@ public class ClassPlan<T> {
   }
 
   
-  MemberValueGetterSetter getNodeField (String memberName) {
+  @Override
+  public MemberValueGetterSetter getNodeField (String memberName) {
     return memberFields.get(memberName);
   }
   
@@ -1205,7 +1218,8 @@ public class ClassPlan<T> {
   }
   
   
-  void dump (int level) {
+  @Override
+  public void dump (int level) {
     indent(level);
     System.out.println("ClassPlan(" + klass.getName() + "[" + memberPlans.size() + "]," + super.toString() + ")");
     for (IRuntimeFactoryProvider factoryProvider : runtimeFactoryProviders) {
@@ -1221,32 +1235,34 @@ public class ClassPlan<T> {
   }
 
 
-  Class<?> getSourceClass() {
+  @Override
+  public Class<?> getSourceClass() {
     return klass;
   }
 
 
-  @SuppressWarnings("unchecked")
-  <X> X newInstance () {
-    Object instance;
+  @Override
+  public T newInstance () {
+    T instance;
     try {
       instance = klass.newInstance();
     } catch (InstantiationException | IllegalAccessException ex) {
       throw new RuntimeException(ex);
     }
-    return (X)instance;  
+    return instance;  
   }
   
   
-  Object newInstance (Object fromInstance) {
-    Object toInstance = newInstance();
+  @Override
+  public T replicate (Object fromInstance) {
+    T toInstance = newInstance();
     for (INodePlan member : memberPlans.values()) {
       Object fromValue = member.getFieldValue(fromInstance);
 
       if (member instanceof IItemPlan) {
         member.setFieldValue(toInstance, fromValue);      
       } else if (member instanceof IContainerPlan) {
-        Object newValue = ((IContainerPlan)member).newInstance(fromValue);
+        Object newValue = ((IContainerPlan)member).replicate(fromValue);
         member.setFieldValue(toInstance, newValue);      
       } else {
         throw new RuntimeException("Non-supported node plan: " + member);
@@ -1256,7 +1272,8 @@ public class ClassPlan<T> {
   }
 
 
-  Collection<? extends INode> getContainerNodes() {
+  @Override
+  public Collection<? extends INode> getContainerNodes() {
     return memberPlans.values();
   }
 

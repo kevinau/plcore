@@ -286,7 +286,7 @@ public abstract class NodeModel implements INodeModel {
   @Override
   public String getQName () {
     StringBuilder builder = new StringBuilder();
-    buildQName(getParentEntity(), builder);
+    buildQName((IContainerModel)getParentEntity(), builder);
     return builder.toString();
   }
 

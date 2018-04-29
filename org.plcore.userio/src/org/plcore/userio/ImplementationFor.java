@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
+@Deprecated
 public @interface ImplementationFor {
   
   String[] value() default {};

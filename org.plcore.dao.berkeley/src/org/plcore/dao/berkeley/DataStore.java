@@ -42,6 +42,7 @@ public class DataStore {
     model.registerClass(DecimalProxy.class);
     model.registerClass(CRC64DigestProxy.class);
     model.registerClass(VersionTimeProxy.class);
+    model.registerClass(MimeTypeProxy.class);
 
     StoreConfig storeConfig = new StoreConfig();
     storeConfig.setAllowCreate(true);

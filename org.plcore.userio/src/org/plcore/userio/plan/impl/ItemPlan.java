@@ -130,7 +130,7 @@ public class ItemPlan<T> extends NodePlan implements IItemPlan<T> {
 
 
   @Override
-  public <X> X newInstance(X fromValue) {
+  public <X> X replicate(X fromValue) {
     return fromValue;
   }
   

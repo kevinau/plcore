@@ -8,7 +8,7 @@ import org.plcore.value.VersionTime;
 
 
 
-public interface IEntityPlan<T> extends IClassPlan<T> {
+public interface IEntityPlan<T> extends IEmbeddedPlan<T> {
 
   public String getEntityName();
 
@@ -46,6 +46,9 @@ public interface IEntityPlan<T> extends IClassPlan<T> {
   
   @Override
   public <X> X newInstance();
+  
+  @Override
+  public <X> X replicate(X fromValue);
   
 //  public T newInstance(IItemPlan<?>[] sqlPlans, IResultSet rs);
   

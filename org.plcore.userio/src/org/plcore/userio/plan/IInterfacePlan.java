@@ -2,7 +2,7 @@ package org.plcore.userio.plan;
 
 import java.lang.reflect.Type;
 
-public interface IInterfacePlan {
+public interface IInterfacePlan extends INodePlan {
 
   public Type getInterfaceType();
   

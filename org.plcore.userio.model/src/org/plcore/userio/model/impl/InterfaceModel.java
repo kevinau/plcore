@@ -10,6 +10,7 @@ import java.util.Map;
 import org.plcore.userio.INode;
 import org.plcore.userio.model.ContainerChangeListener;
 import org.plcore.userio.model.IContainerModel;
+import org.plcore.userio.model.IEmbeddedModel;
 import org.plcore.userio.model.IItemModel;
 import org.plcore.userio.model.INameMappedModel;
 import org.plcore.userio.model.INodeModel;
@@ -17,7 +18,6 @@ import org.plcore.userio.model.ModelFactory;
 import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.path.IPathExpression;
 import org.plcore.userio.plan.IInterfacePlan;
-import org.plcore.userio.plan.INodePlan;
 
 public class InterfaceModel extends NodeModel implements INameMappedModel, ContainerChangeListener {
   
@@ -27,12 +27,12 @@ public class InterfaceModel extends NodeModel implements INameMappedModel, Conta
   
   private final List<ContainerChangeListener> containerChangeListeners = new ArrayList<>();
 
-  private INameMappedModel implementedModel = null;
+  private IEmbeddedModel implementedModel = null;
   private Map<String, String> priorValues = new HashMap<>();
   
   
   public InterfaceModel (ModelFactory modelFactory, IValueReference valueRef, IInterfacePlan interfacePlan) {
-    super (modelFactory, valueRef, interfacePlan);
+    super (modelFactory, interfacePlan);
     this.modelFactory = modelFactory;
     this.valueRef = valueRef;
     this.interfacePlan = interfacePlan;
@@ -64,8 +64,7 @@ public class InterfaceModel extends NodeModel implements INameMappedModel, Conta
  
     // Build new NamedMappedModel from new Value
     Class<?> newClass = newValue.getClass();
-    INodePlan nodePlan = modelFactory.buildNodePlan(newClass);
-    implementedModel = modelFactory.buildNodeModel(valueRef, nodePlan);
+    implementedModel = modelFactory.buildEmbeddedModel(newClass);
     
     // Add container change event listener
     implementedModel.addContainerChangeListener(this);

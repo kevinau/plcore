@@ -5,21 +5,21 @@ import java.lang.reflect.Type;
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.plan.EmbeddedLabelGroup;
 import org.plcore.userio.plan.IInterfacePlan;
+import org.plcore.userio.plan.IPlanFactory;
 import org.plcore.userio.plan.MemberValueGetterSetter;
-import org.plcore.userio.plan.PlanFactory;
 import org.plcore.userio.plan.PlanStructure;
 
 
 public class InterfacePlan extends NodePlan implements IInterfacePlan{
 
   @SuppressWarnings("unused")
-  private final PlanFactory planFactory;
+  private final IPlanFactory planFactory;
   
   private final Type fieldType;
   private final EmbeddedLabelGroup labels;
   
   
-  public InterfacePlan (PlanFactory planFactory, MemberValueGetterSetter field, Type fieldType, String name, EntryMode entryMode) {
+  public InterfacePlan (IPlanFactory planFactory, MemberValueGetterSetter field, Type fieldType, String name, EntryMode entryMode) {
     super (field, name, entryMode);
     this.planFactory = planFactory;
     if (fieldType == null) { 
@@ -63,7 +63,7 @@ public class InterfacePlan extends NodePlan implements IInterfacePlan{
 
 
   @Override
-  public <X> X newInstance(X fromValue) {
+  public <X> X replicate(X fromValue) {
     return fromValue;
   }
   

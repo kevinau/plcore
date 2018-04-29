@@ -300,12 +300,6 @@ public class CodeType<T extends ICode<T>> extends Type<T> implements IType<T>, I
 //  }
 
   @Override
-  public Class<?> getFieldClass() {
-    return ICode.class;
-  }
-
-
-  @Override
   protected void validate(T value) throws UserEntryException {
     // Nothing to do?
   }

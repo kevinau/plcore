@@ -7,6 +7,7 @@ import java.util.Set;
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.INameMappedNode;
 import org.plcore.userio.INode;
+import org.plcore.userio.plan.IAugmentedClass;
 import org.plcore.userio.plan.INameMappedPlan;
 import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.IRuntimeDefaultProvider;
@@ -17,119 +18,105 @@ import org.plcore.userio.plan.IRuntimeOccursProvider;
 import org.plcore.userio.plan.IRuntimeValuesProvider;
 import org.plcore.userio.plan.IValidationMethod;
 import org.plcore.userio.plan.MemberValueGetterSetter;
-import org.plcore.userio.plan.PlanFactory;
 
 
-public abstract class NameMappedPlan<T> extends ContainerPlan implements INameMappedPlan, INameMappedNode {
+public abstract class NameMappedPlan extends ContainerPlan implements INameMappedPlan, INameMappedNode {
 
-  private final ClassPlan<T> classPlan;
+  private final IAugmentedClass<?> aclass;
 
-  public NameMappedPlan (MemberValueGetterSetter field, ClassPlan<T> classPlan, String name, EntryMode entryMode) {
+  public NameMappedPlan (MemberValueGetterSetter field, IAugmentedClass<?> aclass, String name, EntryMode entryMode) {
     super(field, name, entryMode);
-    this.classPlan = classPlan;
+    this.aclass = aclass;
   }
   
   
   public void complete (PlanFactory factory) {
-    classPlan.addClassFields (factory, classPlan.getSourceClass(), true);
+    aclass.addClassFields (factory, aclass.getSourceClass(), true);
   }
   
   
   @Override
   public String getClassName() {
-    return classPlan.getClassName();
+    return aclass.getClassName();
   }
   
     
   @Override
   public List<IRuntimeModeProvider> getRuntimeModeProviders() {
-    return classPlan.getRuntimeModeProviders();
+    return aclass.getRuntimeModeProviders();
   }
 
   
   @Override
   public List<IRuntimeDefaultProvider> getRuntimeDefaultProviders() {
-    return classPlan.getRuntimeDefaultProviders();
+    return aclass.getRuntimeDefaultProviders();
   }
 
   
   @Override
   public List<IRuntimeValuesProvider> getRuntimeValuesProviders() {
-    return classPlan.getRuntimeValuesProviders();
+    return aclass.getRuntimeValuesProviders();
   }
 
   
   @Override
   public List<IRuntimeFactoryProvider> getRuntimeFactoryProviders() {
-    return classPlan.getRuntimeFactoryProviders();
+    return aclass.getRuntimeFactoryProviders();
   }
 
   
   @Override
   public Set<IValidationMethod> getValidationMethods() {
-    return classPlan.getValidationMethods();
+    return aclass.getValidationMethods();
   }
 
   
   @Override
   public List<IRuntimeOccursProvider> getRuntimeOccursProviders() {
-    return classPlan.getRuntimeOccursProviders();
+    return aclass.getRuntimeOccursProviders();
   }
 
   
   @Override
   public <X extends INodePlan> X getMember(String name) {
-    return classPlan.getMember(name);
+    return aclass.getMember(name);
   }
 
 
   @SuppressWarnings("unchecked")
   @Override
   public INode getNameMappedNode(String name) {
-    return classPlan.getNameMappedNode(name);
+    return aclass.getNameMappedNode(name);
   }
 
 
   @Override
   public INodePlan[] getMembers() {
-    return classPlan.getMembers();
+    return aclass.getMembers();
   }
 
   
   @Override
   public MemberValueGetterSetter getNodeField (String memberName) {
-    return classPlan.getNodeField(memberName);
+    return aclass.getNodeField(memberName);
   }
   
   
   @Override
   public void dump (int level) {
-    classPlan.dump(level);
+    aclass.dump(level);
   }
 
 
   @Override
   public Class<?> getSourceClass() {
-    return classPlan.getSourceClass();
-  }
-
-
-  @Override
-  public <X> X newInstance () {
-    return classPlan.newInstance();
-  }
-  
-  
-  @SuppressWarnings("unchecked")
-  @Override
-  public Object newInstance (Object fromInstance) {
-    return classPlan.newInstance(fromInstance);
+    return aclass.getSourceClass();
   }
 
 
   @Override
   public Collection<? extends INode> getContainerNodes() {
-    return classPlan.getContainerNodes();
+    return aclass.getContainerNodes();
   }
 
 }

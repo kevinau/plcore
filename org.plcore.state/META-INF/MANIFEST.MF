@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - state machine
+Bundle-SymbolicName: org.plcore.state
+Bundle-Version: 1.0.0
+Automatic-Module-Name: org.plcore.state
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Kevin Holloway
+Export-Package: org.plcore.state

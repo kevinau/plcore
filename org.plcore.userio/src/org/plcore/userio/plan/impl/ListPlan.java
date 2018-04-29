@@ -7,7 +7,6 @@ import java.util.List;
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.plan.IListPlan;
 import org.plcore.userio.plan.MemberValueGetterSetter;
-import org.plcore.userio.plan.PlanFactory;
 import org.plcore.userio.plan.PlanStructure;
 
 
@@ -48,11 +47,11 @@ public class ListPlan extends RepeatingPlan implements IListPlan {
   
   @SuppressWarnings("unchecked")
   @Override
-  public <X> X newInstance(X fromValue) {
+  public <X> X replicate(X fromValue) {
     List<?> fromList = (List<?>)fromValue;
     List<Object> toList = new ArrayList<>(fromList.size());
     for (Object v0 : fromList) {
-      Object v1 = super.newInstance(v0);
+      Object v1 = getElementPlan().replicate(v0);
       toList.add(v1);
     }
     return (X)toList;

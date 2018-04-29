@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.plcore.userio.INameMappedNode;
 
-
 public interface INameMappedPlan extends IContainerPlan, INameMappedNode {
 
   public List<IRuntimeDefaultProvider> getRuntimeDefaultProviders();
@@ -43,5 +42,5 @@ public interface INameMappedPlan extends IContainerPlan, INameMappedNode {
   public <X extends INodePlan> X getMember(String name);
 
   public MemberValueGetterSetter getNodeField(String memberName);
-
+  
 }

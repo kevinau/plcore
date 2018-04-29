@@ -6,10 +6,9 @@ import java.util.Collections;
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.Occurs;
 import org.plcore.userio.plan.INodePlan;
+import org.plcore.userio.plan.IPlanFactory;
 import org.plcore.userio.plan.IRepeatingPlan;
 import org.plcore.userio.plan.MemberValueGetterSetter;
-import org.plcore.userio.plan.NodePlanFactory;
-import org.plcore.userio.plan.PlanFactory;
 import org.plcore.userio.plan.RepeatingLabelGroup;
 
 
@@ -26,10 +25,10 @@ public abstract class RepeatingPlan extends ContainerPlan implements IRepeatingP
   private final int maxOccurs;  
   
   
-  public RepeatingPlan (PlanFactory planFactory, MemberValueGetterSetter field, Class<?> elemClass, String name, EntryMode entryMode, int dimension) {
+  public RepeatingPlan (IPlanFactory planFactory, MemberValueGetterSetter field, Class<?> elemClass, String name, EntryMode entryMode, int dimension) {
     super (field, name, entryMode);
     
-    elemPlan = NodePlanFactory.getNodePlan(planFactory, elemClass, field, name, entryMode, dimension + 1, false);
+    elemPlan = planFactory.getNodePlan(elemClass, field, name, entryMode, dimension + 1, false);
     this.elemClass = elemClass;
     this.dimension = dimension;
     
@@ -115,12 +114,6 @@ public abstract class RepeatingPlan extends ContainerPlan implements IRepeatingP
     return dimension;
   }
 
-  
-  @Override
-  public <X> X newInstance (X fromInstance) {
-    return elemPlan.newInstance(fromInstance);
-  }
-  
   
   @Override
   public String toString() {
