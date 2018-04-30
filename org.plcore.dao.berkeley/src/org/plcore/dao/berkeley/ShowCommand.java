@@ -46,23 +46,47 @@ public class ShowCommand {
   
   @SuppressWarnings("rawtypes")
   @Descriptor ("List all records of the named table")
-  public void show(String tableName) throws InvalidSyntaxException {
-    Collection<ServiceReference<IDataAccessObject>> serviceRefs = bundleContext.getServiceReferences(IDataAccessObject.class, "(name=" + tableName + ")");
-    if (serviceRefs.size() == 0) {
-      throw new IllegalArgumentException("No table named '" + tableName + "' was found");
-    }
-    ServiceReference<IDataAccessObject> serviceRef = serviceRefs.iterator().next();
-    IDataAccessObject<?> dao = bundleContext.getService(serviceRef);
+  public void show(String name) throws InvalidSyntaxException {
+    // Ignore case
+    String name1 = name.toLowerCase();
     
-    int[] count = new int[1];
-    dao.getAll(r -> {
-      System.out.println(r.toString());
-      count[0]++;
-    });
-    if (count[0] == 0) {
-      System.out.println("No objects");
-    } else {
-      System.out.println("- " + count[0] + " object" + (count[0] == 1 ? "" : "s"));
+    // Find correct name
+    Collection<ServiceReference<IDataAccessObject>> serviceRefs = bundleContext.getServiceReferences(IDataAccessObject.class, null);
+    String correctTableName = "";
+    int n = 0;
+    for (ServiceReference<IDataAccessObject> serviceRef : serviceRefs) {
+      String tableName = (String)serviceRef.getProperty("name");
+      if (tableName.toLowerCase().contains(name1)) {
+        correctTableName = tableName;
+        n++;
+      }
+    }
+    switch (n) {
+    case 0 :
+      System.out.println("No table named: " + name);
+      break;
+    case 1 :
+      serviceRefs = bundleContext.getServiceReferences(IDataAccessObject.class, "(name=" + correctTableName + ")");
+      if (serviceRefs.size() == 0) {
+        throw new IllegalArgumentException("No table named '" + correctTableName + "' was found");
+      }
+      ServiceReference<IDataAccessObject> serviceRef = serviceRefs.iterator().next();
+      IDataAccessObject<?> dao = bundleContext.getService(serviceRef);
+    
+      int[] count = new int[1];
+      dao.getAll(r -> {
+        System.out.println(r.toString());
+        count[0]++;
+      });
+      if (count[0] == 0) {
+        System.out.println("No objects");
+      } else {
+        System.out.println("- " + count[0] + " object" + (count[0] == 1 ? "" : "s") + " in " + correctTableName);
+      }
+      break;
+    default :
+      System.out.println("More than one table named: " + name);
+      break;
     }
   }
   

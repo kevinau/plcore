@@ -7,6 +7,7 @@ import com.sleepycat.persist.model.SecondaryKey;
 import org.plcore.value.VersionTime;
 
 @Entity
+@Deprecated
 public class InboxLog {
 
   @PrimaryKey(sequence = "InboxLog_ID")

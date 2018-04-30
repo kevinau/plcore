@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.plcore.dao.IDataAccessObject;
+import org.plcore.dao.ITransaction;
 import org.plcore.inbox.IFileProcessor;
 import org.plcore.userio.model.IEntityModel;
 import org.plcore.userio.model.IItemModel;
@@ -25,6 +27,12 @@ public class ASX200Loader implements IFileProcessor {
   @Reference
   private IModelFactory modelFactory;
   
+  @Reference(target = "(name=ASXCompany)")
+  private IDataAccessObject<ASXCompany> daoCompany;
+
+  @Reference(target = "(name=ASXSector)")
+  private IDataAccessObject<ASXSector> daoSector;
+
   private void loadSectors (Path path) {
     List<String> sectors = new ArrayList<>();
     try (CSVReader reader = new CSVReader(new FileReader(path.toFile())))
@@ -50,19 +58,23 @@ public class ASX200Loader implements IFileProcessor {
     IItemModel name = entityModel.selectItemModel("name");
 
     Collections.sort(sectors);
-    for (String sectorName : sectors) {
-      name.setValueFromSource(sectorName);
-      List<ReportableError> errors = entityModel.getErrors();
-      if (errors.size() == 0) {
-        System.out.println(entityModel.getValue().toString());
-      } else {
-        System.out.println(sectorName);
-        for (ReportableError ex : errors) {
-          System.out.println(ex);
+    
+    try (ITransaction<ASXSector> tran = daoSector.getTransaction()) {
+      for (String sectorName : sectors) {
+        name.setValueFromSource(sectorName);
+        List<ReportableError> errors = entityModel.getErrors();
+        if (errors.size() == 0) {
+          ASXSector sector = new ASXSector(sectorName);
+          tran.add(sector);
+          System.out.println(entityModel.getValue().toString());
+        } else {
+          System.out.println(sectorName);
+          for (ReportableError ex : errors) {
+            System.out.println(ex);
+          }
         }
       }
-    }
-    
+    }  
   }
 
   
@@ -71,7 +83,7 @@ public class ASX200Loader implements IFileProcessor {
 
   
   private void loadCompanies (Path path) {
-    IEntityModel entityModel = modelFactory.buildEntityModel(ASX200.class);
+    IEntityModel entityModel = modelFactory.buildEntityModel(ASXCompany.class);
     entityModel.setNew();
     IItemModel code = entityModel.selectItemModel("code");
     IItemModel company = entityModel.selectItemModel("company");
@@ -81,28 +93,32 @@ public class ASX200Loader implements IFileProcessor {
     
     try (CSVReader reader = new CSVReader(new FileReader(path.toFile())))
     {
-      // First heading line
-      String [] line = reader.readNext();
-      // Second heading line
-      line = reader.readNext();
-      // First data line
-      line = reader.readNext();
-      while (line != null) {
-        code.setValueFromSource(line[0]);
-        company.setValueFromSource(line[1]);
-        sector.setValueFromSource(line[2]);
-        marketCap.setValueFromSource(line[3].replaceAll(",", ""));
-        weight.setValueFromSource(line[4]);
-        List<ReportableError> errors = entityModel.getErrors();
-        if (errors.size() == 0) {
-          System.out.println(entityModel.getValue().toString());
-        } else {
-          System.out.println(Arrays.toString(line));
-          for (ReportableError ex : errors) {
-            System.out.println(ex);
-          }
-        }
+      try (ITransaction<ASXCompany> tran = daoCompany.getTransaction()) {
+        // First heading line
+        String [] line = reader.readNext();
+        // Second heading line
         line = reader.readNext();
+        // First data line
+        line = reader.readNext();
+        while (line != null) {
+          code.setValueFromSource(line[0]);
+          company.setValueFromSource(line[1]);
+          sector.setValueFromSource(line[2]);
+          marketCap.setValueFromSource(line[3].replaceAll(",", ""));
+          weight.setValueFromSource(line[4]);
+          List<ReportableError> errors = entityModel.getErrors();
+          if (errors.size() == 0) {
+            ASXCompany asx200 = entityModel.getValue();
+            tran.add(asx200);
+            System.out.println(asx200);
+          } else {
+            System.out.println(Arrays.toString(line));
+            for (ReportableError ex : errors) {
+              System.out.println(ex);
+            }
+          }
+          line = reader.readNext();
+        }
       }
     } catch (IOException ex) {
       throw new RuntimeException(ex);

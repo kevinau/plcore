@@ -12,6 +12,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.plcore.dao.IDataAccessObject;
+import org.plcore.dao.ITransaction;
 import org.plcore.osgi.Configurable;
 import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.value.EntityLife;
@@ -42,6 +43,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   private Class<T> entityClass;
   
   private Field idField;
+  private boolean idSequence;
   private Field versionTimeField;
   private Field entityLifeField;
   
@@ -63,10 +65,13 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
     configLoader.load(this, context);
     
     idField = null;
+    idSequence = false;
     entityClass.getDeclaredFields();
     for (Field field : entityClass.getDeclaredFields()) {
-      if (field.isAnnotationPresent(PrimaryKey.class)) {
+      PrimaryKey pkAnn = field.getAnnotation(PrimaryKey.class);
+      if (pkAnn != null) {
         idField = field;
+        idSequence = pkAnn.sequence().length() > 0;
         break;
       }
     }
@@ -78,8 +83,25 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
 
   
   @SuppressWarnings("unchecked")
-  private PrimaryIndex<Object, T> getPrimaryIndex(Class<?> keyClass) {
+  private PrimaryIndex<Object, T> getPrimaryIndex() {
+    Class<?> keyClass = null;
+    
     if (primaryIndex == null) {
+      Field[] fields = entityClass.getDeclaredFields();
+      for (Field field : fields) {
+        if (field.isAnnotationPresent(PrimaryKey.class)) {
+          keyClass = field.getType();
+          if (keyClass == int.class) {
+            keyClass = Integer.class;
+          } else if (keyClass == long.class) {
+            keyClass = Long.class;
+          }
+          break;
+        }
+      }
+      if (keyClass == null) {
+        throw new RuntimeException("No @PrimaryKey field in " + entityClass);
+      }
       primaryIndex = dataStore.getPrimaryIndex((Class<Object>)keyClass, entityClass);      
     }
     return primaryIndex;
@@ -102,8 +124,25 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   
   @Override
   public T add(T value) {
+    Transaction transaction = dataStore.beginTransaction();
     try {
-      idField.setAccessible(true);
+      PrimaryIndex<Object, T> index1 = getPrimaryIndex();
+      add(index1, value);
+      transaction.commit();
+      logger.info("add: " + value);
+    } catch (Exception ex) {
+      transaction.abort();
+    }
+    return value;
+  }
+
+  
+  T add(PrimaryIndex<Object, T> index, T value) {
+    try {
+      if (idSequence) {
+        idField.setAccessible(true);
+        idField.set(value, 0);
+      }
       
       if (versionTimeField != null) {
         VersionTime versionTime = VersionTime.now();
@@ -119,19 +158,18 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
       throw new RuntimeException(ex);
     }
     
-    // Put it in the store.
-    Transaction transaction = dataStore.beginTransaction();
-    try {
-      PrimaryIndex<Object, T> index1 = getPrimaryIndex(idField.getType());
-      index1.put(value);
-      transaction.commit();
-      logger.info("add: " + value);
-    } catch (Exception ex) {
-      transaction.abort();
-    }
+    index.put(value);
     return value;
   }
 
+  
+  @Override
+  public ITransaction<T> getTransaction() {
+    PrimaryIndex<Object, T> index1 = getPrimaryIndex();
+    index1 = getPrimaryIndex();
+    return new TransactionSet<>(this, dataStore.beginTransaction(), index1);
+  }
+  
   
   @Override
   public void close() {
@@ -141,7 +179,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   
   @Override
   public T getById(int id) {
-    PrimaryIndex<Object, T> index1 = getPrimaryIndex(Integer.class);
+    PrimaryIndex<Object, T> index1 = getPrimaryIndex();
     T value = index1.get(id);
     logger.info("getById " + id + ": " + value);
     return value;
@@ -150,7 +188,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
 
   @Override
   public T getByPrimary(Object key) {
-    PrimaryIndex<Object, T> index1 = getPrimaryIndex(key.getClass());
+    PrimaryIndex<Object, T> index1 = getPrimaryIndex();
     T value = index1.get(key);
     logger.info("getById " + key + ": " + value);
     return value;
@@ -169,6 +207,20 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   public void remove(T value) throws ConcurrentModificationException {
     Transaction transaction = dataStore.beginTransaction();
     try {
+      PrimaryIndex<Object, T> index = getPrimaryIndex();
+      remove(index, value);
+      logger.info("delete " + value);
+      transaction.commit();
+    } catch (SecurityException | IllegalArgumentException |
+             DatabaseException ex) {
+      transaction.abort();
+      throw new RuntimeException(ex);
+    }
+  }
+
+  
+  void remove(PrimaryIndex<Object, T> index, T value) throws ConcurrentModificationException {
+    try {
       idField.setAccessible(true);
       Object key = idField.get(value);
       
@@ -182,14 +234,9 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
           throw new ConcurrentModificationException(oldTime + " vs " + newTime);
         }
       }
-      
-      PrimaryIndex<Object, T> index1 = getPrimaryIndex(idField.getType());
-      index1.delete(key);
-      logger.info("delete " + key + ": " + value2);
-      transaction.commit();
+      index.delete(key);
     } catch (SecurityException | IllegalArgumentException |
              IllegalAccessException | DatabaseException ex) {
-      transaction.abort();
       throw new RuntimeException(ex);
     }
   }
@@ -217,7 +264,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
         versionTimeField.set(newValue, newTime);
       }
       
-      PrimaryIndex<Object, T> index1 = getPrimaryIndex(idField.getType());
+      PrimaryIndex<Object, T> index1 = getPrimaryIndex();
       index1.put(newValue);
       transaction.commit();
       logger.info("update " + key + ": " + newValue);
@@ -232,7 +279,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   
   @Override
   public void getAll (Consumer<T> consumer) {
-    PrimaryIndex<Object, T> index1 = getPrimaryIndex(idField.getType());
+    PrimaryIndex<Object, T> index1 = getPrimaryIndex();
     EntityCursor<T> cursor = index1.entities();
     try {
       for (T value : cursor) {

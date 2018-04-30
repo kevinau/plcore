@@ -3,6 +3,8 @@
    <service>
       <provide interface="org.plcore.inbox.IFileProcessor"/>
    </service>
+   <reference cardinality="1..1" field="daoCompany" interface="org.plcore.dao.IDataAccessObject" name="daoCompany" target="(name=ASXCompany)"/>
+   <reference cardinality="1..1" field="daoSector" interface="org.plcore.dao.IDataAccessObject" name="daoSector" target="(name=ASXSector)"/>
    <reference cardinality="1..1" field="modelFactory" interface="org.plcore.userio.model.IModelFactory" name="modelFactory"/>
    <implementation class="org.pennyledger.data.asx200.ASX200Loader"/>
 </scr:component>

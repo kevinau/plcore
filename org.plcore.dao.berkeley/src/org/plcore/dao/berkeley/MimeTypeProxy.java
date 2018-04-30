@@ -1,7 +1,5 @@
 package org.plcore.dao.berkeley;
 
-import java.time.LocalDate;
-
 import org.plcore.util.MimeType;
 import org.plcore.util.MimeTypeFactory;
 

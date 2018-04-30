@@ -17,13 +17,13 @@ public interface IDataAccessObject<T> {
    * Add the instance to the datastore.  The 'value' is updated so  
    * the id, versionTime and entityLife matches the datastore.
    */
-  public T add (T value);
+  public T add(T value);
   
 //  public void addEntityChangeListener (EntityChangeListener<T> x);
 //  
 //  public void addDescriptionChangeListener (DescriptionChangeListener x);
   
-  public void close ();
+  public void close();
 
   public T getById(int id) throws EntityNotFoundException;
   
@@ -66,5 +66,7 @@ public interface IDataAccessObject<T> {
    * the version updated to match the datastore.
    */
   public T update(T newValue) throws ConcurrentModificationException;
+
+  public ITransaction<T> getTransaction();
 
 }
