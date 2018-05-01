@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.osgi.service.component.ComponentContext;
@@ -27,9 +29,17 @@ public class ConfigurationLoader {
   
   
   public void load(Object target, ComponentContext context) {
+    load(target, context.getProperties());
+  }
+  
+  
+  public void load(Object target, Map<String, Object> props) {
+    load(target, (Dictionary<String, Object>)new Hashtable<String, Object>(props));
+  }
+  
+  
+  public void load(Object target, Dictionary<String, Object> dict) {
     try {
-      Dictionary<String, Object> dict = context.getProperties();
-      
       Class<?> klass = target.getClass();
       Field[] fields = klass.getDeclaredFields();
       for (Field field : fields) {

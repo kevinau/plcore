@@ -58,6 +58,7 @@ public class ASX200Loader implements IFileProcessor {
     IItemModel name = entityModel.selectItemModel("name");
 
     Collections.sort(sectors);
+    int loaded = 0;
     
     try (ITransaction<ASXSector> tran = daoSector.getTransaction()) {
       for (String sectorName : sectors) {
@@ -66,14 +67,15 @@ public class ASX200Loader implements IFileProcessor {
         if (errors.size() == 0) {
           ASXSector sector = new ASXSector(sectorName);
           tran.add(sector);
-          System.out.println(entityModel.getValue().toString());
+          loaded++;
         } else {
           System.out.println(sectorName);
           for (ReportableError ex : errors) {
-            System.out.println(ex);
+            System.out.println("  " + ex);
           }
         }
       }
+      System.out.println(loaded + " ASX sectors loaded");
     }  
   }
 
@@ -98,6 +100,8 @@ public class ASX200Loader implements IFileProcessor {
         String [] line = reader.readNext();
         // Second heading line
         line = reader.readNext();
+        int loaded = 0;
+
         // First data line
         line = reader.readNext();
         while (line != null) {
@@ -110,7 +114,7 @@ public class ASX200Loader implements IFileProcessor {
           if (errors.size() == 0) {
             ASXCompany asx200 = entityModel.getValue();
             tran.add(asx200);
-            System.out.println(asx200);
+            loaded++;
           } else {
             System.out.println(Arrays.toString(line));
             for (ReportableError ex : errors) {
@@ -119,6 +123,7 @@ public class ASX200Loader implements IFileProcessor {
           }
           line = reader.readNext();
         }
+        System.out.println(loaded + " ASX companies loaded");
       }
     } catch (IOException ex) {
       throw new RuntimeException(ex);

@@ -55,7 +55,7 @@ public class DataEnvironment {
   public void activate (ComponentContext componentContext) {
     configLoader.load(this, componentContext);
     
-    String envDir = (isCoreData ? "coreData" : "applicationData");
+    String envDir = (isCoreData ? "data-core" : "data-default");
     Path envHome = application.getBaseDir().resolve(envDir);
     
     // Create directory if it does not exist

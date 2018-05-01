@@ -10,24 +10,24 @@ import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
 @Component
-public class ASXSector implements IDAOCandidate {
+public class ASXCategory implements IDAOCandidate {
 
-  @PrimaryKey(sequence = "ASXSector_ID")
+  @PrimaryKey(sequence = "ASXCategory_ID")
   int id;
   
   @SecondaryKey(relate = Relationship.ONE_TO_ONE)
   private String name;
   
-  public ASXSector () {
+  public ASXCategory () {
   }
   
-  public ASXSector (String name) {
+  public ASXCategory (String name) {
     this.name = name;
   }
   
   @Override
   public String toString() {
-    return "ASXSector[" + id + "," + name +"]";
+    return "ASXCategory[" + id + "," + name +"]";
   }
 
 }

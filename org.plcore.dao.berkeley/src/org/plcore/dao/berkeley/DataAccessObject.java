@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -51,6 +50,16 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   private Map<String, SecondaryIndex<Object, Object, T>> secondaryIndexes = new HashMap<>();
   
   
+  public DataAccessObject() {
+  }
+  
+  
+  DataAccessObject (DataStore dataStore, ConfigurationLoader configLoader) {
+    this.dataStore = dataStore;
+    this.configLoader = configLoader;
+  }
+  
+  
   private Field getDeclaredField(String name) {
     try {
       return entityClass.getDeclaredField(name);
@@ -61,9 +70,9 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
 
   
   @Activate
-  private void activate (ComponentContext context) {
-    configLoader.load(this, context);
-    
+  void activate (Map<String, Object> props) {
+    configLoader.load(this, props);
+
     idField = null;
     idSequence = false;
     entityClass.getDeclaredFields();

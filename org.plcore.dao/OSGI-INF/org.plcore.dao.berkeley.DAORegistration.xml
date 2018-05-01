@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="activate" deactivate="deactivate" immediate="true" name="org.plcore.dao.berkeley.DAORegistration">
+   <service>
+      <provide interface="org.plcore.dao.DAORegistration"/>
+   </service>
+   <reference bind="addCandidate" cardinality="0..n" interface="org.plcore.dao.IDAOCandidate" name="Candidate" policy="dynamic" unbind="removeCandidate"/>
+   <reference cardinality="1..1" field="dao" interface="org.plcore.dao.IDataAccessObject" name="dao"/>
+   <implementation class="org.plcore.dao.berkeley.DAORegistration"/>
+</scr:component>
