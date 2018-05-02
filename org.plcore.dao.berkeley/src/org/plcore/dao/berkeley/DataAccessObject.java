@@ -27,7 +27,8 @@ import com.sleepycat.persist.SecondaryIndex;
 import com.sleepycat.persist.model.PrimaryKey;
 
 
-@Component(configurationPolicy = ConfigurationPolicy.REQUIRE)
+@Component(configurationPolicy = ConfigurationPolicy.REQUIRE,
+           property="store.target = (name=DefaultDataStore)")
 public class DataAccessObject<T> implements IDataAccessObject<T> {
 
   private final Logger logger = LoggerFactory.getLogger(DataAccessObject.class);
@@ -75,7 +76,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
 
     idField = null;
     idSequence = false;
-    entityClass.getDeclaredFields();
+    //entityClass.getDeclaredFields();
     for (Field field : entityClass.getDeclaredFields()) {
       PrimaryKey pkAnn = field.getAnnotation(PrimaryKey.class);
       if (pkAnn != null) {

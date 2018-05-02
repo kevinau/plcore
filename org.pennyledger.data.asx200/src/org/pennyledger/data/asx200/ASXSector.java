@@ -1,16 +1,12 @@
 package org.pennyledger.data.asx200;
 
-import org.osgi.service.component.annotations.Component;
-import org.plcore.dao.IDAOCandidate;
-
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
-@Component
-public class ASXSector implements IDAOCandidate {
+public class ASXSector {
 
   @PrimaryKey(sequence = "ASXSector_ID")
   int id;

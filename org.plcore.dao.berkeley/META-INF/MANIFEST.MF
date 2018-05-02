@@ -12,8 +12,7 @@ Bundle-ClassPath: lib/je-7.5.11.jar,
 Service-Component: OSGI-INF/org.plcore.dao.berkeley.DataEnvironment.xml,
  OSGI-INF/org.plcore.dao.berkeley.DataStore.xml,
  OSGI-INF/org.plcore.dao.berkeley.DataAccessObject.xml,
- OSGI-INF/org.plcore.dao.berkeley.ShowCommand.xml,
- OSGI-INF/org.plcore.dao.berkeley.DAORegistration.xml
+ OSGI-INF/org.plcore.dao.berkeley.ShowCommand.xml
 Import-Package: org.apache.felix.service.command;status=provisional;version="0.16.2",
  org.osgi.framework;version="1.8.0",
  org.osgi.service.component;version="1.2.0",
