@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - dynamic component configuration
+Bundle-SymbolicName: org.plcore.osgi.dynconfig
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.plcore.cm
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.osgi.framework;version="1.8.0",
+ org.osgi.service.cm,
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.osgi.service.log;version="1.3.0",
+ org.plcore.util
+Service-Component: OSGI-INF/org.apache.felix.fileinstall.internal.TestDAOConfig.xml
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: Kevin Holloway

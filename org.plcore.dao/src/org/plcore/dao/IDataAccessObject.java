@@ -13,6 +13,8 @@ public interface IDataAccessObject<T> {
   public static final String ENTITY_REMOVED = "REMOVED";
   
 
+  public Class<T> getEntityClass();
+
   /**
    * Add the instance to the datastore.  The 'value' is updated so  
    * the id, versionTime and entityLife matches the datastore.

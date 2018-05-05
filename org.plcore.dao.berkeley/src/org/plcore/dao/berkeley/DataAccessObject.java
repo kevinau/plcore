@@ -61,6 +61,12 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   }
   
   
+  @Override
+  public Class<T> getEntityClass() {
+    return entityClass;
+  }
+  
+  
   private Field getDeclaredField(String name) {
     try {
       return entityClass.getDeclaredField(name);
@@ -72,6 +78,8 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   
   @Activate
   void activate (Map<String, Object> props) {
+    logger.info("************** Activate with props: " + props);
+    
     configLoader.load(this, props);
 
     idField = null;
