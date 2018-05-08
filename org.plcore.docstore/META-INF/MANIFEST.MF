@@ -20,8 +20,7 @@ Import-Package: com.sleepycat.persist.model,
  org.plcore.value,
  org.slf4j;version="1.7.21"
 Service-Component: OSGI-INF/org.plcore.docstore.parser.impl.TesseractImageOCR.xml,
- OSGI-INF/DocumentStore.xml,
- OSGI-INF/org.plcore.docstore.DocumentClassType.xml
+ OSGI-INF/DocumentStore.xml
 Bundle-ActivationPolicy: lazy
 Export-Package: org.plcore.docstore,
  org.plcore.docstore.parser,

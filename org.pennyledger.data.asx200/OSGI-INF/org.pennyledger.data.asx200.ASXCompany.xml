@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="org.pennyledger.data.asx200.ASXCompany">
+   <service>
+      <provide interface="org.plcore.entity.IEntity"/>
+   </service>
+   <implementation class="org.pennyledger.data.asx200.ASXCompany"/>
+</scr:component>

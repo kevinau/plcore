@@ -2,9 +2,9 @@ package org.plcore.userio.model;
 
 import java.util.List;
 
+import org.plcore.entity.EntityLife;
+import org.plcore.entity.VersionTime;
 import org.plcore.userio.IEntityNode;
-import org.plcore.value.EntityLife;
-import org.plcore.value.VersionTime;
 
 public interface IEntityModel extends IEmbeddedModel, IEntityNode {
 

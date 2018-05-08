@@ -1,10 +1,11 @@
 package org.plcore.inbox;
 
+import org.plcore.entity.VersionTime;
+
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
-import org.plcore.value.VersionTime;
 
 @Entity
 @Deprecated

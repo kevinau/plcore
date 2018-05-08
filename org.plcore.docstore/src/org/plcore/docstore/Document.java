@@ -1,9 +1,9 @@
 package org.plcore.docstore;
 
+import org.plcore.entity.VersionTime;
 import org.plcore.userio.IOField;
 import org.plcore.userio.ManyToOne;
 import org.plcore.util.MimeType;
-import org.plcore.value.VersionTime;
 
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;

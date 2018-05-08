@@ -24,27 +24,17 @@
  */
 package org.apache.felix.fileinstall.internal;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URI;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
-import java.util.Properties;
 
-import org.apache.felix.cm.file.ConfigurationHandler;
-import org.apache.felix.fileinstall.internal.Util.Logger;
-import org.apache.felix.utils.properties.InterpolationHelper;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.plcore.util.DictionaryAsMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -53,6 +43,10 @@ import org.plcore.util.DictionaryAsMap;
  */
 public class ConfigInstaller {
 
+  public final static String REFERENCE = "org.plcore.osgi.dynconfig.Reference";
+
+  private final Logger logger = LoggerFactory.getLogger(ConfigInstaller.class);
+  
   private final BundleContext context;
   private final ConfigurationAdmin configAdmin;
   private ServiceRegistration<?> registration;
@@ -76,96 +70,10 @@ public class ConfigInstaller {
   }
 
 
-//  @Override
-//  public void install(File artifact) throws Exception {
-//    setConfig(artifact);
-//  }
-//
-//
-//  @Override
-//  public void update(File artifact) throws Exception {
-//    setConfig(artifact);
-//  }
-//
-//
-//  @Override
-//  public void uninstall(File artifact) throws Exception {
-//    deleteConfig(artifact);
-//  }
 
 
   ConfigurationAdmin getConfigurationAdmin() {
     return configAdmin;
-  }
-
-
-  /**
-   * Set the configuration based on the config file.
-   *
-   * @param f
-   *            Configuration file
-   * @return <code>true</code> if the configuration has been updated
-   * @throws Exception
-   */
-  boolean setConfig(final File f) throws Exception {
-    final Hashtable<String, Object> ht = new Hashtable<String, Object>();
-    final InputStream in = new BufferedInputStream(new FileInputStream(f));
-    try {
-      if (f.getName().endsWith(".cfg")) {
-        final Properties p = new Properties();
-        in.mark(1);
-        boolean isXml = in.read() == '<';
-        in.reset();
-        if (isXml) {
-          p.loadFromXML(in);
-        } else {
-          p.load(in);
-        }
-        Map<String, String> strMap = new HashMap<String, String>();
-        for (Object k : p.keySet()) {
-          strMap.put(k.toString(), p.getProperty(k.toString()));
-        }
-        InterpolationHelper.performSubstitution(strMap, context);
-        ht.putAll(strMap);
-      } else if (f.getName().endsWith(".config")) {
-        final Dictionary<String, Object> config = ConfigurationHandler.read(in);
-        final Enumeration<String> i = config.keys();
-        while (i.hasMoreElements()) {
-          final String key = i.nextElement();
-          ht.put(key.toString(), config.get(key));
-        }
-      }
-    } finally {
-      in.close();
-    }
-
-    String pid[] = parsePid(f.getName());
-    Configuration config = getConfiguration(toConfigKey(f), pid[0], pid[1]);
-
-    Dictionary<String, Object> props = config.getProperties();
-    Hashtable<String, Object> old = props != null
-        ? new Hashtable<String, Object>(new DictionaryAsMap<String, Object>(props))
-        : null;
-    if (old != null) {
-      old.remove(DirectoryWatcher.FILENAME);
-      old.remove(Constants.SERVICE_PID);
-      old.remove(ConfigurationAdmin.SERVICE_FACTORYPID);
-    }
-
-    if (!ht.equals(old)) {
-      ht.put(DirectoryWatcher.FILENAME, toConfigKey(f));
-      if (old == null) {
-        Util.log(context, Logger.LOG_INFO,
-            "Creating configuration from " + pid[0] + (pid[1] == null ? "" : "-" + pid[1]) + ".cfg", null);
-      } else {
-        Util.log(context, Logger.LOG_INFO,
-            "Updating configuration from " + pid[0] + (pid[1] == null ? "" : "-" + pid[1]) + ".cfg", null);
-      }
-      config.update(ht);
-      return true;
-    } else {
-      return false;
-    }
   }
 
 
@@ -179,9 +87,9 @@ public class ConfigInstaller {
    */
   boolean setConfig(String pid, String factoryPid, final Dictionary<String, Object> ht) throws Exception {
 
-    String fileName = pid + (factoryPid == null ? "" : "-" + factoryPid);
+    String reference = pid + (factoryPid == null ? "" : "-" + factoryPid);
     System.out.println("...... about to get configuration");
-    Configuration config = getConfiguration(fileName, pid, factoryPid);
+    Configuration config = getConfiguration(reference, pid, factoryPid);
     System.out.println("...... " + config);
 
     Dictionary<String, Object> props = config.getProperties();
@@ -190,20 +98,18 @@ public class ConfigInstaller {
         ? new Hashtable<String, Object>(new DictionaryAsMap<String, Object>(props))
         : null;
     if (old != null) {
-      old.remove(DirectoryWatcher.FILENAME);
+      old.remove(REFERENCE);
       old.remove(Constants.SERVICE_PID);
       old.remove(ConfigurationAdmin.SERVICE_FACTORYPID);
     }
 
     if (!ht.equals(old)) {
       System.out.println("..... change of confiuration");
-      ht.put(DirectoryWatcher.FILENAME, fileName);
+      ht.put(REFERENCE, reference);
       if (old == null) {
-        Util.log(context, Logger.LOG_INFO,
-            "Creating configuration from " + pid + (factoryPid == null ? "" : "-" + factoryPid) + ".cfg", null);
+        logger.info("Creating configuration from " + pid + (factoryPid == null ? "" : "-" + factoryPid) + ".cfg");
       } else {
-        Util.log(context, Logger.LOG_INFO,
-            "Updating configuration from " + pid + (factoryPid == null ? "" : "-" + factoryPid) + ".cfg", null);
+        logger.info("Updating configuration from " + pid + (factoryPid == null ? "" : "-" + factoryPid) + ".cfg");
       }
       System.out.println("..... config update to: " + ht);
       config.update(ht);
@@ -223,58 +129,17 @@ public class ConfigInstaller {
    * @return <code>true</code>
    * @throws Exception
    */
-  boolean deleteConfig(File f) throws Exception {
-    String pid[] = parsePid(f.getName());
-    Util.log(context, Logger.LOG_INFO,
-        "Deleting configuration from " + pid[0] + (pid[1] == null ? "" : "-" + pid[1]) + ".cfg", null);
-    Configuration config = getConfiguration(toConfigKey(f), pid[0], pid[1]);
-    config.delete();
-    return true;
-  }
-
-
-  /**
-   * Remove the configuration.
-   *
-   * @param f
-   *            File where the configuration in was defined.
-   * @return <code>true</code>
-   * @throws Exception
-   */
   boolean deleteConfig(String pid, String factoryPid) throws Exception {
     String fileName = pid + (factoryPid == null ? "" : "-" + factoryPid);
-    Util.log(context, Logger.LOG_INFO, "Deleting configuration from " + pid + " " + factoryPid, null);
+    logger.info("Deleting configuration from " + pid + " " + factoryPid);
     Configuration config = getConfiguration(fileName, pid, factoryPid);
     config.delete();
     return true;
   }
 
 
-  String toConfigKey(File f) {
-    return f.getAbsoluteFile().toURI().toString();
-  }
-
-
-  File fromConfigKey(String key) {
-    return new File(URI.create(key));
-  }
-
-
-  String[] parsePid(String path) {
-    String pid = path.substring(0, path.lastIndexOf('.'));
-    int n = pid.indexOf('-');
-    if (n > 0) {
-      String factoryPid = pid.substring(n + 1);
-      pid = pid.substring(0, n);
-      return new String[] { pid, factoryPid };
-    } else {
-      return new String[] { pid, null };
-    }
-  }
-
-
-  Configuration getConfiguration(String fileName, String pid, String factoryPid) throws Exception {
-    Configuration oldConfiguration = findExistingConfiguration(fileName);
+  private Configuration getConfiguration(String reference, String pid, String factoryPid) throws Exception {
+    Configuration oldConfiguration = findExistingConfiguration(reference);
     if (oldConfiguration != null) {
       return oldConfiguration;
     } else {
@@ -289,20 +154,14 @@ public class ConfigInstaller {
   }
 
 
-  Configuration findExistingConfiguration(String fileName) throws Exception {
-    String filter = "(" + DirectoryWatcher.FILENAME + "=" + escapeFilterValue(fileName) + ")";
+  private Configuration findExistingConfiguration(String reference) throws Exception {
+    String filter = "(" + REFERENCE + "=" + reference + ")";
     Configuration[] configurations = getConfigurationAdmin().listConfigurations(filter);
     if (configurations != null && configurations.length > 0) {
       return configurations[0];
     } else {
       return null;
     }
-  }
-
-
-  private String escapeFilterValue(String s) {
-    return s.replaceAll("[(]", "\\\\(").replaceAll("[)]", "\\\\)").replaceAll("[=]", "\\\\=").replaceAll("[\\*]",
-        "\\\\*");
   }
 
 }

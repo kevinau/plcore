@@ -4,9 +4,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.plcore.entity.EntityLife;
+import org.plcore.entity.EntityLifeType;
+import org.plcore.entity.VersionTime;
+import org.plcore.entity.VersionTimeType;
 import org.plcore.type.IType;
-import org.plcore.type.builtin.EntityLifeType;
-import org.plcore.type.builtin.VersionTimeType;
 import org.plcore.userio.Id;
 import org.plcore.userio.UniqueConstraint;
 import org.plcore.userio.Version;
@@ -17,8 +19,6 @@ import org.plcore.userio.plan.IItemPlan;
 import org.plcore.userio.plan.ILabelGroup;
 import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.PlanStructure;
-import org.plcore.value.EntityLife;
-import org.plcore.value.VersionTime;
 
 
 public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {

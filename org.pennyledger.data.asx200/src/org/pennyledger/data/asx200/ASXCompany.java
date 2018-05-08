@@ -1,5 +1,9 @@
 package org.pennyledger.data.asx200;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.plcore.entity.IEntity;
 import org.plcore.math.Decimal;
 import org.plcore.type.NumberSign;
 import org.plcore.userio.IOField;
@@ -10,7 +14,8 @@ import com.sleepycat.persist.model.Relationship;
 import com.sleepycat.persist.model.SecondaryKey;
 
 @Entity
-public class ASXCompany {
+@Component
+public class ASXCompany implements IEntity {
 
   @PrimaryKey(sequence = "ASXCompnay_ID")
   private int id;
@@ -32,6 +37,17 @@ public class ASXCompany {
   @Override
   public String toString() {
     return "ASXCompany[" + id + "," + code + "," + company + "," + sector + "," + marketCap + "," + weight +"]";
+  }
+  
+  
+  @Activate
+  private void activate () {
+    System.out.println("##################### activate");
+  }
+
+  @Deactivate
+  private void deactivate () {
+    System.out.println("##################### de-activate");
   }
 
 }

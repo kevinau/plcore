@@ -1,6 +1,6 @@
 package org.plcore.dao.berkeley;
 
-import org.plcore.value.VersionTime;
+import org.plcore.entity.VersionTime;
 
 import com.sleepycat.persist.model.Persistent;
 import com.sleepycat.persist.model.PersistentProxy;

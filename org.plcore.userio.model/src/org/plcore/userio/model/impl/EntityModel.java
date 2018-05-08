@@ -3,6 +3,8 @@ package org.plcore.userio.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.plcore.entity.EntityLife;
+import org.plcore.entity.VersionTime;
 import org.plcore.userio.model.EntityCreationListener;
 import org.plcore.userio.model.IEntityModel;
 import org.plcore.userio.model.INodeModel;
@@ -11,8 +13,6 @@ import org.plcore.userio.model.ReportableError;
 import org.plcore.userio.model.ref.IValueReference;
 import org.plcore.userio.plan.IEntityPlan;
 import org.plcore.userio.plan.INodePlan;
-import org.plcore.value.EntityLife;
-import org.plcore.value.VersionTime;
 
 public class EntityModel extends EmbeddedModel implements IEntityModel {
   

@@ -11,6 +11,7 @@ Import-Package: com.sleepycat.persist.model,
  org.osgi.framework;version="1.8.0",
  org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
  org.plcore.dao,
+ org.plcore.entity,
  org.plcore.inbox,
  org.plcore.math,
  org.plcore.type,
@@ -19,5 +20,8 @@ Import-Package: com.sleepycat.persist.model,
  org.plcore.util
 Bundle-ClassPath: lib/opencsv-2.3.jar,
  .
-Service-Component: OSGI-INF/ASX200Loader.xml
+Service-Component: OSGI-INF/ASX200Loader.xml,
+ OSGI-INF/org.pennyledger.data.asx200.ASXSector.xml,
+ OSGI-INF/org.pennyledger.data.asx200.ASXCategory.xml,
+ OSGI-INF/org.pennyledger.data.asx200.ASXCompany.xml
 Export-Package: org.pennyledger.data.asx200

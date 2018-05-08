@@ -8,3 +8,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: Kevin Holloway
 Bundle-ActivationPolicy: lazy
 Export-Package: org.plcore.dao
+Import-Package: org.plcore.entity

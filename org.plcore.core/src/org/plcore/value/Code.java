@@ -21,12 +21,20 @@ public class Code<T extends ICode<T>> implements ICode<T>, Serializable {
   private final boolean selfDescribing; 
 
   
-	public Code (String code, String description, boolean obsolete) {
-	  this.code = code;
-		this.description = description;
-		this.obsolete = obsolete;
+  public Code (String code, String description, boolean obsolete) {
+    this.code = code;
+    this.description = description;
+    this.obsolete = obsolete;
     this.selfDescribing = code.equals(description);
-	}
+  }
+  
+  
+  public Code (String code, boolean obsolete) {
+    this.code = code;
+    this.description = code;
+    this.obsolete = obsolete;
+    this.selfDescribing = true;
+  }
   
   
   public Code (String code, String description) {

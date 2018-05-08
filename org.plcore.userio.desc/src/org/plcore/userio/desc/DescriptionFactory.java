@@ -6,12 +6,12 @@ public class DescriptionFactory {
 
   public static String getDescription(Object instance) {    
     // Use the entity's self describing method if present
-    if (instance instanceof SelfDescribing) {
-      SelfDescribing describing = (SelfDescribing)instance;
-      return describing.elicitDescription();
+    if (instance instanceof IExplicitDescription) {
+      IExplicitDescription describing = (IExplicitDescription)instance;
+      return describing.getDescription();
     }
     
-    // Otherwise, concatenate all top level nodes that are marked as describing.
+    // Otherwise, concatenate all top level nodes that are marked as @Describing.
     String description = null;
     Class<?> klass = instance.getClass();
     Field[] fields = klass.getDeclaredFields();

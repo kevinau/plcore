@@ -12,10 +12,10 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.plcore.dao.IDataAccessObject;
 import org.plcore.dao.ITransaction;
+import org.plcore.entity.EntityLife;
+import org.plcore.entity.VersionTime;
 import org.plcore.osgi.Configurable;
 import org.plcore.osgi.ConfigurationLoader;
-import org.plcore.value.EntityLife;
-import org.plcore.value.VersionTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

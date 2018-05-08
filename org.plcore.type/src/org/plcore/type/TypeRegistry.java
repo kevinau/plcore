@@ -20,7 +20,6 @@ import org.plcore.type.builtin.CodeType;
 import org.plcore.type.builtin.DateType;
 import org.plcore.type.builtin.DecimalType;
 import org.plcore.type.builtin.DoubleType;
-import org.plcore.type.builtin.EntityLifeType;
 import org.plcore.type.builtin.EnumType;
 import org.plcore.type.builtin.FloatType;
 import org.plcore.type.builtin.IntegerType;
@@ -38,7 +37,6 @@ import org.plcore.type.builtin.PrimitiveShortType;
 import org.plcore.type.builtin.ShortType;
 import org.plcore.type.builtin.SqlDateType;
 import org.plcore.type.builtin.StringType;
-import org.plcore.type.builtin.VersionTimeType;
 import org.plcore.value.ICode;
 
 
@@ -153,8 +151,6 @@ public class TypeRegistry {
     addType (new DateType(), props);
     addType (new DecimalType(), props);
     addType (new DoubleType(), props);
-    addType (new EntityLifeType(), props);
-    addType (new FloatType(), props);
     addType (new IntegerType(), props);
     addType (new LocalDateType(), props);
     addType (new LongType(), props);
@@ -162,7 +158,6 @@ public class TypeRegistry {
     addType (new ShortType(), props);
     addType (new SqlDateType(), props);
     addType (new StringType(), props);
-    addType (new VersionTimeType(), props);
 }
 
   // static {

@@ -12,7 +12,7 @@ import org.plcore.type.IType;
 import org.plcore.type.builtin.CodeType;
 
 
-@Component(service = {IType.class, DocumentClassType.class})
+//@Component(service = {IType.class, DocumentClassType.class})
 public class DocumentClassType extends CodeType<DocumentClass> {
 
   @Reference(policy = ReferencePolicy.DYNAMIC)

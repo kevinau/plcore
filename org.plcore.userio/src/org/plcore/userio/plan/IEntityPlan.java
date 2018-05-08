@@ -3,8 +3,8 @@ package org.plcore.userio.plan;
 import java.sql.Timestamp;
 import java.util.List;
 
-import org.plcore.value.EntityLife;
-import org.plcore.value.VersionTime;
+import org.plcore.entity.EntityLife;
+import org.plcore.entity.VersionTime;
 
 
 
