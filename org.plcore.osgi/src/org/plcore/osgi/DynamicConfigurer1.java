@@ -2,13 +2,14 @@ package org.plcore.osgi;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
 
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.plcore.util.DictionaryAsMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,86 +27,26 @@ import org.slf4j.LoggerFactory;
  * from Felix fileinstall.
  * 
  */
-public class DynamicConfigurer<T> {
+//@Component (service = DynamicConfigurer1.class, immediate = true)
+public class DynamicConfigurer1 {
 
   private final static String REFERENCE = "org.plcore.osgi.DynamicConfigurer";
 
-  private final Logger logger = LoggerFactory.getLogger(DynamicConfigurer.class);
+  private final Logger logger = LoggerFactory.getLogger(DynamicConfigurer1.class);
   
-  private boolean activated = false;
-  
-  private final List<T> deferred = new LinkedList<>();
-  
-  private final Class<?> targetComponent;
-
+  @Reference
   private ConfigurationAdmin configAdmin;
-  private Function<T, String> candidateNameFn;
-  private Function<T, Dictionary<String, Object>> propsFn;
-  
-  
-  public DynamicConfigurer (Class<?> targetComponent) {
-    this.targetComponent = targetComponent;
-  }
-  
-  
-  public void addCandidate(T candidate) {
-    if (activated) {
-      register(candidate);
-    } else {
-      logger.info("Deferred {} registration for {}", targetComponent.getSimpleName(), candidate.getClass().getName());
-      deferred.add(candidate);
-    }
-  }
-  
-  
-  public void removeCandidate(T candidate) {
-    unregister(candidate);
-  }
-  
-  
-  private void register(T candidate) {
-    String name = candidateNameFn.apply(candidate);
-    Dictionary<String, Object> props = propsFn.apply(candidate);
-    setConfig(targetComponent.getName(), name, props);
-    logger.info("{} is registered for {}", targetComponent.getSimpleName(), candidate.getClass().getName());
-  }
-  
-  
-  private void unregister(T candidate) {
-    String name = candidateNameFn.apply(candidate);
-    deleteConfig(targetComponent.getName(), name);
-    logger.info("{} is un-registered for {}", targetComponent.getSimpleName(), candidate.getClass().getName());
+
+  @Activate
+  private void activate() {
+    logger.info(".............ACTIVATE");
   }
 
-
-  public void activate(ConfigurationAdmin configAdmin, 
-        Function<T, Dictionary<String, Object>> propsFn) {
-    activate(configAdmin, c -> c.getClass().getSimpleName(), propsFn);
-  }
-    
-    
-  public void activate(ConfigurationAdmin configAdmin, 
-        Function<T, String> candidateNameFn, Function<T, Dictionary<String, Object>> propsFn) {
-    this.configAdmin = configAdmin;
-    this.candidateNameFn = candidateNameFn;
-    this.propsFn = propsFn;
-    
-    activated = true;
-    
-    // Register all deferred IEntity
-    while (deferred.size() > 0) {
-      T entity = deferred.remove(0);
-      register(entity);
-    }
+  @Deactivate
+  private void deactivate() {
+    logger.info(".............DE-ACTIVATE");
   }
   
-  
-  public void deactivate() {
-    deferred.clear();
-    activated = false;  
-  }
-
-
   /**
    * Set the configuration based on a Dictionary of properties.
    *
@@ -118,11 +59,15 @@ public class DynamicConfigurer<T> {
    * @return <code>true</code> if the configuration has been updated
    * @throws Exception
    */
-  private boolean setConfig(String pid, String factoryPid, final Dictionary<String, Object> ht) {
+  public boolean setConfig(String pid, String factoryPid, final Dictionary<String, Object> ht) {
     try {
       String reference = pid + (factoryPid == null ? "" : "." + factoryPid);
+      System.out.println("...... about to get configuration");
       Configuration config = getConfiguration(reference, pid, factoryPid);
+      System.out.println("...... " + config);
+
       Dictionary<String, Object> props = config.getProperties();
+      System.out.println("....... old props " + props);
       Hashtable<String, Object> old = props != null
           ? new Hashtable<String, Object>(new DictionaryAsMap<String, Object>(props))
           : null;
@@ -133,15 +78,18 @@ public class DynamicConfigurer<T> {
       }
 
       if (!ht.equals(old)) {
+        System.out.println("..... change of confiuration");
         ht.put(REFERENCE, reference);
-//        if (old == null) {
-//          logger.info("Creating configuration from " + pid + (factoryPid == null ? "" : "." + factoryPid));
-//        } else {
-//          logger.info("Updating configuration from " + pid + (factoryPid == null ? "" : "." + factoryPid));
-//        }
+        if (old == null) {
+          logger.info("Creating configuration from " + pid + (factoryPid == null ? "" : "." + factoryPid));
+        } else {
+          logger.info("Updating configuration from " + pid + (factoryPid == null ? "" : "." + factoryPid));
+        }
+        System.out.println("..... config update to: " + ht);
         config.update(ht);
         return true;
       } else {
+        System.out.println("..... NO hange of configuration");
         return false;
       }
     } catch (Exception ex) {
@@ -159,9 +107,9 @@ public class DynamicConfigurer<T> {
    *            Factory PID of the component to be configured
    * @throws Exception
    */
-  private void deleteConfig(String pid, String factoryPid) {
+  public void deleteConfig(String pid, String factoryPid) {
     String fileName = pid + (factoryPid == null ? "" : "." + factoryPid);
-//    logger.info("Deleting configuration from " + pid + " " + factoryPid);
+    logger.info("Deleting configuration from " + pid + " " + factoryPid);
     try {
       Configuration config = getConfiguration(fileName, pid, factoryPid);
       config.delete();

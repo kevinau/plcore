@@ -38,16 +38,5 @@ public class ASXCompany implements IEntity {
   public String toString() {
     return "ASXCompany[" + id + "," + code + "," + company + "," + sector + "," + marketCap + "," + weight +"]";
   }
-  
-  
-  @Activate
-  private void activate () {
-    System.out.println("##################### activate");
-  }
-
-  @Deactivate
-  private void deactivate () {
-    System.out.println("##################### de-activate");
-  }
 
 }

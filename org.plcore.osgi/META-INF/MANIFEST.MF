@@ -17,5 +17,4 @@ Import-Package: org.osgi.framework;version="1.8.0",
 Export-Package: org.plcore.osgi
 Eclipse-BuddyPolicy: global
 Bundle-ActivationPolicy: lazy
-Service-Component: OSGI-INF/org.plcore.osgi.ConfigurationLoader.xml,
- OSGI-INF/org.plcore.osgi.DynamicConfigurer.xml
+Service-Component: OSGI-INF/org.plcore.osgi.ConfigurationLoader.xml

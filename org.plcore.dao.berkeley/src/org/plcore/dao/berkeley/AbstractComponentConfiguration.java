@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.plcore.entity.IEntity;
-import org.plcore.osgi.DynamicConfigurer;
+import org.plcore.osgi.DynamicConfigurer1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public class AbstractComponentConfiguration<T> {
   
   private List<T> deferred = new LinkedList<>();
   
-  private DynamicConfigurer dynamicConfigurer;
+  private DynamicConfigurer1 dynamicConfigurer;
   private Function<T, String> configName2;
   private Function<T, Dictionary<String, Object>> newProperties2;
   
@@ -66,7 +66,7 @@ public class AbstractComponentConfiguration<T> {
   }
 
   
-  protected void activate(DynamicConfigurer dynamicConfigurer, Function<T, String> configName2, Function<T, Dictionary<String, Object>> newProperties2) {
+  protected void activate(DynamicConfigurer1 dynamicConfigurer, Function<T, String> configName2, Function<T, Dictionary<String, Object>> newProperties2) {
     this.dynamicConfigurer = dynamicConfigurer;
     this.configName2 = configName2;
     this.newProperties2 = newProperties2;

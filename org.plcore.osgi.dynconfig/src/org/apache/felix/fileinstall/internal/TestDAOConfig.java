@@ -8,13 +8,13 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.plcore.osgi.DynamicConfigurer;
+import org.plcore.osgi.DynamicConfigurer1;
 
 //@Component(immediate = true)
 public class TestDAOConfig {
 
   @Reference
-  private DynamicConfigurer dynamicConfigurer;
+  private DynamicConfigurer1 dynamicConfigurer;
   
   @Activate
   private void activate(BundleContext bundleContext) {

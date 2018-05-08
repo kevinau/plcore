@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 import org.osgi.service.component.annotations.Reference;
 import org.plcore.entity.IEntity;
-import org.plcore.osgi.DynamicConfigurer;
+import org.plcore.osgi.DynamicConfigurer1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,14 +20,14 @@ public class Test2 extends AbstractComponentConfiguration<IEntity> {
   private final Logger logger = LoggerFactory.getLogger(DataAccessObjectConfiguration.class);
   
   @Reference
-  private DynamicConfigurer dynamicConfigurer;
+  private DynamicConfigurer1 dynamicConfigurer;
   
   private boolean activated = false;
   
   private List<IEntity> deferred = new LinkedList<>();
   
   
-  public Test2(Supplier<DynamicConfigurer> dynamicConfigurer2, Function<IEntity, String> configName2, Function<IEntity, Dictionary<String, Object>> newProperties2) {
+  public Test2(Supplier<DynamicConfigurer1> dynamicConfigurer2, Function<IEntity, String> configName2, Function<IEntity, Dictionary<String, Object>> newProperties2) {
     super(() -> dynamicConfigurer2, configName2, newProperties2);
   }
 
@@ -35,7 +35,7 @@ public class Test2 extends AbstractComponentConfiguration<IEntity> {
   public static void main(String[] args) {
     IEntity dao = new Entity();
     
-    DynamicConfigurer someConfigurer = new DynamicConfigurer();
+    DynamicConfigurer1 someConfigurer = new DynamicConfigurer1();
     System.out.println(someConfigurer);
     Test<IEntity> test = new Test<IEntity>(() -> someConfigurer, c -> c.getClass().getSimpleName(), c -> {
       Hashtable<String, Object> props = new Hashtable<>();
@@ -49,7 +49,7 @@ public class Test2 extends AbstractComponentConfiguration<IEntity> {
       props.put("class", className);
       return props;
     });
-    DynamicConfigurer s = test.dynamicConfigurer2.get();
+    DynamicConfigurer1 s = test.dynamicConfigurer2.get();
     System.out.println(s);
     String s2 = test.configName2.apply(dao);
     System.out.println(s2);

@@ -6,15 +6,15 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.plcore.entity.IEntity;
-import org.plcore.osgi.DynamicConfigurer;
+import org.plcore.osgi.DynamicConfigurer1;
 
 public class Test<T> {
 
-  protected Supplier<DynamicConfigurer> dynamicConfigurer2;
+  protected Supplier<DynamicConfigurer1> dynamicConfigurer2;
   protected Function<T, String> configName2;
   protected Function<T, Dictionary<String, Object>> newProperties2;
   
-  public Test(Supplier<DynamicConfigurer> dynamicConfigurer2, Function<T, String> configName2, Function<T, Dictionary<String, Object>> newProperties2) {
+  public Test(Supplier<DynamicConfigurer1> dynamicConfigurer2, Function<T, String> configName2, Function<T, Dictionary<String, Object>> newProperties2) {
     this.dynamicConfigurer2 = dynamicConfigurer2;
     this.configName2 = configName2;
     this.newProperties2 = newProperties2;
@@ -26,7 +26,7 @@ public class Test<T> {
   public static void main(String[] args) {
     IEntity dao = new Entity();
     
-    DynamicConfigurer someConfigurer = new DynamicConfigurer();
+    DynamicConfigurer1 someConfigurer = new DynamicConfigurer1();
     System.out.println(someConfigurer);
     Test<IEntity> test = new Test<IEntity>(() -> someConfigurer, c -> c.getClass().getSimpleName(), c -> {
       Hashtable<String, Object> props = new Hashtable<>();
@@ -40,7 +40,7 @@ public class Test<T> {
       props.put("class", className);
       return props;
     });
-    DynamicConfigurer s = test.dynamicConfigurer2.get();
+    DynamicConfigurer1 s = test.dynamicConfigurer2.get();
     System.out.println(s);
     String s2 = test.configName2.apply(dao);
     System.out.println(s2);

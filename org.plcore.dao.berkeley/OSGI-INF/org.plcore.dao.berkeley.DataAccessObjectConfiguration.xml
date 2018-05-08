@@ -4,6 +4,6 @@
       <provide interface="org.plcore.dao.berkeley.DataAccessObjectConfiguration"/>
    </service>
    <reference bind="addCandidate" cardinality="0..n" interface="org.plcore.entity.IEntity" name="Candidate" policy="dynamic" unbind="removeCandidate"/>
-   <reference cardinality="1..1" field="dynamicConfigurer" interface="org.plcore.osgi.DynamicConfigurer" name="dynamicConfigurer"/>
+   <reference cardinality="1..1" field="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin" name="configAdmin"/>
    <implementation class="org.plcore.dao.berkeley.DataAccessObjectConfiguration"/>
 </scr:component>
