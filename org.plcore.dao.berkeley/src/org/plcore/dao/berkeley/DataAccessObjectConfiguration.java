@@ -1,8 +1,5 @@
 package org.plcore.dao.berkeley;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -36,17 +33,15 @@ public class DataAccessObjectConfiguration {
   
   @Activate
   private void activate() {
-    componentConfigurer.activate(configAdmin, c -> {
-      String name = c.getClass().getSimpleName();
-      Dictionary<String, Object> props = new Hashtable<>();
+    componentConfigurer.activate(configAdmin, (candidate, props) -> {
+      String name = candidate.getClass().getSimpleName();
       props.put("name", name);
       
-      String className = c.getClass().getName();
+      String className = candidate.getClass().getName();
       if (className.startsWith("org.plcore.")) {
         props.put("store.target", "(name=CoreDataStore)");
       }
       props.put("class", className);
-      return props;
     });
   }
   

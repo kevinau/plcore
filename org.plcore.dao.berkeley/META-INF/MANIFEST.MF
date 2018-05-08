@@ -25,7 +25,6 @@ Import-Package: org.apache.felix.service.command;status=provisional;version="0.1
  org.plcore.math,
  org.plcore.osgi,
  org.plcore.util,
- org.plcore.value,
  org.slf4j;version="1.7.21"
 Export-Package: com.sleepycat.persist.model
 Eclipse-BuddyPolicy: global
