@@ -7,7 +7,6 @@ public class SourceReference implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  
   private final String hashCode;
 
   private final Timestamp importTime;

@@ -17,10 +17,10 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
+import org.plcore.dao.IDataAccessObject;
 import org.plcore.docstore.parser.IImageParser;
 import org.plcore.docstore.parser.IPDFParser;
 import org.plcore.docstore.parser.impl.ImageIO;
-import org.plcore.docstore.parser.impl.PDFBoxPDFParser;
 import org.plcore.docstore.parser.impl.TesseractImageOCR;
 import org.plcore.home.IApplication;
 import org.plcore.inbox.IFileProcessor;
@@ -53,9 +53,16 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   @Reference
   private IApplication application;
   
+  @Reference
+  private IPDFParser pdfParser;
+  
+  @Reference(target = "(name=SourceDocument)")
+  private IDataAccessObject<SourceDocument> sourceDocDAO;
+
   @Configurable
   private Path baseDir = null;
 
+  
   private static final String IMAGES = "images";
   private static final String SOURCE = "source";
   private static final String THUMBS = "thumbs";
@@ -261,8 +268,8 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
     } else {
       switch (extn) {
       case ".pdf" :
-        IImageParser imageParser = new TesseractImageOCR();
-        IPDFParser pdfParser = new PDFBoxPDFParser(imageParser);
+        //IImageParser imageParser = new TesseractImageOCR();
+        //IPDFParser pdfParser = new PDFBoxPDFParser(imageParser);
         docContents = pdfParser.parse(hashCode, path, IMAGE_RESOLUTION, this);
         break;
       default :
@@ -279,8 +286,7 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
     // Write Document record
     Timestamp importTime = new Timestamp(System.currentTimeMillis());
     SourceDocument document = new SourceDocument(hashCode, originTime, originName, extn, importTime, docContents);
-    Path catalogPath = catalogDir.resolve(hashCode + ".ser");
-    document.save(catalogPath);
+    sourceDocDAO.add(document);
     
     logger.info("Import complete: {} -> {}", originName, hashCode + ".ser");
 
@@ -426,7 +432,14 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   @Override
   public void removeDocument(SourceDocument document) {
     String hashCode = document.getHashCode();
+    String extension = document.getOriginExtension();
+    removeDocument(hashCode, extension);
     
+    fireDocumentRemoved(document);
+  }
+
+
+  private void removeDocument(String hashCode, String extension) {
     try {
       // Remove the document from all the 'at-rest' places
       // Document details and contents
@@ -435,7 +448,7 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
       Files.deleteIfExists(catalogPath);
       
       // Source file
-      Path sourcePath = getSourcePath(hashCode, document.getOriginExtension());
+      Path sourcePath = getSourcePath(hashCode, extension);
       Files.deleteIfExists(sourcePath);
       
       // Thumbnail
@@ -444,8 +457,6 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
       
       // All page images
       // TODO need to do this
-      
-      fireDocumentRemoved(document);
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -454,8 +465,7 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
 
   @Override
   public SourceDocument getDocument(String hashCode) {
-    Path catalogPath = catalogDir.resolve(hashCode + ".ser");
-    return SourceDocument.load(catalogPath);
+    return sourceDocDAO.getByPrimary(hashCode);
   }
 
 
@@ -463,21 +473,21 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   public List<SourceReference> getAllDocuments() {
     List<SourceReference> docList = new ArrayList<>();
     
-    String[] names = catalogDir.toFile().list();
-    for (String name : names) {
-      if (name.endsWith(".ser")) {
-        SourceDocument doc = SourceDocument.load(catalogDir.resolve(name));
-        docList.add(doc);
-      }
-    }
+//    String[] names = catalogDir.toFile().list();
+//    for (String name : names) {
+//      if (name.endsWith(".ser")) {
+//        SourceDocument doc = SourceDocument.load(catalogDir.resolve(name));
+//        docList.add(doc);
+//      }
+//    }
     return docList;
   }
 
 
   public void rebuildPDF (String hashCode, int dpi) {
     Path path = getSourcePath(hashCode, ".pdf");
-    IImageParser imageParser = new TesseractImageOCR();
-    IPDFParser pdfParser = new PDFBoxPDFParser(imageParser);
+    //IImageParser imageParser = new TesseractImageOCR();
+    //IPDFParser pdfParser = new PDFBoxPDFParser(imageParser);
     ISourceDocumentContents docContents = pdfParser.parse(hashCode, path, dpi, this);
     for (ISegment seg : docContents.getSegments()) {
       System.out.println(seg);
@@ -494,6 +504,19 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   @Override
   public void process(Path path, String hashCode) {
     this.importDocument(path, hashCode);
+  }
+  
+  @Override
+  public void unprocess(Path path, String hashCode) {
+    String fileName = path.getFileName().toString();
+    int n = fileName.lastIndexOf('.');
+    String extension;
+    if (n >= 0) {
+      extension = fileName.substring(n);
+    } else {
+      extension = "";
+    }
+    this.removeDocument(hashCode, extension);
   }
   
 }

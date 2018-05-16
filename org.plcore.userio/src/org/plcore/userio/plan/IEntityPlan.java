@@ -55,5 +55,7 @@ public interface IEntityPlan<T> extends IEmbeddedPlan<T> {
   public List<INodePlan> getDataPlans();
 
   //public List<IItemPlan<?>> getDescriptionPlans();
+  
+  public String getDescription(Object instance);
 
 }

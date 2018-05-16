@@ -4,8 +4,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.plcore.entity.Describing;
 import org.plcore.entity.EntityLife;
 import org.plcore.entity.EntityLifeType;
+import org.plcore.entity.IExplicitDescription;
 import org.plcore.entity.VersionTime;
 import org.plcore.entity.VersionTimeType;
 import org.plcore.type.IType;
@@ -31,7 +33,9 @@ public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
   private IItemPlan<VersionTime> versionPlan;
   private IItemPlan<EntityLife> entityLifePlan;
   private List<INodePlan> dataPlans;
-  //private List<IItemPlan<?>> descriptionPlans;
+  private List<IItemPlan<?>> describingItemPlans;
+  private IItemPlan<?> firstItemPlan;
+  
   
   private List<IItemPlan<?>[]> uniqueConstraints;
 
@@ -274,6 +278,14 @@ public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
           entityLifePlan = (IItemPlan<EntityLife>)itemPlan;
           continue;
         }
+        
+        if (itemPlan.isAnnotated(Describing.class)) {
+          describingItemPlans.add(itemPlan);
+        }
+        
+        if (firstItemPlan == null) {
+          firstItemPlan = itemPlan;
+        }
       }
       dataPlans.add(member);
     }
@@ -318,6 +330,25 @@ public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
       }
       uniqueConstraints.add(fields);
     }
+  }
+
+  
+  @Override
+  public String getDescription(Object instance) {
+    if (instance instanceof IExplicitDescription) {
+      return ((IExplicitDescription)instance).getDescription();
+    }
+    String description = "";
+    int i = 0;
+    for (IItemPlan<?> itemPlan : describingItemPlans) {
+      if (i == 0) {
+        description = itemPlan.getDisplayString(instance);
+      } else {
+        description += ", " + itemPlan.getDisplayString(instance);
+      }
+      i++;
+    }
+    return description;
   }
 
   

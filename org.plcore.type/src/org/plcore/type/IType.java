@@ -38,13 +38,12 @@ public interface IType<T> {
   
   /**
    * Return the description of a value when the description is different from
-   * the entry value. Can return <code>null</code> if it does not have a
-   * description that is distinct from its entry representation. If a non-null
-   * value is returned, it should not duplicate the entry representation.
+   * the entry value. If this method is not provided, it defaults to returning
+   * the entry value.
    */
-  public String toDescriptionString(T value);
+  public String toDisplayString(T value);
 
-  public String toEntryString (T value, T fillValue);
+  public String toEntrySource (T value, T fillValue);
 
   public String toValueString (T value);
   

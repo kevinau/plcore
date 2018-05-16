@@ -1,16 +1,18 @@
 package org.plcore.srcdoc;
 
-import java.io.Serializable;
+import com.sleepycat.persist.model.Persistent;
 
+@Persistent
+public class PageImage {
 
-public class PageImage implements Serializable {
-
-  private static final long serialVersionUID = 1L;
-
-  private final int imageIndex;
-  private final int imageWidth;
-  private final int imageHeight;
+  private int imageIndex;
+  private int imageWidth;
+  private int imageHeight;
   
+  
+  public PageImage () {
+  }
+
   
   public PageImage (int imageIndex, int imageWidth, int imageHeight) {
     this.imageIndex = imageIndex;

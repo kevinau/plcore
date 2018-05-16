@@ -8,10 +8,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Reference;
 import org.plcore.docstore.parser.IImageParser;
 import org.plcore.docstore.segment.SegmentMatcherList;
+import org.plcore.osgi.Configurable;
+import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.srcdoc.ISourceDocumentContents;
 import org.plcore.srcdoc.PartialSegment;
 import org.plcore.srcdoc.SourceDocumentContents;
@@ -24,12 +29,22 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
-@Component(configurationPolicy = ConfigurationPolicy.IGNORE)
+@Component(configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class TesseractImageOCR implements IImageParser {
 
   private Logger logger = LoggerFactory.getLogger(TesseractImageOCR.class);
 
-
+  @Reference
+  private ConfigurationLoader configLoader;
+  
+  @Configurable(required = true)
+  private String tesseractHome;
+  
+  @Activate
+  private void activate(ComponentContext context) {
+    configLoader.load(this, context);
+  }
+  
 //  private ISourceDocumentContents readOCRResults(int pageIndex, Path resultsFile) {
 //    XMLInputFactory2 factory = null;
 //    try {
@@ -178,10 +193,10 @@ public class TesseractImageOCR implements IImageParser {
 
     Path ocrBase = OCRPaths.getBasePath(id);
 
-    String tesseractHome = System.getenv("TESSDATA_PREFIX");
-    if (tesseractHome == null) {
-      throw new RuntimeException("Environment variable 'TESSDATA_PREFIX' not set");
-    }
+//    String tesseractHome = System.getenv("TESSDATA_PREFIX");
+//    if (tesseractHome == null) {
+//      throw new RuntimeException("Environment variable 'TESSDATA_PREFIX' not set");
+//    }
     String[] cmd = { tesseractHome + "/tesseract", "--oem", "2", imagePath.toString(), ocrBase.toString(), "hocr" };
     // logger.info("Starting Tesseract OCR: " + cmd[0] + "|" + cmd[1] + "|" +
     // cmd[2] + "|" + cmd[3] + "|" + cmd[4]);

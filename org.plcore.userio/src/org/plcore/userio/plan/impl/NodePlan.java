@@ -135,6 +135,12 @@ public abstract class NodePlan implements INodePlan {
   }
   
   
+  @Override
+  public <A extends Annotation> boolean isAnnotated(Class<A> klass) {
+    return field.isAnnotationPresent(klass);
+  }
+  
+  
 //  @Override
 //  public Method getSetter () {
 //    return setter;

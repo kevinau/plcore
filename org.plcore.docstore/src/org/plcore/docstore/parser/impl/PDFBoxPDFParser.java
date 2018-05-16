@@ -10,6 +10,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.plcore.docstore.IDocumentStore;
 import org.plcore.docstore.parser.IImageParser;
 import org.plcore.docstore.parser.IPDFParser;
@@ -21,10 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+@Component
 public class PDFBoxPDFParser implements IPDFParser {
 
   private static Logger logger = LoggerFactory.getLogger(PDFBoxPDFParser.class);
 
+  @Reference
   private IImageParser imageParser;
 
   

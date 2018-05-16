@@ -133,5 +133,19 @@ public class ItemPlan<T> extends NodePlan implements IItemPlan<T> {
   public <X> X replicate(X fromValue) {
     return fromValue;
   }
+
+
+  @Override
+  public String getDisplayString(Object instance) {
+    T value = getFieldValue(instance);
+    return type.toDisplayString(value);
+  }
+
+
+  @Override
+  public String getEntrySource(Object instance, T fillValue) {
+    T value = getFieldValue(instance);
+    return type.toEntrySource(value, fillValue);
+  }
   
 }

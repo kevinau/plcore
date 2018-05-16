@@ -44,7 +44,7 @@ public class BooleanType extends Type<Boolean> implements IType<Boolean> {
 
 
   @Override
-  public String toEntryString(Boolean value, Boolean fillValue) {
+  public String toEntrySource(Boolean value, Boolean fillValue) {
     if (value == null) {
       return "";
     }
@@ -68,7 +68,7 @@ public class BooleanType extends Type<Boolean> implements IType<Boolean> {
    * representation.
    */
   @Override
-  public String toDescriptionString(Boolean value) {
+  public String toDisplayString(Boolean value) {
     boolean v = (Boolean) value;
     return v ? "Checked" : "Un-checked";
   }

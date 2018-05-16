@@ -50,7 +50,15 @@ public interface INodePlan extends INode {
   
   public PlanStructure getStructure();
 
+  /**
+   * A convenience method that returns an Annotation for this input field.
+   */
   public <A extends Annotation> A getAnnotation(Class<A> klass);
+
+  /**
+   * A convenience method that tests for an Annotation on this input field.
+   */
+  public <A extends Annotation> boolean isAnnotated(Class<A> klass);
 
   public boolean isViewOnly();
 

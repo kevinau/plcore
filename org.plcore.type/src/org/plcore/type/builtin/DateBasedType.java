@@ -169,7 +169,7 @@ public abstract class DateBasedType<T> extends Type<T> implements IType<T> {
   
   
   @Override
-  public String toEntryString (T value, T fillValue) {
+  public String toEntrySource (T value, T fillValue) {
     if (value == null) {
       return "";
     }

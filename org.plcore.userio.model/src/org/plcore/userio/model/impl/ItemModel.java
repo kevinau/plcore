@@ -303,7 +303,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       defaultWasShowing = (defaultValue == null ? currentValue == null : defaultValue.equals(currentValue));
     }
     defaultValue = value;
-    defaultSource = type.toEntryString(value, null);
+    defaultSource = type.toEntrySource(value, null);
     if (comparisonBasis == ComparisonBasis.DEFAULT) {
       if (defaultWasShowing) {
         setRawValue(value, null, true);
@@ -324,7 +324,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
       referenceWasShowing = (referenceValue == null ? currentValue == null : referenceValue.equals(currentValue));
     }
     referenceValue = value;
-    referenceSource = type.toEntryString(value, null);
+    referenceSource = type.toEntrySource(value, null);
     if (comparisonBasis == ComparisonBasis.REFERENCE) {
       if (referenceWasShowing) {
         setRawValue(value, null, true);
@@ -358,7 +358,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   
   public void setSourceFromValue (Object value) {
     if (!currentValueInError) {
-      currentSource = type.toEntryString(value, null);
+      currentSource = type.toEntrySource(value, null);
       setRawValue(value, null, false);
     }
   }
@@ -366,7 +366,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   
   @Override
   public void setValue(Object value) {
-    String source = type.toEntryString(value, null);
+    String source = type.toEntrySource(value, null);
     if (source == null ? currentSource != null : !source.equals(currentSource)) {
       currentSource = source;
       fireSourceChange(this);
@@ -394,7 +394,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   @Deprecated
   public void setValueFromPrime () {
     Object primalValue = itemPlan.getType().primalValue();
-    String source = type.toEntryString(primalValue, null);
+    String source = type.toEntrySource(primalValue, null);
     currentSource = source;
     
     //Object currentValue = valueRef.getValue();
@@ -416,7 +416,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   
   
   public void setValueFromDefault () {
-    String source = type.toEntryString(defaultValue, null);
+    String source = type.toEntrySource(defaultValue, null);
     currentSource = source;
     
     //Object currentValue = valueRef.getValue();
@@ -438,7 +438,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   
   
   public void setValueFromReference () {
-    String source = type.toEntryString(referenceValue, null);
+    String source = type.toEntrySource(referenceValue, null);
     currentSource = source;
     
     //Object currentValue = valueRef.getValue();
@@ -548,7 +548,7 @@ public class ItemModel extends NodeModel implements EffectiveEntryModeListener, 
   
   @Override
   public String toEntryString (Object value) {
-    return type.toEntryString(value, null);
+    return type.toEntrySource(value, null);
   }
   
   

@@ -274,7 +274,7 @@ public class EnumType<E extends Enum<E>> extends Type<E> implements IType<E> {
   
 
   @Override
-  public String toEntryString (E value, E fillValue) {
+  public String toEntrySource (E value, E fillValue) {
     if (value == null) {
       return "";
     }

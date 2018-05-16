@@ -1,11 +1,9 @@
 package org.plcore.srcdoc;
 
-import java.io.Serializable;
+import com.sleepycat.persist.model.Persistent;
 
-
-public class Segment implements Serializable, ISegment {
-
-  private static final long serialVersionUID = 1L;
+@Persistent
+public class Segment implements ISegment {
 
 //  private static Pattern titlePattern = Pattern.compile(" ");
 

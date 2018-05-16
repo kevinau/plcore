@@ -1,15 +1,15 @@
 package org.plcore.srcdoc;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.sleepycat.persist.model.Persistent;
 
-public class SourceDocumentContents implements ISourceDocumentContents, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
+@Persistent
+public class SourceDocumentContents implements ISourceDocumentContents {
+
   private final List<ISegment> segments;
   
   private final List<PageImage> pageImages;

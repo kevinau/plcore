@@ -99,7 +99,7 @@ public abstract class PathBasedType<T extends File> extends Type<T> implements I
   
 
   @Override
-  public String toEntryString (T value, T fillValue) {
+  public String toEntrySource (T value, T fillValue) {
     if (value == null) {
       return "";
     }

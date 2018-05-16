@@ -43,6 +43,7 @@ public class DataStore {
     model.registerClass(CRC64DigestProxy.class);
     model.registerClass(VersionTimeProxy.class);
     model.registerClass(MimeTypeProxy.class);
+    model.registerClass(TimestampProxy.class);
 
     StoreConfig storeConfig = new StoreConfig();
     storeConfig.setAllowCreate(true);

@@ -12,9 +12,9 @@ Import-Package: org.osgi.service.component;version="1.2.0",
  org.plcore.srcdoc,
  org.slf4j;version="1.7.21"
 Bundle-ActivationPolicy: lazy
-Service-Component: OSGI-INF/org.plcore.docstore.lucerne.LuceneSearchEngine.xml
-Bundle-ClassPath: lib/lucene-core-6.6.0.jar,
- lib/lucene-queryparser-6.6.0.jar,
+Bundle-ClassPath: lib/lucene-core-7.3.0.jar,
+ lib/lucene-queryparser-7.3.0.jar,
  .
 Export-Package: org.apache.lucene,
  org.apache.lucene.document
+Service-Component: OSGI-INF/org.plcore.docstore.lucerne.LuceneSearchEngine.xml

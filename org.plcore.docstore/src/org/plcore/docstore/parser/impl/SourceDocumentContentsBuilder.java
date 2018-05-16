@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+@Deprecated
+/** No known uses of this class */
 public class SourceDocumentContentsBuilder {
 
   private static final Logger logger = LoggerFactory.getLogger(SourceDocumentContentsBuilder.class);

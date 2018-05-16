@@ -164,7 +164,7 @@ public class CodeType<T extends ICode<T>> extends Type<T> implements IType<T>, I
   }
 
   @Override
-  public String toEntryString(T value, T fillValue) {
+  public String toEntrySource(T value, T fillValue) {
     if (value == null) {
       return "";
     }
@@ -180,7 +180,7 @@ public class CodeType<T extends ICode<T>> extends Type<T> implements IType<T>, I
   }
 
   @Override
-  public String toDescriptionString(T value) {
+  public String toDisplayString(T value) {
     if (value == null) {
       return "";
     }

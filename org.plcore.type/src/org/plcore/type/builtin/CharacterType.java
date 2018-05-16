@@ -30,7 +30,7 @@ public class CharacterType extends Type<Character> implements ICaseSettable {
   
   
   @Override
-  public String toEntryString(Character value, Character fillValue) {
+  public String toEntrySource(Character value, Character fillValue) {
     if (value == null) {
       return "";
     }

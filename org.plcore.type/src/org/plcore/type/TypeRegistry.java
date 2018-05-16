@@ -21,7 +21,6 @@ import org.plcore.type.builtin.DateType;
 import org.plcore.type.builtin.DecimalType;
 import org.plcore.type.builtin.DoubleType;
 import org.plcore.type.builtin.EnumType;
-import org.plcore.type.builtin.FloatType;
 import org.plcore.type.builtin.IntegerType;
 import org.plcore.type.builtin.LocalDateType;
 import org.plcore.type.builtin.LongType;
@@ -56,6 +55,9 @@ public class TypeRegistry {
       } else {
         this.pattern = Pattern.compile(nameRegex);
       }
+      if (fieldClass == null) {
+        throw new IllegalArgumentException("fieldClass cannot be null");
+      }
       this.fieldClass = fieldClass;
       this.type = type;
     }
@@ -66,7 +68,11 @@ public class TypeRegistry {
           return false;
         }
       }
-      return this.fieldClass.equals(fieldClass);
+      if (this.fieldClass != null) {
+        return this.fieldClass.equals(fieldClass);
+      } else {
+        return true;
+      }
     }
     
     private boolean matches (Class<?> fieldClass, String fieldName) {
@@ -76,7 +82,11 @@ public class TypeRegistry {
           return false;
         }
       }
-      return this.fieldClass.isAssignableFrom(fieldClass);
+      if (this.fieldClass != null) {
+        return this.fieldClass.isAssignableFrom(fieldClass);
+      } else {
+        return true;
+      }
     }
   }
   

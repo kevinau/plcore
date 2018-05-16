@@ -50,7 +50,7 @@ public class PasswordType extends Type<PasswordValue> {
 
 
   @Override
-  public String toEntryString (PasswordValue value, PasswordValue fillValue) {
+  public String toEntrySource (PasswordValue value, PasswordValue fillValue) {
     return "";
   }
   

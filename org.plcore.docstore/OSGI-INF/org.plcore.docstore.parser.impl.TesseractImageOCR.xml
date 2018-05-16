@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" configuration-policy="ignore" name="org.plcore.docstore.parser.impl.TesseractImageOCR">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="activate" configuration-policy="require" name="org.plcore.docstore.parser.impl.TesseractImageOCR">
    <service>
       <provide interface="org.plcore.docstore.parser.IImageParser"/>
    </service>
+   <reference cardinality="1..1" field="configLoader" interface="org.plcore.osgi.ConfigurationLoader" name="configLoader"/>
    <implementation class="org.plcore.docstore.parser.impl.TesseractImageOCR"/>
 </scr:component>

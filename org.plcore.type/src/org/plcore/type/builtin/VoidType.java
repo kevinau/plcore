@@ -31,12 +31,12 @@ public class VoidType implements IType<Void> {
   }
 
   @Override
-  public String toDescriptionString(Void value) {
+  public String toDisplayString(Void value) {
     return null;
   }
 
   @Override
-  public String toEntryString(Void value, Void fillValue) {
+  public String toEntrySource(Void value, Void fillValue) {
     return "";
   }
 

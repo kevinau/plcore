@@ -83,13 +83,13 @@ public abstract class Type<T> implements IType<T> {
     
   
   @Override
-  public String toDescriptionString(T value) {
-    return null;
+  public String toDisplayString(T value) {
+    return toEntrySource(value, null);
   }
   
   
   @Override
-  public String toEntryString(T value, T fillValue) {
+  public String toEntrySource(T value, T fillValue) {
     if (value == null) {
       return "";
     }

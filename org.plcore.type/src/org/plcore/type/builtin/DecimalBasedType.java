@@ -138,7 +138,7 @@ public abstract class DecimalBasedType<T> extends Type<T> implements IType<T>, I
 
   
   @Override
-  public String toEntryString(T value, T fillValue) {
+  public String toEntrySource(T value, T fillValue) {
     if (value == null) {
       return "";
     }

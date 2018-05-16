@@ -62,6 +62,7 @@ public abstract class ContainerPlan extends NodePlan implements IContainerPlan {
     return found;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public INodePlan selectNodePlan(String expr) {
     List<INodePlan> found = selectNodePlans(expr);

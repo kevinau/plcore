@@ -6,5 +6,7 @@
    </service>
    <reference cardinality="1..1" field="application" interface="org.plcore.home.IApplication" name="application"/>
    <reference cardinality="1..1" field="configLoader" interface="org.plcore.osgi.ConfigurationLoader" name="configLoader"/>
+   <reference cardinality="1..1" field="pdfParser" interface="org.plcore.docstore.parser.IPDFParser" name="pdfParser"/>
+   <reference cardinality="1..1" field="sourceDocDAO" interface="org.plcore.dao.IDataAccessObject" name="sourceDocDAO" target="(name=SourceDocument)"/>
    <implementation class="org.plcore.docstore.DocumentStore"/>
 </scr:component>

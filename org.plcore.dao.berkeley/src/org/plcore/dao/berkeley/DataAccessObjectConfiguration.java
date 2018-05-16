@@ -33,8 +33,7 @@ public class DataAccessObjectConfiguration {
   
   @Activate
   private void activate() {
-    componentConfigurer.activate(configAdmin, (candidate, props) -> {
-      String name = candidate.getClass().getSimpleName();
+    componentConfigurer.activate(configAdmin, (candidate, name, props) -> {
       props.put("name", name);
       
       String className = candidate.getClass().getName();

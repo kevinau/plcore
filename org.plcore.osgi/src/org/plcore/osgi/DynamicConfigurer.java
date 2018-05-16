@@ -4,13 +4,13 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.plcore.util.DictionaryAsMap;
+import org.plcore.util.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class DynamicConfigurer<T> {
 
   private ConfigurationAdmin configAdmin;
   private Function<T, String> candidateNameFn;
-  private BiConsumer<T, Dictionary<String, Object>> propsFn;
+  private TriConsumer<T, String, Dictionary<String, Object>> propsFn;
   
   
   public DynamicConfigurer (Class<?> targetComponent) {
@@ -67,7 +67,7 @@ public class DynamicConfigurer<T> {
   private void register(T candidate) {
     String name = candidateNameFn.apply(candidate);
     Dictionary<String, Object> props = new Hashtable<>();
-    propsFn.accept(candidate, props);
+    propsFn.accept(candidate, name, props);
     setConfig(targetComponent.getName(), name, props);
     logger.info("{} is registered for {}", targetComponent.getSimpleName(), candidate.getClass().getName());
   }
@@ -81,13 +81,13 @@ public class DynamicConfigurer<T> {
 
 
   public void activate(ConfigurationAdmin configAdmin, 
-        BiConsumer<T, Dictionary<String, Object>> propsFn) {
+        TriConsumer<T, String, Dictionary<String, Object>> propsFn) {
     activate(configAdmin, c -> c.getClass().getSimpleName(), propsFn);
   }
     
     
   public void activate(ConfigurationAdmin configAdmin, 
-        Function<T, String> candidateNameFn, BiConsumer<T, Dictionary<String, Object>> propsFn) {
+        Function<T, String> candidateNameFn, TriConsumer<T, String, Dictionary<String, Object>> propsFn) {
     this.configAdmin = configAdmin;
     this.candidateNameFn = candidateNameFn;
     this.propsFn = propsFn;

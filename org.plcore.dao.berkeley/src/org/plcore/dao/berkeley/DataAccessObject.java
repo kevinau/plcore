@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -77,11 +78,11 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
 
   
   @Activate
-  void activate (Map<String, Object> props) {
-    logger.info("************** Activate with props: " + props);
-    
-    configLoader.load(this, props);
+  void activate (ComponentContext context) {
+    configLoader.load(this, context);
 
+    //Dictionary<String, Object> props = context.getProperties();
+    
     idField = null;
     idSequence = false;
     //entityClass.getDeclaredFields();

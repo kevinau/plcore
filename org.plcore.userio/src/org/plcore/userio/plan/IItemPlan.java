@@ -1,7 +1,5 @@
 package org.plcore.userio.plan;
 
-import java.lang.annotation.Annotation;
-
 import org.plcore.type.IType;
 import org.plcore.userio.INode;
 
@@ -12,12 +10,6 @@ public interface IItemPlan<T> extends INodePlan, INode {
    * The type of this input field.
    */
   public IType<T> getType();
-
-  /**
-   * A convenience method that returns an Annotation for this input field.
-   */
-  @Override
-  public <A extends Annotation> A getAnnotation(Class<A> klass);
 
   /**
    * Is an empty input field acceptable.  If this is true, an empty input field is acceptable
@@ -40,7 +32,11 @@ public interface IItemPlan<T> extends INodePlan, INode {
   
   @Override
   public void setFieldValue(Object instance, Object value);
-
+  
+  public String getDisplayString(Object instance);
+  
+  public String getEntrySource(Object instance, T fillValue);
+  
   //public boolean isDescribing();
   
 //  public T getResultValue(IResultSet rs);

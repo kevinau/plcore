@@ -6,6 +6,10 @@ Bundle-Version: 1.0.0
 Bundle-Vendor: Kevin Holloway
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.plcore.srcdoc
-Import-Package: org.plcore.math,
+Import-Package: com.sleepycat.persist.model,
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.plcore.entity,
+ org.plcore.math,
  org.slf4j
 Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/org.plcore.srcdoc.SourceDocument.xml
