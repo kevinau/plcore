@@ -10,13 +10,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.plcore.dao.IDataAccessObject;
 import org.plcore.docstore.parser.IImageParser;
 import org.plcore.docstore.parser.IPDFParser;
@@ -59,6 +63,9 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   @Reference(target = "(name=SourceDocument)")
   private IDataAccessObject<SourceDocument> sourceDocDAO;
 
+  @Reference
+  private EventAdmin eventAdmin;
+
   @Configurable
   private Path baseDir = null;
 
@@ -66,14 +73,10 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   private static final String IMAGES = "images";
   private static final String SOURCE = "source";
   private static final String THUMBS = "thumbs";
-  private static final String CATALOG = "catalog";
 
   private Path sourceDir;
   private Path imagesDir;
   private Path thumbsDir;
-  private Path catalogDir;
-  
-  private final List<DocumentStoreListener> docStoreListeners = new ArrayList<>(2);
   
   
   public DocumentStore () {
@@ -93,37 +96,18 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
       Files.createDirectories(imagesDir);
       thumbsDir = baseDir.resolve(THUMBS);
       Files.createDirectories(thumbsDir);
-      catalogDir = baseDir.resolve(CATALOG);
-      Files.createDirectories(catalogDir);
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
   }
 
   
-  @Override
-  public void addDocumentStoreListener(DocumentStoreListener x) {
-    docStoreListeners.add(x);
-  }
+  private void fireEvent(SourceDocument doc, String action) {
+    Map<String, Object> props = new HashMap<>();
+    props.put("document", doc);
 
-  
-  @Override
-  public void removeDocumentStoreListener(DocumentStoreListener x) {
-    docStoreListeners.remove(x);
-  }
-  
-  
-  private void fireDocumentAdded(SourceDocument doc) {
-    for (DocumentStoreListener x : docStoreListeners) {
-      x.documentAdded(doc);
-    }
-  }
-
-  
-  private void fireDocumentRemoved(SourceDocument doc) {
-    for (DocumentStoreListener x : docStoreListeners) {
-      x.documentRemoved(doc);
-    }
+    Event event = new Event("org/plcore/docstore/Document/" + action, props);
+    eventAdmin.postEvent(event);
   }
 
   
@@ -170,14 +154,14 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   
   
   public String importDocument(Path path, String hashCode) {
-    Path catalogPath = catalogDir.resolve(hashCode + ".ser");
-    if (Files.exists(catalogPath)) {
-      logger.info("{} already exists as {}. Not importing", path, hashCode);
-       // No need to import.  The file already exists.  The file is uniquely named by it's hashCode, 
-      // so if it exists under that name, it exists and is current.  Size and time stamp do not 
-      // need to be checked.
-      return hashCode;
-    }
+//    Path catalogPath = catalogDir.resolve(hashCode + ".ser");
+//    if (Files.exists(catalogPath)) {
+//      logger.info("{} already exists as {}. Not importing", path, hashCode);
+//       // No need to import.  The file already exists.  The file is uniquely named by it's hashCode, 
+//      // so if it exists under that name, it exists and is current.  Size and time stamp do not 
+//      // need to be checked.
+//      return hashCode;
+//    }
     
     logger.info("Importing {} as {}", path, hashCode);
     String pathName = path.toString();
@@ -221,13 +205,13 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   
   
   private String importDocument(String hashCode, InputStream is, String originName, String extn) {
-    Path catalogPath = catalogDir.resolve(hashCode + ".ser");
-    if (Files.exists(catalogPath)) {
-      // No need to import.  The file already exists.  The file is uniquely named by it's id, 
-      // so if it exists under that name, it exists and is current.  Size and timestamp do not 
-      // need to be checked.
-      return hashCode;
-    }
+//    Path catalogPath = catalogDir.resolve(hashCode + ".ser");
+//    if (Files.exists(catalogPath)) {
+//      // No need to import.  The file already exists.  The file is uniquely named by it's id, 
+//      // so if it exists under that name, it exists and is current.  Size and timestamp do not 
+//      // need to be checked.
+//      return hashCode;
+//    }
 
     Path newSourcePath = sourceDir.resolve(hashCode + extn);
     
@@ -290,7 +274,7 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
     
     logger.info("Import complete: {} -> {}", originName, hashCode + ".ser");
 
-    fireDocumentAdded(document);
+    fireEvent(document, "ADDED");
     
     // For debugging
 //    Document d = primaryIndex.get(id);
@@ -435,17 +419,17 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
     String extension = document.getOriginExtension();
     removeDocument(hashCode, extension);
     
-    fireDocumentRemoved(document);
+    fireEvent(document, "REMOVED");
   }
 
 
   private void removeDocument(String hashCode, String extension) {
     try {
       // Remove the document from all the 'at-rest' places
-      // Document details and contents
-      Path catalogDir = baseDir.resolve(CATALOG);
-      Path catalogPath = catalogDir.resolve(hashCode + ".ser");
-      Files.deleteIfExists(catalogPath);
+//      // Document details and contents
+//      Path catalogDir = baseDir.resolve(CATALOG);
+//      Path catalogPath = catalogDir.resolve(hashCode + ".ser");
+//      Files.deleteIfExists(catalogPath);
       
       // Source file
       Path sourcePath = getSourcePath(hashCode, extension);

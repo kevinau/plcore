@@ -32,7 +32,7 @@ import com.sleepycat.persist.model.PrimaryKey;
            property="store.target = (name=DefaultDataStore)")
 public class DataAccessObject<T> implements IDataAccessObject<T> {
 
-  private final Logger logger = LoggerFactory.getLogger(DataAccessObject.class);
+  ////private final Logger logger = LoggerFactory.getLogger(DataAccessObject.class);
   
   @Reference(name = "store")
   private DataStore dataStore;
@@ -81,11 +81,8 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   void activate (ComponentContext context) {
     configLoader.load(this, context);
 
-    //Dictionary<String, Object> props = context.getProperties();
-    
     idField = null;
     idSequence = false;
-    //entityClass.getDeclaredFields();
     for (Field field : entityClass.getDeclaredFields()) {
       PrimaryKey pkAnn = field.getAnnotation(PrimaryKey.class);
       if (pkAnn != null) {
@@ -148,7 +145,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
       PrimaryIndex<Object, T> index1 = getPrimaryIndex();
       add(index1, value);
       transaction.commit();
-      logger.info("add: " + value);
+      ////logger.info("add: " + value);
     } catch (Exception ex) {
       transaction.abort();
     }
@@ -200,7 +197,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   public T getById(int id) {
     PrimaryIndex<Object, T> index1 = getPrimaryIndex();
     T value = index1.get(id);
-    logger.info("getById " + id + ": " + value);
+    ////logger.info("getById " + id + ": " + value);
     return value;
   }
   
@@ -209,7 +206,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   public T getByPrimary(Object key) {
     PrimaryIndex<Object, T> index1 = getPrimaryIndex();
     T value = index1.get(key);
-    logger.info("getById " + key + ": " + value);
+    ////logger.info("getById " + key + ": " + value);
     return value;
   }
   
@@ -228,7 +225,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
     try {
       PrimaryIndex<Object, T> index = getPrimaryIndex();
       remove(index, value);
-      logger.info("delete " + value);
+      ////logger.info("delete " + value);
       transaction.commit();
     } catch (SecurityException | IllegalArgumentException |
              DatabaseException ex) {
@@ -286,7 +283,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
       PrimaryIndex<Object, T> index1 = getPrimaryIndex();
       index1.put(newValue);
       transaction.commit();
-      logger.info("update " + key + ": " + newValue);
+      ////logger.info("update " + key + ": " + newValue);
       return newValue;
     } catch (SecurityException | IllegalArgumentException |
              IllegalAccessException | DatabaseException ex) {

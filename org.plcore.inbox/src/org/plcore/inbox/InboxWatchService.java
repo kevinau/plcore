@@ -84,7 +84,7 @@ public class InboxWatchService {
     DirectoryWatcher.IProcessor watchProcessor = new DirectoryWatcher.IProcessor() {
       @Override
       public void process(Path path, EventKind kind) throws IOException {
-        logger.info("{}: Processing {}, {}", watchDir, kind, watchDir.relativize(path));
+        logger.info("{}: Found {} {}", watchDir, kind, watchDir.relativize(path));
         String fileName = watchDir.relativize(path).toString();
         switch (kind) {
         case EXISTING :
@@ -101,19 +101,19 @@ public class InboxWatchService {
               // The file has been changed since last processing.
               String firstDigest = firstDigestForFile(digest);
               String priorDigest = seen.digest;
-              seen.digest = digest;
-              dao.update(seen);
               logger.info("{}: {} {}, {}", watchDir, kind, watchDir.relativize(path), digest);
               conditionallyUnprocess(path, priorDigest);
               conditionallyProcess(path, firstDigest);
+              seen.digest = digest;
+              dao.update(seen);
             }
           } else {
             // As expected by the ENTRY_CREATE, the file is new and MAY need to be processed.
             String firstDigest = firstDigestForFile(digest);
             seen = new InboxSeen(fileName, digest);
-            dao.add(seen);
             logger.info("{}: {} {}, {}", watchDir, kind, watchDir.relativize(path), digest);
             conditionallyProcess(path, firstDigest);
+            dao.add(seen);
           }
           break;
         case DELETE :
@@ -121,9 +121,9 @@ public class InboxWatchService {
           if (seen2 == null) {
             throw new IOException("No 'seen' record for deletion of: " + path);
           }
-          dao.remove(seen2);
           logger.info("{}: {} {}, {}", watchDir, kind, watchDir.relativize(path), seen2.digest);
           conditionallyUnprocess(path, seen2.digest);
+          dao.remove(seen2);
           break;
         }
       }
