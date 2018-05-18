@@ -31,6 +31,10 @@ public class SourceDocumentContents implements ISourceDocumentContents {
     if (partialSegment == null) {
       throw new IllegalArgumentException("Segment argument cannot be null");
     }
+    if (partialSegment.getNibbleCount() == 0) {
+      throw new IllegalArgumentException("Nibble size must be > 0");
+    }
+
     // Iterate through the list of matchers, looking for the first match
     String word = partialSegment.getWord();
     findMatchAndAdd (matchers, partialSegment, word, 0, word.length());

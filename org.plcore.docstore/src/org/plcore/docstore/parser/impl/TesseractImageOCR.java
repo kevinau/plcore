@@ -2,7 +2,9 @@ package org.plcore.docstore.parser.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -126,8 +128,15 @@ public class TesseractImageOCR implements IImageParser {
 //    }
 //  }
 
+  private static final double ADJACENT_TOLERANCE = 0.5;
+  private static final double SPACE_TOLERANCE = 1.2;
+  
+  private static Pattern titlePattern = Pattern.compile("[ ;]");
+
 
   private void parseOcrLine(SourceDocumentContents docContents, Document doc, int page, Element e) {
+    PartialSegment psegment = null;
+    
     final NodeList children = e.getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
       final Node n = children.item(i);
@@ -136,13 +145,36 @@ public class TesseractImageOCR implements IImageParser {
         String classAttribute = ce.getAttribute("class");
         if (classAttribute.equals("ocrx_word")) {
           String titleAttrib = ce.getAttribute("title");
+          String[] x = titlePattern.split(titleAttrib);
+          float nextx0 = Float.parseFloat(x[1]);
+          float nexty0 = Float.parseFloat(x[2]);
+          float nextx1 = Float.parseFloat(x[3]);
+          float nexty1 = Float.parseFloat(x[4]);
+
           String text = ce.getTextContent();
-          PartialSegment segment = new PartialSegment(page, titleAttrib, text);
-          docContents.add(SegmentMatcherList.matchers, segment);
+          if (psegment == null) {
+            psegment = new PartialSegment(page, nextx0, nexty0, nextx1, nexty1, text);
+          } else {
+            double aveCharWidth = psegment.aveCharWidth(nextx1 - nextx0, text);
+            double gap = nextx0 - psegment.getX1();
+            
+            if (gap < aveCharWidth * ADJACENT_TOLERANCE) {
+              psegment.extendWide(nextx0, nexty0, nextx1, nexty1, text);
+            } else if (gap < aveCharWidth * SPACE_TOLERANCE) {
+              psegment.extendWideWithSpace(nextx0, nexty0, nextx1, nexty1, text);
+            } else {
+              // Add currently extended segment
+              docContents.add(SegmentMatcherList.matchers, psegment);
+              psegment = new PartialSegment(page, nextx0, nexty0, nextx1, nexty1, text);
+            }
+          }
         } else {
           parseOcrLine(docContents, doc, page, ce);
         }
       }
+    }
+    if (psegment != null) {
+      docContents.add(SegmentMatcherList.matchers, psegment);
     }
   }
 
@@ -183,9 +215,10 @@ public class TesseractImageOCR implements IImageParser {
       throw new RuntimeException(ex);
     }
     parseOuter(docContents, doc, pageIndex, doc.getDocumentElement());
+
     return docContents;
   }
-  
+    
   
   @Override
   public ISourceDocumentContents parse(String id, int pageIndex, Path imagePath) {
@@ -193,10 +226,6 @@ public class TesseractImageOCR implements IImageParser {
 
     Path ocrBase = OCRPaths.getBasePath(id);
 
-//    String tesseractHome = System.getenv("TESSDATA_PREFIX");
-//    if (tesseractHome == null) {
-//      throw new RuntimeException("Environment variable 'TESSDATA_PREFIX' not set");
-//    }
     String[] cmd = { tesseractHome + "/tesseract", "--oem", "2", imagePath.toString(), ocrBase.toString(), "hocr" };
     // logger.info("Starting Tesseract OCR: " + cmd[0] + "|" + cmd[1] + "|" +
     // cmd[2] + "|" + cmd[3] + "|" + cmd[4]);
@@ -238,32 +267,12 @@ public class TesseractImageOCR implements IImageParser {
 
     // The readOCRResults method is done with the hocrFile, so we can get rid of
     // it.
-    /// try {
-    //// System.out.println("#### " + hocrFile.toAbsolutePath().toString());
-    /////////////// TODO Files.delete(hocrFile);
-    /// } catch (IOException ex) {
-    /// throw new RuntimeException(ex);
-    /// }
+    try {
+      Files.delete(hocrFile);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
 
     return docInstance;
-
-    // // Now do something with the lines extracted by Tesseract
-    // String textFileName = FileName.replaceExtn(imageFile, ".txt");
-    // File textFile = new File(textFileName);
-    //
-    // try (BufferedReader reader = new BufferedReader(new
-    // FileReader(textFileName))) {
-    // String line = reader.readLine();
-    // while (line != null) {
-    // wordSink.addWord(line);
-    // line = reader.readLine();
-    // }
-    // reader.close();
-    // if (deleteWhenDone) {
-    // textFile.delete();
-    // }
-    // } catch (IOException ex) {
-    // throw new RuntimeException(ex);
-    // }
   }
 }
