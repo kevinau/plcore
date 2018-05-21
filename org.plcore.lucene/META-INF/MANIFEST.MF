@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - Apache Lucene wrapper
+Bundle-SymbolicName: org.plcore.lucene
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.plcore.lucene
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Kevin Holloway
+Service-Component: OSGI-INF/org.plcore.lucene.LuceneSearch.xml
+Bundle-ActivationPolicy: lazy
+Import-Package: org.osgi.service.component;version="1.2.0",
+ org.osgi.service.component.annotations;version="1.3.0";resolution:=optional,
+ org.plcore.home,
+ org.slf4j;version="1.7.21"
+Export-Package: org.apache.lucene.analysis,
+ org.apache.lucene.analysis.standard,
+ org.apache.lucene.document,
+ org.apache.lucene.index,
+ org.apache.lucene.search,
+ org.apache.lucene.store,
+ org.apache.lucene.util,
+ org.plcore.lucene
+Bundle-ClassPath: lib/lucene-core-7.3.1.jar,
+ .

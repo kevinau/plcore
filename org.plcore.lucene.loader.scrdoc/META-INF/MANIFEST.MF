@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - loading Lucene indexes from source documents
+Bundle-SymbolicName: org.plcore.lucene.loader.scrdoc
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.plcore.lucene.from.srcdoc
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.apache.lucene.analysis,
+ org.apache.lucene.document,
+ org.apache.lucene.index,
+ org.apache.lucene.search,
+ org.osgi.service.event,
+ org.plcore.lucene,
+ org.plcore.srcdoc,
+ org.slf4j;version="1.7.21"
+Service-Component: OSGI-INF/org.plcore.lucene.loader.srcdoc.FromSourceDocument.xml
+Bundle-ActivationPolicy: lazy

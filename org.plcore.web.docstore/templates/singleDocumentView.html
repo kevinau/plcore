@@ -1,0 +1,111 @@
+{% extends "page" %}
+{% block title %}PDF View{% endblock %}
+{% block head %}
+  <link href="resources/singleDocumentView.css" rel="stylesheet">
+
+  <script>
+var docFields = new Map();
+docFields.set("declaredDate", {
+    title : "Declared date",
+    isDate : true,
+    isCurrency : false,
+    targetId : ""
+  });
+docFields.set("paymentDate", {
+    title : "Payment date",
+    isDate : true,
+    isCurrency : false,
+    targetId : ""
+  });
+docFields.set("dividendAmount", {
+    title : "Dividend amount",
+    isDate : false,
+    isCurrency : true,
+    targetId : ""
+  });
+docFields.set("imputationCredit", {
+    title : "Imputation credit",
+    isDate : false,
+    isCurrency : true,
+    targetId : ""
+  });
+docFields.set("otherAmount", {
+    title : "Very long label for other amount",
+    isDate : false,
+    isCurrency : true,
+    targetId : ""
+  });
+  </script>
+  
+  <script type="text/javascript" src="/global/ws.js" charset="utf-8"></script>
+  
+  <script>
+function updateBackend(itemPath, value) {
+  console.log("Update backend " + itemPath + " = " + value);
+  var n = itemPath.indexOf('_');
+  sendMessage(websocket, "edit|" + itemPath.substring(n + 1) + "|" + value);
+ }
+ 
+var websocket;
+var websocket1;
+var websocket2;
+
+window.addEventListener("DOMContentLoaded", function() {
+  console.log(window.location.host + "/d/edit");
+  websocket = websocketStart(window.location.host + "/d/edit", "");
+  websocket1 = websocketStart(window.location.host + "/ws/entitySet", "", function(ws) {
+    console.log("/ws/entitySet " + websocket1.url);
+  	SearchInput.init(websocket1, "entitySearchInput");
+  });
+  websocket2 = websocketStart(window.location.host + "/ws/documentTypes", "", function(ws) {
+    console.log("/ws/documentTypes " + websocket2.url);
+  	SearchInput.init(websocket2, "doctypeSearchInput");
+  });
+}, false);
+</script>
+{% endblock %}
+{% block body %}
+  <div id="main">
+    <div id="pagelinks">
+      <div>
+        <form id="accountingData" action="/my-handling-form-page" method="post">
+          <input type="text" id="declaredDate" name="declaredDate">
+          <input type="text" id="paymentDate" name="paymentDate">
+          <input type="text" id="dividendAmount" name="dividendAmount">
+          <input type="text" id="imputationCredit" name="imputationCredit">
+          <button type="submit" disabled="true">Save</button>
+        </form>
+      </div>
+      <div>
+        <a href="/docstore{{sourcePath}}" title="Source document">{{document.originExtension | upper | slice(1)}}</a>
+      </div>
+    </div>
+    <div class="docPages">
+      {% for p in imagePaths %}
+      {% set i = loop.index %}
+      {% set pageImage = pageImages[i] %}
+      <div class="docPage" style="background-image: url(/docstore{{p}}); background-size: {{pageImage.width * imageScale}}px {{pageImage.height * imageScale}}px; width:{{pageImage.width * imageScale}}px; height:{{pageImage.height * imageScale}}px;">
+        {% for seg in segments %}
+          {% if i == seg.pageIndex %}
+            {% if seg.type.isSingular %}
+              <div style="width:{{seg.width}}px; height:{{seg.height}}px"
+                   title="{{seg.text}}({{seg.type}})" class="{{seg.type}}"><span style="left:{{seg.x0}}px; top:{{seg.y0}}px; height:{{seg.height}}px; font-size:{{seg.fontSize}}pt">{{seg.text}}</span></div>
+            {% elseif seg.type.isRawText %}
+              <div style="width:{{seg.width}}px; height:{{seg.height}}px"
+                   title="{{seg.text}}" class="{{seg.type}}"><span style="left:{{seg.x0}}px; top:{{seg.y0}}px; height:{{seg.height}}px; font-size:{{seg.fontSize}}pt">{{seg.text}}</span></div>
+            {% else %}
+              <div id="segment{{loop.index}}" style="left:{{seg.x0}}px; top:{{seg.y0}}px; width:{{seg.width}}px; height:{{seg.height}}px"
+                   onclick="myFunction(this, updateBackend)" data-value="{{seg.value}}" 
+                   title="{{seg.text}}({{seg.type}})" class="{{seg.type}} dropbtn"></div>
+            {% endif %}
+          {% endif %}
+       {% endfor %}
+        <!-- img src="/docstore{{p}}" width="{{pageImage.width * imageScale}}" height="{{pageImage.height * imageScale}}" -->
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  
+  <script type="text/javascript" src="resources/singleDocumentView.js" charset="utf-8"></script>
+{% endblock %}
+ 

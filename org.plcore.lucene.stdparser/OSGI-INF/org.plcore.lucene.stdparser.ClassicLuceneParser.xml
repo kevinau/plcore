@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" configuration-policy="optional" name="org.plcore.lucene.stdparser.ClassicLuceneParser">
+   <service>
+      <provide interface="org.plcore.lucene.IQueryParser"/>
+   </service>
+   <implementation class="org.plcore.lucene.stdparser.ClassicLuceneParser"/>
+</scr:component>

@@ -1,0 +1,163 @@
+html, body {
+  margin: 0;
+  padding: 0; }
+
+div.docpage .TEXT,
+div.docpage .DATE,
+div.docpage .CURRENCY,
+div.docpage .COMPANY_NUMBER,
+div.docpage .PERCENT,
+div.docpage .RUBBISH {
+  display: block;
+  position: absolute;
+  background: transparent; }
+
+div.docPage .TEXT span,
+div.docPage .COMPANY_NUMBER span {
+  position: absolute;
+  background: transparent;
+  white-space: pre; }
+
+div.docPage .DATE {
+  border: 2px solid darkorange;
+  margin: -2px -4px 0 -4px;
+  padding: 0 2px 0 2px; }
+
+div.docPage .CURRENCY {
+  border: 2px solid darkorange;
+  margin: -2px -4px 0 -4px;
+  padding: 0 2px 0 2px; }
+
+div.docPage .PERCENT {
+  border: 2px solid darkorange;
+  margin: -2px -4px 0 -4px;
+  padding: 0 2px 0 2px; }
+
+div.docPage .RUBBISH {
+  border: 2px dashed #888;
+  white-space: pre; }
+
+div.docPage .DATE span,
+div.docPage .CURRENCY span {
+  color: #FFF;
+  background: darkorange;
+  padding: 0 2px;
+  font-size: 9pt;
+  position: absolute;
+  top: -2px;
+  opacity: 1;
+  transition: opacity .5s ease-in-out;
+  cursor: default; }
+
+div.docPage .DATE span:hover,
+div.docPage .CURRENCY span:hover {
+  xxxopacity: 0;
+  xxxtransition: opacity 1s ease-in-out; }
+
+div.docPage div span {
+  font-family: sans-serif;
+  font-size: 6pt;
+  background: white; }
+
+#main {
+  background-color: #b7b7b7; }
+
+#pagelinks {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 20; }
+
+#pagelinks div {
+  xxxborder-bottom: 4pt solid red;
+  margin-top: 2pt;
+  background-color: darkorange;
+  padding: .25em 0.5em 0.25em 0.5em; }
+
+#pagelinks div:first-child {
+  margin-top: 0; }
+
+#accountingData input {
+  position: absolute;
+  left: -99999px; }
+
+#accountingData button {
+  font-family: Helvetica, sans-serif;
+  font-size: 14px;
+  color: #FFF;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0; }
+
+#accountingData button:disabled {
+  color: rgba(255, 255, 255, 0.5);
+  cursor: default; }
+
+.form-item label {
+  font-family: sans-serif;
+  font-size: 9pt;
+  color: #FFF;
+  background: darkorange;
+  padding: 0 6px;
+  cursor: default; }
+
+#pagelinks div a {
+  font-family: Helvetica, sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+  text-decoration: none; }
+
+.unselectable {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  unselectable: on;
+  /* Prevents dragging of images/divs etc */
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none; }
+
+.selectable {
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -o-user-select: text;
+  user-select: text; }
+
+div.docPage {
+  margin-bottom: 16px;
+  position: relative;
+  top: 0;
+  bottom: 0; }
+
+div.docPage:first-child {
+  xxxmargin-top: 0; }
+
+div.docPage > div.TEXT,
+div.docPage > div.DATE,
+div.docPage > div.CURRENCY,
+div.docPage > div.COMPANY_NUMBER,
+div.docPage > div.PERCENT {
+  position: absolute;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -o-user-select: text;
+  user-select: text;
+  color: transparent;
+  font-family: Arial, sans-serif;
+  white-space: nowrap; }
+
+div.docPage img {
+  z-index: -10;
+  pointer-events: none;
+  unselectable: on; }
+
+/*# sourceMappingURL=singleDocumentView.css.map */

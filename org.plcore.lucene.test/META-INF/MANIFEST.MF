@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: plcore - Testing Luene
+Bundle-SymbolicName: org.plcore.lucene.test
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.plcore.lucene.text
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.apache.lucene.analysis,
+ org.apache.lucene.analysis.standard,
+ org.apache.lucene.document,
+ org.apache.lucene.index,
+ org.apache.lucene.search,
+ org.apache.lucene.store,
+ org.apache.lucene.util,
+ org.plcore.lucene
+Service-Component: OSGI-INF/org.plcore.lucene.test.DocumentSearchTest.xml
+Bundle-ActivationPolicy: lazy

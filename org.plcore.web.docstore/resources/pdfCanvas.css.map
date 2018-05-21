@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,UAAW;EACT,UAAU,EAAE,IAAI;EAChB,MAAM,EAAE,aAAa",
+"sources": ["../scss/pdfCanvas.scss"],
+"names": [],
+"file": "pdfCanvas.css"
+}
