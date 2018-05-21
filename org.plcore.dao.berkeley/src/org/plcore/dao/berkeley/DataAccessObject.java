@@ -15,10 +15,8 @@ import org.plcore.dao.IDataAccessObject;
 import org.plcore.dao.ITransaction;
 import org.plcore.entity.EntityLife;
 import org.plcore.entity.VersionTime;
+import org.plcore.osgi.ComponentConfiguration;
 import org.plcore.osgi.Configurable;
-import org.plcore.osgi.ConfigurationLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Transaction;
@@ -37,9 +35,6 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   @Reference(name = "store")
   private DataStore dataStore;
   
-  @Reference
-  private ConfigurationLoader configLoader;
-
   @Configurable(name = "class", required = true)
   private Class<T> entityClass;
   
@@ -56,9 +51,8 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   }
   
   
-  DataAccessObject (DataStore dataStore, ConfigurationLoader configLoader) {
+  DataAccessObject (DataStore dataStore) {
     this.dataStore = dataStore;
-    this.configLoader = configLoader;
   }
   
   
@@ -79,7 +73,7 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   
   @Activate
   void activate (ComponentContext context) {
-    configLoader.load(this, context);
+    ComponentConfiguration.load(this, context);
 
     idField = null;
     idSequence = false;

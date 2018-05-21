@@ -12,8 +12,8 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.plcore.home.IApplication;
+import org.plcore.osgi.ComponentConfiguration;
 import org.plcore.osgi.Configurable;
-import org.plcore.osgi.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +38,6 @@ public class DataEnvironment {
   @Reference
   private IApplication application;
   
-  @Reference
-  private ConfigurationLoader configLoader;
-  
   @Configurable
   /**
    * Is this environment for plcore data or application data.  True if
@@ -53,7 +50,7 @@ public class DataEnvironment {
   
   @Activate
   public void activate (ComponentContext componentContext) {
-    configLoader.load(this, componentContext);
+    ComponentConfiguration.load(this, componentContext);
     
     String envDir = (isCoreData ? "data-core" : "data-default");
     Path envHome = application.getBaseDir().resolve(envDir);

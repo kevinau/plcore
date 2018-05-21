@@ -29,8 +29,8 @@ import org.plcore.docstore.parser.impl.TesseractImageOCR;
 import org.plcore.home.IApplication;
 import org.plcore.inbox.IFileProcessor;
 import org.plcore.nio.SafeOutputStream;
+import org.plcore.osgi.ComponentConfiguration;
 import org.plcore.osgi.Configurable;
-import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.srcdoc.ISegment;
 import org.plcore.srcdoc.ISourceDocumentContents;
 import org.plcore.srcdoc.SourceDocument;
@@ -51,9 +51,6 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   // This document store uses the MD5 digest to identify documents
   private final DigestFactory digestFactory = new MD5DigestFactory();
 
-  @Reference
-  private ConfigurationLoader configLoader;
-  
   @Reference
   private IApplication application;
   
@@ -87,7 +84,7 @@ public class DocumentStore implements IDocumentStore, IFileProcessor {
   public void activate(ComponentContext context) {
     baseDir = application.getBaseDir();
     
-    configLoader.load(this, context);
+    ComponentConfiguration.load(this, context);
 
     try {
       sourceDir = baseDir.resolve(SOURCE);

@@ -8,17 +8,13 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
+import org.plcore.osgi.ComponentConfiguration;
 import org.plcore.osgi.Configurable;
-import org.plcore.osgi.ConfigurationLoader;
 
 
 @Component(immediate = true, configurationPolicy = ConfigurationPolicy.OPTIONAL)
 public class Application implements IApplication {
 
-  @Reference 
-  private ConfigurationLoader configLoader;
-  
   @Configurable
   private String id = "pennyledger";
   
@@ -31,7 +27,7 @@ public class Application implements IApplication {
 
   @Activate
   private void activate(ComponentContext componentContext) {
-    configLoader.load(this, componentContext);
+    ComponentConfiguration.load(this, componentContext);
     if (baseDir == null) {
       baseDir = parentDir.resolve(id);
     }

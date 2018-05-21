@@ -6,8 +6,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.plcore.osgi.ComponentConfiguration;
 import org.plcore.osgi.Configurable;
-import org.plcore.osgi.ConfigurationLoader;
 
 import com.sleepycat.je.Transaction;
 import com.sleepycat.persist.EntityStore;
@@ -21,9 +21,6 @@ import com.sleepycat.persist.model.EntityModel;
 @Component(service = DataStore.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class DataStore {
 
-  @Reference
-  private ConfigurationLoader configLoader;
-  
   @Reference(name = "environment")
   private DataEnvironment environment;
   
@@ -35,7 +32,7 @@ public class DataStore {
 
   @Activate 
   public void activate (ComponentContext componentContext) {
-    configLoader.load(this, componentContext);
+    ComponentConfiguration.load(this, componentContext);
     
     EntityModel model = new AnnotationModel();
     model.registerClass(LocalDateProxy.class);

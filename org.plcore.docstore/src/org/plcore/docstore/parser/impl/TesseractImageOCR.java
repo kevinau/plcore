@@ -14,11 +14,10 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
-import org.osgi.service.component.annotations.Reference;
 import org.plcore.docstore.parser.IImageParser;
 import org.plcore.docstore.segment.SegmentMatcherList;
+import org.plcore.osgi.ComponentConfiguration;
 import org.plcore.osgi.Configurable;
-import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.srcdoc.ISourceDocumentContents;
 import org.plcore.srcdoc.PartialSegment;
 import org.plcore.srcdoc.SourceDocumentContents;
@@ -36,15 +35,12 @@ public class TesseractImageOCR implements IImageParser {
 
   private Logger logger = LoggerFactory.getLogger(TesseractImageOCR.class);
 
-  @Reference
-  private ConfigurationLoader configLoader;
-  
   @Configurable(required = true)
   private String tesseractHome;
   
   @Activate
   private void activate(ComponentContext context) {
-    configLoader.load(this, context);
+    ComponentConfiguration.load(this, context);
   }
   
 //  private ISourceDocumentContents readOCRResults(int pageIndex, Path resultsFile) {
@@ -236,7 +232,10 @@ public class TesseractImageOCR implements IImageParser {
 
     Runtime runtime = Runtime.getRuntime();
     try {
-      Process process = runtime.exec(cmd);
+      String[] argp = {
+          "TESSDATA_PREFIX=" + tesseractHome,
+      };
+      Process process = runtime.exec(cmd, argp);
       int result = process.waitFor();
       System.out.println("Result: " + result);
       InputStream outputStream = process.getInputStream();

@@ -4,7 +4,6 @@
    <service>
       <provide interface="org.plcore.dao.IDataAccessObject"/>
    </service>
-   <reference cardinality="1..1" field="configLoader" interface="org.plcore.osgi.ConfigurationLoader" name="configLoader"/>
    <reference cardinality="1..1" field="dataStore" interface="org.plcore.dao.berkeley.DataStore" name="store"/>
    <implementation class="org.plcore.dao.berkeley.DataAccessObject"/>
 </scr:component>

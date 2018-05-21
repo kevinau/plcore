@@ -3,7 +3,6 @@
    <service>
       <provide interface="org.plcore.dao.berkeley.DataStore"/>
    </service>
-   <reference cardinality="1..1" field="configLoader" interface="org.plcore.osgi.ConfigurationLoader" name="configLoader"/>
    <reference cardinality="1..1" field="environment" interface="org.plcore.dao.berkeley.DataEnvironment" name="environment"/>
    <implementation class="org.plcore.dao.berkeley.DataStore"/>
 </scr:component>

@@ -11,7 +11,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.osgi.framework.ServiceReference;
+//import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.plcore.value.ExistingDirectory;
 
@@ -78,25 +78,25 @@ public class ComponentConfiguration {
   }
 
 
-  private static class ServiceReferenceProperties implements IProperties {
-
-    private final ServiceReference<?> serviceRef;
-
-    ServiceReferenceProperties(ServiceReference<?> serviceRef) {
-      this.serviceRef = serviceRef;
-    }
-
-    @Override
-    public Object get(String key) {
-      return serviceRef.getProperty(key);
-    }
-
-    @Override
-    public String[] getKeys() {
-      return serviceRef.getPropertyKeys();
-    }
-
-  }
+//  private static class ServiceReferenceProperties implements IProperties {
+//
+//    private final ServiceReference<?> serviceRef;
+//
+//    ServiceReferenceProperties(ServiceReference<?> serviceRef) {
+//      this.serviceRef = serviceRef;
+//    }
+//
+//    @Override
+//    public Object get(String key) {
+//      return serviceRef.getProperty(key);
+//    }
+//
+//    @Override
+//    public String[] getKeys() {
+//      return serviceRef.getPropertyKeys();
+//    }
+//
+//  }
 
 
   public static void load(Object target, ComponentContext context) {
@@ -107,12 +107,12 @@ public class ComponentConfiguration {
   }
 
 
-  public static void load(Object target, ServiceReference<?> serviceRef) {
-    if (serviceRef != null) {
-      IProperties props = new ServiceReferenceProperties(serviceRef);
-      load(target, props);
-    }
-  }
+//  public static void load(Object target, ServiceReference<?> serviceRef) {
+//    if (serviceRef != null) {
+//      IProperties props = new ServiceReferenceProperties(serviceRef);
+//      load(target, props);
+//    }
+//  }
 
 
   public static void load(Object target, Map<String, Object> map) {
@@ -123,6 +123,7 @@ public class ComponentConfiguration {
   }
 
 
+  // TODO walk superclass
   public static void load(Object target, IProperties props) {
     try {
       Class<?> klass = target.getClass();

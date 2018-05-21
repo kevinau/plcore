@@ -13,8 +13,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.plcore.dao.IDataAccessObject;
 import org.plcore.nio.DirectoryWatcher;
 import org.plcore.nio.DirectoryWatcher.EventKind;
+import org.plcore.osgi.ComponentConfiguration;
 import org.plcore.osgi.Configurable;
-import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.util.MD5DigestFactory;
 import org.plcore.value.ExistingDirectory;
 import org.slf4j.Logger;
@@ -27,9 +27,6 @@ public class InboxWatchService {
   private final Logger logger = LoggerFactory.getLogger(InboxWatchService.class);
 
   private final MD5DigestFactory digestFactory = new MD5DigestFactory();
-  
-  @Reference
-  private ConfigurationLoader configLoader;
   
   @Reference(name = "processor")
   private IFileProcessor fileProcessor;
@@ -76,7 +73,7 @@ public class InboxWatchService {
   
   @Activate
   protected void activate (ComponentContext context) throws IOException {
-    configLoader.load(this, context);
+    ComponentConfiguration.load(this, context);
     
     logger.info("{}: watching for new/changed files", watchDir);
     

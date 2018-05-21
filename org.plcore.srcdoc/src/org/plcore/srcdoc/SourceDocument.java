@@ -1,11 +1,5 @@
 package org.plcore.srcdoc;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Path;
 import java.sql.Timestamp;
 
 import org.osgi.service.component.annotations.Component;

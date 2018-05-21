@@ -13,9 +13,8 @@ package org.plcore.type.password;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.plcore.osgi.ComponentConfiguration;
 import org.plcore.osgi.Configurable;
-import org.plcore.osgi.ConfigurationLoader;
 import org.plcore.todo.NotYetImplementedException;
 import org.plcore.type.Type;
 import org.plcore.type.UserEntryException;
@@ -26,15 +25,12 @@ import org.plcore.value.PasswordValue;
 @Component
 public class PasswordType extends Type<PasswordValue> {
 
-  @Reference
-  private ConfigurationLoader configLoader;
-  
   @Configurable
   private int minimumLength = 8;
   
   @Activate 
   protected void activate(ComponentContext context) {
-    configLoader.load(this, context);
+    ComponentConfiguration.load(this, context);
   }
   
   

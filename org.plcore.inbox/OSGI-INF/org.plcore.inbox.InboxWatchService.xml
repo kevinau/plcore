@@ -3,7 +3,6 @@
    <service>
       <provide interface="org.plcore.inbox.InboxWatchService"/>
    </service>
-   <reference cardinality="1..1" field="configLoader" interface="org.plcore.osgi.ConfigurationLoader" name="configLoader"/>
    <reference cardinality="1..1" field="dao" interface="org.plcore.dao.IDataAccessObject" name="dao" target="(name=InboxSeen)"/>
    <reference cardinality="1..1" field="fileProcessor" interface="org.plcore.inbox.IFileProcessor" name="processor"/>
    <implementation class="org.plcore.inbox.InboxWatchService"/>
