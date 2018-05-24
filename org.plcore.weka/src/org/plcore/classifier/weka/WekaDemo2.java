@@ -1,4 +1,4 @@
-package org.plcore.weka;
+package org.plcore.classifier.weka;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;

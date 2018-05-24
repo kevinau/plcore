@@ -1,4 +1,4 @@
-package org.plcore.weka;
+package org.plcore.classifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +24,11 @@ public class ClassSet {
     }
     classAttributeVector.add("?");
     return new Attribute("class", classAttributeVector);
+  }
+  
+  
+  public String getValue (int i) {
+    return classValues.get(i);
   }
   
   

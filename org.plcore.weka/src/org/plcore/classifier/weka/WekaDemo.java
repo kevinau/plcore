@@ -20,7 +20,7 @@
  *
  */
 
-package org.plcore.weka;
+package org.plcore.classifier.weka;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

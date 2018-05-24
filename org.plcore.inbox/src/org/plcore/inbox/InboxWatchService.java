@@ -81,7 +81,6 @@ public class InboxWatchService {
     DirectoryWatcher.IProcessor watchProcessor = new DirectoryWatcher.IProcessor() {
       @Override
       public void process(Path path, EventKind kind) throws IOException {
-        logger.info("{}: Found {} {}", watchDir, kind, watchDir.relativize(path));
         String fileName = watchDir.relativize(path).toString();
         switch (kind) {
         case EXISTING :
@@ -96,6 +95,7 @@ public class InboxWatchService {
               //logger.info("{}: No change... {} {}, {}", watchDir, kind, watchDir.relativize(path), digest);
             } else {
               // The file has been changed since last processing.
+              logger.info("{}: Found {} {}", watchDir, kind, watchDir.relativize(path));
               String firstDigest = firstDigestForFile(digest);
               String priorDigest = seen.digest;
               logger.info("{}: {} {}, {}", watchDir, kind, watchDir.relativize(path), digest);

@@ -1,4 +1,4 @@
-package org.plcore.weka;
+package org.plcore.classifier.weka;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * A map of words/phrases and associated index.
  */
-public class Dictionary {
+public class Dictionary2 {
 
   private Map<String, Integer> map = new LinkedHashMap<>(500);
   
@@ -40,7 +40,7 @@ public class Dictionary {
   }
 
   
-  public int[] clean (int[] docCounts) {
+  public int[] clean (int[] docCounts, int n) {
     int j = 0;
     int[] compactDocCounts = new int[docCounts.length];
     
@@ -49,7 +49,7 @@ public class Dictionary {
     while (itr.hasNext()) {
       Map.Entry<String, Integer> entry = itr.next();
       int i = entry.getValue();
-      if (docCounts[i] == 1) {
+      if (docCounts[i] == 1 || docCounts[i] == n) {
         itr.remove();
       } else {
         compactDocCounts[j] = docCounts[i];
@@ -58,15 +58,6 @@ public class Dictionary {
       }
     }
     return Arrays.copyOf(compactDocCounts, j);
-  }
-  
-  
-  public void reindex () {
-    int i = 0;
-    for (Map.Entry<String, Integer> entry : map.entrySet()) {
-      entry.setValue(i);
-      i++;
-    }
   }
   
   
@@ -97,6 +88,21 @@ public class Dictionary {
     if (value == null) {
       return -1;
     } else {
+      return value;
+    }
+  }
+
+  
+  public int query(String word, int[] docCounts, int n) {
+    Integer value = map.get(word);
+
+    if (value == null) {
+      return -1;
+    } else {
+      int dc = docCounts[value];
+      if (dc == 1 || dc == n) {
+        return -1;
+      }
       return value;
     }
   }
@@ -172,10 +178,10 @@ public class Dictionary {
     }
   }
 
-  public static Dictionary load(Path file) {
-    Dictionary dictionary;
+  public static Dictionary2 load(Path file) {
+    Dictionary2 dictionary;
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file.toFile()))) {
-      dictionary = (Dictionary) ois.readObject();
+      dictionary = (Dictionary2) ois.readObject();
     } catch (ClassNotFoundException | IOException ex) {
       throw new RuntimeException(ex);
     }

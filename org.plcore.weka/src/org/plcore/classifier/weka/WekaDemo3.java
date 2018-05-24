@@ -1,4 +1,4 @@
-package org.plcore.weka;
+package org.plcore.classifier.weka;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import weka.core.Utils;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.Randomize;
 
-@Component (immediate = true)
+//@Component (immediate = true)
 public class WekaDemo3 {
   
   @Reference(target = "(name=SourceDocument)")
@@ -86,7 +86,7 @@ public class WekaDemo3 {
    */
   public void buildTrainingInstances() throws FileNotFoundException {
     ClassSet classSet = new ClassSet();
-    Dictionary dictionary = new Dictionary();
+    Dictionary dictionary = new Dictionary(512);
     
     sourceDocDAO.getAll(d -> {
       String originName = d.getOriginName();
@@ -120,7 +120,7 @@ public class WekaDemo3 {
       }
       documentCount++;
     });
-    wordDocCounts = dictionary.clean(wordDocCounts);
+    //wordDocCounts = dictionary.clean(wordDocCounts, documentCount);
     
     // Calculate idf's for all words in the dictionary
     double[] idfs = new double[dictionary.size()];
