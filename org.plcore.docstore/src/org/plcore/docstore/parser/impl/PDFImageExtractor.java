@@ -19,8 +19,9 @@ package org.plcore.docstore.parser.impl;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.pdfbox.contentstream.PDFGraphicsStreamEngine;
@@ -32,12 +33,15 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImage;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.util.Matrix;
-import org.plcore.docstore.IDocumentStore;
 import org.plcore.docstore.parser.IImageParser;
 import org.plcore.srcdoc.ISourceDocumentContents;
+import org.plcore.srcdoc.SmallImage;
 import org.plcore.srcdoc.SourceDocumentContents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eatthepath.imagehash.PerceptualImageHash;
+import com.eatthepath.imagehash.PerceptualImageHashes;
 
 /**
  * Extracts the images from a PDF file.
@@ -51,6 +55,9 @@ final class PDFImageExtractor {
   private final IImageParser imageParser;
   private final int dpi;
   private final Set<PDImageXObject> seen = new HashSet<>();
+  
+  private final PerceptualImageHash imageDigestFactory = PerceptualImageHashes.getPHashImageHash();
+  
   
   PDFImageExtractor(IImageParser imageParser, int dpi) {
     this.imageParser = imageParser;
@@ -88,33 +95,36 @@ final class PDFImageExtractor {
 //  }
 
 
-  ISourceDocumentContents extract(PDDocument document, String id, ISourceDocumentContents docContents) throws IOException {
+  List<SmallImage> extract(PDDocument document, String id) throws IOException {
     AccessPermission ap = document.getCurrentAccessPermission();
     if (!ap.canExtractContent()) {
       throw new IOException("You do not have permission to extract images");
     }
 
+    List<SmallImage> smallImages = new ArrayList<>();
+    
     for (int i = 0; i < document.getNumberOfPages(); i++) {
       PDPage page = document.getPage(i);
       logger.info("Extract image: " + page + " " + i + " " + id);
       ImageGraphicsEngine extractor = new ImageGraphicsEngine(page, i, id);
       extractor.run();
-      ISourceDocumentContents pageContents = extractor.getPageContents();
-      docContents = docContents.merge(pageContents);
+      smallImages.addAll(extractor.getSmallImages());
     }
-    return docContents;
+    return smallImages;
   }
   
   
   private class ImageGraphicsEngine extends PDFGraphicsStreamEngine {
     private final int pageIndex;
     private final String id;
+    private List<SmallImage> smallImages;
     private ISourceDocumentContents pageContents;
     private int imageIndex = 0;
     
     
     protected ImageGraphicsEngine(PDPage page, int pageIndex, String id) throws IOException {
       super(page);
+      this.smallImages = new ArrayList<>();
       this.pageContents = new SourceDocumentContents();
       this.pageIndex = pageIndex;
       this.id = id;
@@ -180,24 +190,30 @@ final class PDFImageExtractor {
         Matrix gm = gs.getCurrentTransformationMatrix();
       
         BufferedImage image = pdImage.getImage();
-        logger.info("Image size: " + pdImage.getWidth() + "  " + pdImage.getHeight());
-        Path ocrImagePath = OCRPaths.getOCRImagePath(id, pageIndex, imageIndex);
-        ImageIO.writeImage(image, ocrImagePath);
-        ISourceDocumentContents imageContents = imageParser.parse(id, pageIndex, ocrImagePath);
-        float pageWidth = gm.getScaleX() + gm.getTranslateX();
+        long digest = imageDigestFactory.getPerceptualHash(image);
         
-        // Scale the image down to page width (at 72dpi), and then scale to the dpi we want.
-        double scale = (pageWidth / imageWidth) * (dpi / 72.0);
-        imageContents.scaleSegments(scale * IDocumentStore.IMAGE_SCALE);
-        pageContents = pageContents.merge(imageContents);
+        SmallImage smallImage = new SmallImage(imageIndex, pdImage.getWidth(), pdImage.getHeight(), digest);
+        smallImages.add(smallImage);
+        
+        // Don't write is image to a file (for the moment)
+//        logger.info("Image size: " + pdImage.getWidth() + "  " + pdImage.getHeight());
+//        Path ocrImagePath = OCRPaths.getOCRImagePath(id, pageIndex, imageIndex);
+//        ImageIO.writeImage(image, ocrImagePath);
+//        ISourceDocumentContents imageContents = imageParser.parse(id, pageIndex, ocrImagePath);
+//        float pageWidth = gm.getScaleX() + gm.getTranslateX();
+//        
+//        // Scale the image down to page width (at 72dpi), and then scale to the dpi we want.
+//        double scale = (pageWidth / imageWidth) * (dpi / 72.0);
+//        imageContents.scaleSegments(scale * IDocumentStore.IMAGE_SCALE);
+//        pageContents = pageContents.merge(imageContents);
         //////////Files.delete(ocrImagePath);
       }
       imageIndex++;
     }
 
     
-    public ISourceDocumentContents getPageContents () {
-      return pageContents;
+    public List<SmallImage> getSmallImages () {
+      return smallImages;
     }
     
     

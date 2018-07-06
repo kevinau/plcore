@@ -79,7 +79,7 @@ public class CRC64DigestFactory implements DigestFactory {
   
   
   @Override
-  public Digest getFileDigest (File file) {
+  public CRC64Digest getFileDigest (File file) {
     try (FileInputStream fis = new FileInputStream(file)) {
       return getInputStreamDigest(fis);
     } catch (FileNotFoundException ex) {
@@ -91,13 +91,13 @@ public class CRC64DigestFactory implements DigestFactory {
 
 
   @Override
-  public Digest getFileDigest (Path path) {
+  public CRC64Digest getFileDigest (Path path) {
     return getFileDigest(path.toFile());
   }
 
 
   @Override
-  public Digest getFileDigest (URL url) {
+  public CRC64Digest getFileDigest (URL url) {
     try {
       return getInputStreamDigest(url.openStream());
     } catch (IOException ex) {
@@ -107,7 +107,7 @@ public class CRC64DigestFactory implements DigestFactory {
 
 
   @Override
-  public Digest getInputStreamDigest (InputStream fis) {
+  public CRC64Digest getInputStreamDigest (InputStream fis) {
     try {
       long checksum = 0L;
       byte[] dataBytes = new byte[4096];

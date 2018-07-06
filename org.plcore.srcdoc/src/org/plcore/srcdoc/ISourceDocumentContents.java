@@ -55,12 +55,16 @@ public interface ISourceDocumentContents {
 
   public void addSegment (ISegment segment);
   
+  public void setSmallImages (List<SmallImage> smallImages);
+  
   public void addPageImage (PageImage docImage);
   
+  public List<SmallImage> getSmallImages ();
+
   public List<PageImage> getPageImages ();
 
   public int getPageCount();
 
   public ISegment getUniqueSegment(SegmentType type);
-  
+
 }

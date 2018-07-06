@@ -7,7 +7,8 @@ Automatic-Module-Name: prg.plcore.weka
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.osgi.service.component,
  org.plcore.dao,
- org.plcore.srcdoc
+ org.plcore.srcdoc,
+ org.plcore.util
 Bundle-ActivationPolicy: lazy
 Eclipse-BuddyPolicy: global
 Bundle-ClassPath: lib/commons-math3-3.6.1.jar,

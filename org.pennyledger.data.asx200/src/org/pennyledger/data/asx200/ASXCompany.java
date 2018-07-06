@@ -1,8 +1,6 @@
 package org.pennyledger.data.asx200;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.plcore.entity.IEntity;
 import org.plcore.math.Decimal;
 import org.plcore.type.NumberSign;

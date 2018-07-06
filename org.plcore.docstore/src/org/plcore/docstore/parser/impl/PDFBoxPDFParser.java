@@ -22,11 +22,16 @@ import org.plcore.util.MD5DigestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eatthepath.imagehash.PerceptualImageHash;
+import com.eatthepath.imagehash.PerceptualImageHashes;
+
 
 @Component
 public class PDFBoxPDFParser implements IPDFParser {
 
   private static Logger logger = LoggerFactory.getLogger(PDFBoxPDFParser.class);
+
+  private final PerceptualImageHash imageDigestFactory = PerceptualImageHashes.getAverageHashImageHash();
 
   @Reference
   private IImageParser imageParser;
@@ -53,17 +58,16 @@ public class PDFBoxPDFParser implements IPDFParser {
   }
 
 
-  private ISourceDocumentContents extractImages(PDDocument document, int dpi, String id, Path pdfPath, ISourceDocumentContents docContents)
+  private void extractSmallImages(PDDocument document, int dpi, String id, Path pdfPath, ISourceDocumentContents docContents)
       throws IOException {
-    logger.info("Extract images from PDF document: " + pdfPath.getFileName());
+    logger.info("Extract small images from PDF document: " + pdfPath.getFileName());
 
     PDFImageExtractor imageExtractor = new PDFImageExtractor(imageParser, dpi);
-    docContents = imageExtractor.extract(document, id, docContents);
-    return docContents;
+    docContents.setSmallImages(imageExtractor.extract(document, id));
   }
 
   
-  private ISourceDocumentContents extractImages2(PDDocument pdDocument, int dpi, String id, Path pdfPath, ISourceDocumentContents docContents)
+  private ISourceDocumentContents extractPageImages(PDDocument pdDocument, int dpi, String id, Path pdfPath, ISourceDocumentContents docContents)
       throws IOException {
     logger.info("Extract images from PDF document: " + pdfPath.getFileName());
 
@@ -85,6 +89,11 @@ public class PDFBoxPDFParser implements IPDFParser {
       imageDocContents.scaleSegments(scale * IDocumentStore.IMAGE_SCALE);
       docContents = docContents.merge(imageDocContents);
     }
+    
+    // Extract small images
+    PDFImageExtractor imageExtractor = new PDFImageExtractor(imageParser, dpi);
+    docContents.setSmallImages(imageExtractor.extract(pdDocument, id));
+    
     return docContents;
   }
 
@@ -185,7 +194,7 @@ public class PDFBoxPDFParser implements IPDFParser {
       textContents.scaleSegments(scale * IDocumentStore.IMAGE_SCALE);
 
       // Add segments OCR'd from images within the PDF document
-      ISourceDocumentContents docContents = extractImages2(pdDocument, dpi, id, pdfPath, textContents);
+      ISourceDocumentContents docContents = extractPageImages(pdDocument, dpi, id, pdfPath, textContents);
 
       // Render PDF as an image for viewing
       PDFRenderer renderer = new PDFRenderer(pdDocument);
@@ -199,7 +208,6 @@ public class PDFBoxPDFParser implements IPDFParser {
         }
         Path imageFile = docStore.newViewImagePath(id, i);
         ImageIO.writeImage(image, imageFile);
-///////////////////////////////////////////////        ImageIOUtil.writeImage(image, imageFile.toString(), dpi);
         PageImage pageImage = new PageImage(i, image.getWidth(), image.getHeight());
         docContents.addPageImage(pageImage);
       }

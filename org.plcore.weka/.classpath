@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/JTransforms-3.1-with-dependencies.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/colt.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/concurrent.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-math3-3.6.1.jar"/>

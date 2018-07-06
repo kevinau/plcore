@@ -12,17 +12,21 @@ public class SourceDocumentContents implements ISourceDocumentContents {
 
   private final List<ISegment> segments;
   
+  private List<SmallImage> smallImages = new ArrayList<>(0);
+  
   private final List<PageImage> pageImages;
   
   
   public SourceDocumentContents () {
     segments = new ArrayList<>();
+    smallImages = new ArrayList<>();
     pageImages = new ArrayList<>();
   }
   
   
   private SourceDocumentContents (int n) {
     segments = new ArrayList<>(n);
+    smallImages = new ArrayList<>(n);
     pageImages = new ArrayList<>(n);
   }
   
@@ -47,6 +51,12 @@ public class SourceDocumentContents implements ISourceDocumentContents {
   }
   
   
+  @Override
+  public void setSmallImages (List<SmallImage> smallImages) {
+    this.smallImages = smallImages;
+  }
+  
+ 
   @Override
   public void addPageImage (PageImage pageImage) {
     pageImages.add(pageImage);
@@ -250,6 +260,12 @@ public class SourceDocumentContents implements ISourceDocumentContents {
       System.out.println(segment);
     }
     System.out.println();
+  }
+  
+  
+  @Override
+  public List<SmallImage> getSmallImages () {
+    return smallImages;
   }
   
   

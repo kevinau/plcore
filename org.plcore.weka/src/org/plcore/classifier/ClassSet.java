@@ -17,6 +17,16 @@ public class ClassSet {
   }
   
   
+  public int resolve(String classValue) {
+    int i = classValues.indexOf(classValue);
+    if (i == -1) {
+      i = classValues.size();
+      classValues.add(classValue);
+    }
+    return i;
+  }
+  
+  
   public Attribute buildClassAttribute() {
     List<String> classAttributeVector = new ArrayList<>();
     for (String value : classValues) {
@@ -34,6 +44,11 @@ public class ClassSet {
   
   public int indexOf(String classValue) {
     return classValues.indexOf(classValue);
+  }
+  
+  
+  public int size() {
+    return classValues.size();
   }
   
 }
