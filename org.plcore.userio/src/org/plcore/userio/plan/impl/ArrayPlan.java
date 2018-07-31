@@ -2,9 +2,12 @@ package org.plcore.userio.plan.impl;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.plan.IArrayPlan;
+import org.plcore.userio.plan.IItemPlan;
+import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.IPlanFactory;
 import org.plcore.userio.plan.MemberValueGetterSetter;
 import org.plcore.userio.plan.PlanStructure;
@@ -68,6 +71,28 @@ public class ArrayPlan extends RepeatingPlan implements IArrayPlan {
   @Override
   public String toString() {
     return "ArrayPlan[" + super.toString() + "]";  
+  }
+
+
+  @Override
+  public void walkNodes(Object value, BiConsumer<INodePlan, Object> consumer) {
+    consumer.accept(this, value);
+    
+    INodePlan elementPlan = getElementPlan();
+    Object[] arrayValue = (Object[])value;
+    for (Object elemValue : arrayValue) {
+      elementPlan.walkNodes(elemValue, consumer);
+    }
+  }
+
+
+  @Override
+  public void walkItems(Object value, BiConsumer<IItemPlan<?>, Object> consumer) {
+    INodePlan elementPlan = getElementPlan();
+    Object[] arrayValue = (Object[])value;
+    for (Object elemValue : arrayValue) {
+      elementPlan.walkItems(elemValue, consumer);
+    }
   }
   
 }

@@ -13,10 +13,12 @@ Import-Package: com.sleepycat.persist.model,
  org.plcore.dao,
  org.plcore.entity,
  org.plcore.inbox,
+ org.plcore.lucene,
  org.plcore.math,
  org.plcore.type,
  org.plcore.userio,
  org.plcore.userio.model,
+ org.plcore.userio.plan,
  org.plcore.util
 Bundle-ClassPath: lib/opencsv-2.3.jar,
  .

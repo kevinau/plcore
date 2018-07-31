@@ -2,6 +2,7 @@ package org.pennyledger.data.asx200;
 
 import org.osgi.service.component.annotations.Component;
 import org.plcore.entity.IEntity;
+import org.plcore.entity.Identifiable;
 import org.plcore.math.Decimal;
 import org.plcore.type.NumberSign;
 import org.plcore.userio.IOField;
@@ -15,13 +16,14 @@ import com.sleepycat.persist.model.SecondaryKey;
 @Component
 public class ASXCompany implements IEntity {
 
-  @PrimaryKey(sequence = "ASXCompnay_ID")
+  @PrimaryKey(sequence = "ASXCompany_ID")
   private int id;
   
   @SecondaryKey(relate = Relationship.ONE_TO_ONE)
   @IOField(pattern = "A-Z0-9{3}", length = 3)
   private String code;
   
+  @Identifiable
   private String company;
   
   private String sector;

@@ -149,18 +149,17 @@ final class PDFImageExtractor {
       //PDImageXObject image2 = (PDImageXObject)pdImage;
       int imageWidth2 = pdImage.getWidth();
       int imageHeight2 = pdImage.getHeight();
-      System.out.println("*******************************************************************");
 
       Matrix ctmNew = getGraphicsState().getCurrentTransformationMatrix();
       float imageXScale = ctmNew.getScalingFactorX();
       float imageYScale = ctmNew.getScalingFactorY();
 
       // position in user space units. 1 unit = 1/72 inch at 72 dpi
-      System.out.println("position in PDF = " + ctmNew.getTranslateX() + ", " + ctmNew.getTranslateY() + " in user space units");
+      // System.out.println("position in PDF = " + ctmNew.getTranslateX() + ", " + ctmNew.getTranslateY() + " in user space units");
       // raw size in pixels
-      System.out.println("raw image size  = " + imageWidth2 + ", " + imageHeight2 + " in pixels");
+      // System.out.println("raw image size  = " + imageWidth2 + ", " + imageHeight2 + " in pixels");
       // displayed size in user space units
-      System.out.println("displayed size  = " + imageXScale + ", " + imageYScale + " in user space units");
+      // System.out.println("displayed size  = " + imageXScale + ", " + imageYScale + " in user space units");
 //      // displayed size in inches at 72 dpi rendering
 //      imageXScale /= 72;
 //      imageYScale /= 72;
@@ -169,7 +168,7 @@ final class PDFImageExtractor {
 //      imageXScale *= 25.4;
 //      imageYScale *= 25.4;
 //      System.out.println("displayed size  = " + imageXScale + ", " + imageYScale + " in millimeters at 72 dpi rendering");
-      System.out.println();
+      //System.out.println();
       /* ---------------------------------------------------------------- */
 
       //Matrix ctm = getGraphicsState().getCurrentTransformationMatrix();
@@ -219,27 +218,27 @@ final class PDFImageExtractor {
     
     @Override
     public void appendRectangle(Point2D p0, Point2D p1, Point2D p2, Point2D p3) throws IOException {
-      logger.info("Append rectangle");
+      //logger.info("Append rectangle");
     }
 
     @Override
     public void clip(int windingRule) throws IOException {
-      logger.info("Clip");
+      //logger.info("Clip");
     }
 
     @Override
     public void moveTo(float x, float y) throws IOException {
-      logger.info("Moving to {}, {} from page {} of: {}", x, y, pageIndex, id);
+      //logger.info("Moving to {}, {} from page {} of: {}", x, y, pageIndex, id);
     }
 
     @Override
     public void lineTo(float x, float y) throws IOException {
-      logger.info("Line to {}, {}", x, y);
+      //logger.info("Line to {}, {}", x, y);
     }
 
     @Override
     public void curveTo(float x1, float y1, float x2, float y2, float x3, float y3) throws IOException {
-      logger.info("Curve to");
+      //logger.info("Curve to");
     }
 
     @Override

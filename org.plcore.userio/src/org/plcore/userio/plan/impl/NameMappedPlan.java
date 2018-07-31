@@ -3,11 +3,13 @@ package org.plcore.userio.plan.impl;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.INameMappedNode;
 import org.plcore.userio.INode;
 import org.plcore.userio.plan.IAugmentedClass;
+import org.plcore.userio.plan.IItemPlan;
 import org.plcore.userio.plan.INameMappedPlan;
 import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.IRuntimeDefaultProvider;
@@ -118,5 +120,26 @@ public abstract class NameMappedPlan extends ContainerPlan implements INameMappe
   public Collection<? extends INode> getContainerNodes() {
     return aclass.getContainerNodes();
   }
+
+
+  @Override
+  public void walkNodes(Object value, BiConsumer<INodePlan, Object> consumer) {
+    consumer.accept(this, value);
+    
+    for (INodePlan nodePlan : aclass.getMembers()) {
+      Object memberValue = nodePlan.getFieldValue(value);  
+      nodePlan.walkNodes(memberValue, consumer);
+    }
+  }
+
+
+  @Override
+  public void walkItems(Object value, BiConsumer<IItemPlan<?>, Object> consumer) {
+    for (INodePlan nodePlan : aclass.getMembers()) {
+      Object memberValue = nodePlan.getFieldValue(value);
+      nodePlan.walkItems(memberValue, consumer);
+    }
+  }
+
 
 }

@@ -1,10 +1,13 @@
 package org.plcore.userio.plan.impl;
 
 import java.lang.reflect.Type;
-
+import java.util.function.BiConsumer;
+import org.plcore.todo.NotYetImplementedException;
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.plan.EmbeddedLabelGroup;
 import org.plcore.userio.plan.IInterfacePlan;
+import org.plcore.userio.plan.IItemPlan;
+import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.IPlanFactory;
 import org.plcore.userio.plan.MemberValueGetterSetter;
 import org.plcore.userio.plan.PlanStructure;
@@ -65,6 +68,19 @@ public class InterfacePlan extends NodePlan implements IInterfacePlan{
   @Override
   public <X> X replicate(X fromValue) {
     return fromValue;
+  }
+
+
+  @Override
+  public void walkNodes(Object value, BiConsumer<INodePlan, Object> consumer) {
+    consumer.accept(this, value);
+  }
+
+
+  @Override
+  public void walkItems(Object value, BiConsumer<IItemPlan<?>, Object> consumer) {
+    throw new NotYetImplementedException();
+    //consumer.accept(this, value);
   }
   
 }

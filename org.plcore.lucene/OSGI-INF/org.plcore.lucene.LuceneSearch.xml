@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="activate" deactivate="deactivate" name="org.plcore.lucene.LuceneSearch">
-   <service>
-      <provide interface="org.plcore.lucene.LuceneSearch"/>
-   </service>
-   <reference cardinality="1..1" field="application" interface="org.plcore.home.IApplication" name="application"/>
-   <reference cardinality="1..1" field="queryParser" interface="org.plcore.lucene.IQueryParser" name="queryParser"/>
-   <implementation class="org.plcore.lucene.LuceneSearch"/>
-</scr:component>

@@ -1,6 +1,7 @@
 package org.plcore.userio.plan;
 
 import java.lang.annotation.Annotation;
+import java.util.function.BiConsumer;
 
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.INode;
@@ -63,5 +64,9 @@ public interface INodePlan extends INode {
   public boolean isViewOnly();
 
 //  public Field getField();
+
+  public void walkNodes (Object value, BiConsumer<INodePlan, Object> consumer);
+
+  public void walkItems (Object value, BiConsumer<IItemPlan<?>, Object> consumer);
 
 }

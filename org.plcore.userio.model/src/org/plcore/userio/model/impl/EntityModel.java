@@ -68,6 +68,12 @@ public class EntityModel extends EmbeddedModel implements IEntityModel {
   
   
   @Override
+  public void setValue (Object value) {
+    syncValue(value, true);
+  }
+  
+  
+  @Override
   public void buildQualifiedNamePart (StringBuilder builder, boolean[] isFirst, int[] repeatCount) {
     builder.append(((IEntityPlan<?>)getPlan()).getClassName());
     builder.append('#');

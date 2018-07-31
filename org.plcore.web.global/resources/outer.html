@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+      html, body, main {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+      body {
+        font-family: sans-serif;
+        xxxfont-size: 12px;
+      }
+      h1, h2, h3, h4, h5 {
+        margin:0;
+      }
+      header, nav, footer, section, article, div, label, input, select {
+        box-sizing: border-box;
+      }
+      img, embed, object, video {
+        max-width: 100%;
+      }
+      nav {
+        width: 300px;
+        height: 100%;
+        position: absolute;
+        transform: translate(-300px,0);
+        transition: transform 0.3s ease;
+      }
+      nav.open {
+        transform: translate(0,0);
+      }
+      @media screen and (min-width: 600px) {
+        nav {
+          position: relative;
+          transform: translate(0,0);
+        }
+        body {
+          display: flex;
+          flex-flow: row nowrap;
+        }
+        main {
+          width: auto;
+          flex-grow: 1;
+        }
+      }
+      nav a, button {
+        min-width: 48px;
+        min-height: 48px;
+      }
+      nav a {
+        padding: 1.5em inherit;
+     }
+     @media screen and (min-width:500px) {
+       /* Over 500px wide styles */
+     }
+     form {
+  display: grid;
+  padding: 1em;
+  background: #f9f9f9;
+  border: 1px solid #c1c1c1;
+  margin: 2rem auto 0 auto;
+  max-width: 600px;
+  padding: 1em;
+}
+form input {
+  background: #fff;
+  border: 1px solid rgb(196,196,196);
+}
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset!important;
+}
+form button {
+  background: lightgrey;
+  padding: 0.7em;
+  width: 100%;
+  border: 0;
+}
+form button:hover {
+  background: gold;
+}
+
+label {
+  padding: 0.2em 0 0 0;
+  vertical-align: middle;
+}
+label span.hint {
+  display: block;
+  font-size: 75%;
+  filter: opacity(0.4);
+}
+input {
+  padding: 2px 0.5em 3px 0.5em;
+  xxxmargin-bottom: 0.5rem;
+  font-size: 1em;
+  height: 1.6em;
+  xxxmin-height: 48px;
+}
+input:focus {
+  xxxoutline: 3px solid gold;
+}
+
+@media (min-width: 14px) {
+  form {
+    grid-template-columns: auto 1fr;
+    grid-gap: 16px;
+  }
+
+  label {
+    text-align: right;
+    grid-column: 1 / 2;
+    max-width: 10em;
+  }
+
+  input,
+  button {
+    grid-column: 2 / 3;
+  }
+}
+    </style>
+  </head>
+  <body>
+    <header class="header"></header>
+    <nav class="drawer"></nav>
+    <main>
+      <section class="content">
+        <form class="form1" action="#">
+            <label for="firstName" class="first-name">First name<span class="hint">The first or given name of the person in question</span></label>
+            <input id="firstName" type="text">
+
+            <label for="lastName" class="last-name">Last Name</label>
+            <input id="lastName" type="text">
+
+            <label for="job">Job</label>
+            <input id="job" type="text">
+
+            <label for="age">Age</label>
+            <input id="age" type="text">
+          </form>
+      </section>
+      <footer class="footer"></footer>
+    </main>
+  </body>
+</html>

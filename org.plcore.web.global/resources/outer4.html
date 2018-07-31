@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <template id="searchInput">
+      <style>
+div {
+  font-family: sans-serif;
+  font-size: 0.75rem;
+  padding: 0.5em;
+  background: cyan;
+  position: relative;
+}
+div input {
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.2em calc(0.5em - 2px);
+  width: 100%;
+}
+div ul {
+  list-style-type: none;
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  z-index: 100;
+  background: yellow;
+}
+div ul li {
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.2em 0.5em;
+}
+div ul li:hover {
+  background: #BFDDF5;  /* 0078D7 */
+}
+      </style>
+      <div>
+        <input type="text">
+        <ul>
+          <li>Volvo</li>
+          <li>Saab</li>
+          <li>Mercedes</li>
+          <li>Audi</li>
+          <li>Holden</li>
+          <li>Ford</li>
+          <li>Mazda</li>
+          <li>Renault</li>
+          <li>Nissan</li>
+        </ul>
+      </div>
+    </template>
+ 
+    <script>
+        class SearchInput extends HTMLElement {
+    	  constructor() {
+    	  	super();
+    	  }
+    	  connectedCallback() {
+    		  var searchServer = null;
+    		  if(this.hasAttribute('server')) {
+    			  searchServer = this.getAttribute('server');
+    		  }
+    		var t = document.querySelector('#searchInput');
+      		var clone = document.importNode(t.content, true);
+    		this.appendChild(clone);
+
+      	    this._itemList = this.querySelector('ul');
+      	    let inputElem = this.querySelector('input');
+
+      	    this._itemList.hidden = true;
+  	    	var children = this._itemList.children;
+  	    	for (let i = 0; i < children.length; i++) {
+  	    		let item = children.item(i);
+  	    		item.addEventListener('mousedown', function() {
+  	    			inputElem.value = item.innerText;
+  	    		})
+  	    	}
+
+      	    this._input = inputElem;
+      	    this._input._itemList = this._itemList;
+      	    
+      	    this._input.addEventListener('focus', function() {
+      	    	this._itemList.hidden = false;
+      	    });
+      	    this._input.addEventListener('blur', function() {
+      	    	this._itemList.hidden = true;
+      	    });
+      	    this._input.addEventListener('input', function() {
+      	    	var target = this.value.toLowerCase();
+      	    	var children = this._itemList.children;
+     	    	for (let i = 0; i < children.length; i++) {
+      	    		let currentValue = children.item(i);
+    			  	let x = currentValue.textContent.toLowerCase();
+      	    		if (x.includes(target)) {
+      	    		  currentValue.hidden = false;
+      	    		} else {
+      	    		  currentValue.hidden = true;
+      	    		}
+       	    	}
+      	    });
+    	  }
+    	  
+      	  disconnectedCallback() {
+      	    if (!this._input) {
+      	      return;
+      	    }
+       	    this._input = null;
+      	  }
+
+      	  _show() {
+      		  this._itemList.hidden = false;
+      	  }
+
+      	  _hide() {
+      	    this._itemList.hidden = true;
+      	  }
+
+        }
+    	window.customElements.define('search-input', SearchInput);
+    </script>
+  </head>
+  <body>
+    <search-input></search-input>
+  </body>
+</html>

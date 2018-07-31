@@ -2,8 +2,8 @@ package org.plcore.lucene;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
@@ -16,6 +16,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
@@ -23,30 +24,14 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.plcore.home.IApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+public class LuceneSearchDetail implements AutoCloseable {
 
-//@Component(service = LuceneSearch.class)
-public class LuceneSearch {
+  private final Logger logger = LoggerFactory.getLogger(LuceneSearchDetail.class);
 
-  private final Logger logger = LoggerFactory.getLogger(LuceneSearch.class);
-
-  private static final String LUCENE = "lucene";
-
-  @Reference
-  private IApplication application;
-  
-  @Reference
   private IQueryParser queryParser;
-    
-  private Path luceneDir;
   
   private IndexWriter iwriter;
   
@@ -58,14 +43,13 @@ public class LuceneSearch {
   
   private DirectoryReader ireader;
   
-  @Activate 
-  public void activate(ComponentContext context) {
-    try {
-      Path baseDir = application.getBaseDir();
-      luceneDir = baseDir.resolve(LUCENE);
-      Files.createDirectories(luceneDir);
 
-      directory = FSDirectory.open(luceneDir);
+  public LuceneSearchDetail(Path luceneDir, String name, IQueryParser queryParser) {
+    try {
+      this.queryParser = queryParser;
+      
+      directory = FSDirectory.open(luceneDir.resolve(name));
+      logger.info("Lucene index: {}", directory);
 
       Analyzer analyzer = new StandardAnalyzer();
       IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -84,17 +68,21 @@ public class LuceneSearch {
   }
   
   
-  @Deactivate
-  public void deactivate() {
+  @Override
+  public void close() {
     try {
       iwriter.close();
       directory.close();
+      if (commitTask != null) {
+        commitTask.cancel();
+        commitTimer.purge();
+      }
     } catch (IOException ex) {
       throw new UncheckedIOException(ex);
     }
   }
-
-
+  
+  
   private void scheduleCommit () {
     if (commitTask != null) {
       commitTask.cancel();
@@ -115,11 +103,22 @@ public class LuceneSearch {
   }
 
   
-  public void addDocument(String id, org.apache.lucene.document.Document indexDoc) {
+  public void addDocument(String id, Document indexDoc) {
     logger.info("Adding document with id: {}", id);
     indexDoc.add(new Field("id", id, StringField.TYPE_STORED));
     try {
       iwriter.addDocument(indexDoc);
+      scheduleCommit();
+    } catch (IOException ex) {
+      throw new UncheckedIOException(ex);
+    }
+  }
+
+    
+  public void addDocument(List<IndexableField> document) {
+    logger.info("Adding document with {} fields", document.size());
+    try {
+      iwriter.addDocument(document);
       scheduleCommit();
     } catch (IOException ex) {
       throw new UncheckedIOException(ex);
@@ -153,8 +152,11 @@ public class LuceneSearch {
       
       IndexSearcher isearcher = new IndexSearcher(ireader);
 
+      System.out.println(">>>> " + queryString);
       Query query = queryParser.parse(queryString);
+      System.out.println(">>>> " + query);
       ScoreDoc[] hits = isearcher.search(query, n).scoreDocs;
+      System.out.println(">>>> " + hits.length);
       // Iterate through the results:
       for (int i = 0; i < hits.length; i++) {
         Document hitDoc = isearcher.doc(hits[i].doc);

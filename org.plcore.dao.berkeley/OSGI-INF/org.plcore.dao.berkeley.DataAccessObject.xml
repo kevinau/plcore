@@ -4,6 +4,7 @@
    <service>
       <provide interface="org.plcore.dao.IDataAccessObject"/>
    </service>
+   <reference cardinality="1..1" field="eventAdmin" interface="org.osgi.service.event.EventAdmin" name="eventAdmin"/>
    <reference cardinality="1..1" field="dataStore" interface="org.plcore.dao.berkeley.DataStore" name="store"/>
    <implementation class="org.plcore.dao.berkeley.DataAccessObject"/>
 </scr:component>

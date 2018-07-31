@@ -1,8 +1,11 @@
 package org.plcore.userio.plan.impl;
 
+import java.util.function.BiConsumer;
+
 import org.plcore.type.IType;
 import org.plcore.userio.EntryMode;
 import org.plcore.userio.plan.IItemPlan;
+import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.ItemLabelGroup;
 import org.plcore.userio.plan.MemberValueGetterSetter;
 import org.plcore.userio.plan.PlanStructure;
@@ -146,6 +149,18 @@ public class ItemPlan<T> extends NodePlan implements IItemPlan<T> {
   public String getEntrySource(Object instance, T fillValue) {
     T value = getFieldValue(instance);
     return type.toEntrySource(value, fillValue);
+  }
+
+
+  @Override
+  public void walkNodes(Object value, BiConsumer<INodePlan, Object> consumer) {
+    consumer.accept(this, value);
+  }
+
+
+  @Override
+  public void walkItems(Object value, BiConsumer<IItemPlan<?>, Object> consumer) {
+    consumer.accept(this, value);
   }
   
 }

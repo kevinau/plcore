@@ -33,10 +33,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-//@Component(service = LuceneSearch.class)
-public class LuceneSearch {
+//@Component(service = LuceneEntitySearch.class)
+public class LuceneEntitySearch {
 
-  private final Logger logger = LoggerFactory.getLogger(LuceneSearch.class);
+  private final Logger logger = LoggerFactory.getLogger(LuceneEntitySearch.class);
 
   private static final String LUCENE = "lucene";
 
@@ -63,6 +63,9 @@ public class LuceneSearch {
     try {
       Path baseDir = application.getBaseDir();
       luceneDir = baseDir.resolve(LUCENE);
+      new LuceneSearchDetail(luceneDir, name, queryParser);
+      
+      
       Files.createDirectories(luceneDir);
 
       directory = FSDirectory.open(luceneDir);

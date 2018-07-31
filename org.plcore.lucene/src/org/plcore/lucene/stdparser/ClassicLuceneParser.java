@@ -17,7 +17,7 @@ import org.plcore.osgi.Configurable;
 public class ClassicLuceneParser implements IQueryParser {
 
   @Configurable
-  private String defaultFieldName = "text";
+  private String defaultFieldName = "identifying";
 
   private QueryParser queryParser;
   

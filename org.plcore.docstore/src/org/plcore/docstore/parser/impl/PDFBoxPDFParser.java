@@ -74,18 +74,18 @@ public class PDFBoxPDFParser implements IPDFParser {
     PDFRendererNoText renderer = new PDFRendererNoText(pdDocument);
     int endPage = pdDocument.getNumberOfPages();
     for (int i = 0; i < endPage; i++) {
-      System.out.println("======================= dpi " + dpi);
+      //System.out.println("======================= dpi " + dpi);
       dpi = 300;
       BufferedImage image = renderer.renderImageWithDPI(i, dpi, ImageType.BINARY);
-      System.out.println("Image size in pixels: " + image.getWidth() + " x " + image.getHeight());
-      System.out.println("A4 size in pixels (@300 dpi): " + "2480 x 3508");
+      //System.out.println("Image size in pixels: " + image.getWidth() + " x " + image.getHeight());
+      //System.out.println("A4 size in pixels (@300 dpi): " + "2480 x 3508");
       Path imageFile = OCRPaths.getOCRImagePath(id, i);
       //ImageIO.writeImage(image, imageFile);
       ImageIOUtil.writeImage(image, imageFile.toString(), dpi);
       ISourceDocumentContents imageDocContents = imageParser.parse(id, i, imageFile);
       double scale = dpi / 72;
       scale = 1.2;
-      System.out.println("======================= " + scale + " " + IDocumentStore.IMAGE_SCALE);
+      //System.out.println("======================= " + scale + " " + IDocumentStore.IMAGE_SCALE);
       imageDocContents.scaleSegments(scale * IDocumentStore.IMAGE_SCALE);
       docContents = docContents.merge(imageDocContents);
     }

@@ -3,11 +3,13 @@ package org.plcore.userio.plan.impl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import org.plcore.entity.Describing;
 import org.plcore.entity.EntityLife;
 import org.plcore.entity.EntityLifeType;
 import org.plcore.entity.IExplicitDescription;
+import org.plcore.entity.Identifiable;
 import org.plcore.entity.VersionTime;
 import org.plcore.entity.VersionTimeType;
 import org.plcore.type.IType;
@@ -22,6 +24,9 @@ import org.plcore.userio.plan.ILabelGroup;
 import org.plcore.userio.plan.INodePlan;
 import org.plcore.userio.plan.PlanStructure;
 
+import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.SecondaryKey;
+
 
 public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
 
@@ -33,7 +38,8 @@ public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
   private IItemPlan<VersionTime> versionPlan;
   private IItemPlan<EntityLife> entityLifePlan;
   private List<INodePlan> dataPlans;
-  private List<IItemPlan<?>> describingItemPlans;
+  private List<IItemPlan<?>> describingItemPlans = new ArrayList<>();
+  private List<IItemPlan<?>> identifyingItemPlans = new ArrayList<>();
   private IItemPlan<?> firstItemPlan;
   
   
@@ -251,7 +257,7 @@ public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
         Id idann = itemPlan.getAnnotation(Id.class);
         if (idann != null) {
           idPlan = (IItemPlan<Integer>)itemPlan;
-          // Id fields are not key or data columns
+          // Id fields are not key, data columns
           continue;
         }
         String name = itemPlan.getName();
@@ -281,6 +287,11 @@ public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
         
         if (itemPlan.isAnnotated(Describing.class)) {
           describingItemPlans.add(itemPlan);
+        }
+
+        if (itemPlan.isAnnotated(PrimaryKey.class) || itemPlan.isAnnotated(SecondaryKey.class) ||
+            itemPlan.isAnnotated(Identifiable.class)) {
+          identifyingItemPlans.add(itemPlan);
         }
         
         if (firstItemPlan == null) {
@@ -455,5 +466,5 @@ public class EntityPlan<T> extends EmbeddedPlan<T> implements IEntityPlan<T> {
   public <X> X replicate(X fromValue) {
     return (X)aclass.replicate(fromValue);
   }
-
+  
 }

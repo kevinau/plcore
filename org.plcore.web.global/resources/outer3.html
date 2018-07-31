@@ -1,0 +1,183 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script>
+        class HowtoTooltip extends HTMLElement {
+    	  constructor() {
+    	    super();
+    	    this._show = this._show.bind(this);
+    	    this._hide = this._hide.bind(this);
+    	  }
+    	  connectedCallback() {
+    	    if (!this.hasAttribute('role')) {
+    	      this.setAttribute('role', 'tooltip');
+    	    }
+
+    	    if (!this.hasAttribute('tabindex')) {
+    	      this.setAttribute('tabindex', -1);
+    	    }
+
+    	    this._hide();
+    	    this._target = document.querySelector('[aria-describedby=' + this.id + ']');
+    	    if (!this._target) {
+    	      return;
+    	    }
+    	    this._target.addEventListener('focus', this._show);
+    	    this._target.addEventListener('blur', this._hide);
+    	    this._target.addEventListener('mouseenter', this._show);
+    	    this._target.addEventListener('mouseleave', this._hide);
+    	  }
+
+    	  disconnectedCallback() {
+    	    if (!this._target) {
+    	      return;
+    	    }
+    	
+    	    this._target.removeEventListener('focus', this._show);
+    	    this._target.removeEventListener('blur', this._hide);
+    	    this._target.removeEventListener('mouseenter', this._show);
+    	    this._target.removeEventListener('mouseleave', this._hide);
+    	    this._target = null;
+    	  }
+
+    	  _show() {
+    	    this.hidden = false;
+    	  }
+
+    	  _hide() {
+    	    this.hidden = true;
+    	  }
+    	}
+
+    	window.customElements.define('howto-tooltip', HowtoTooltip);
+    </script>
+    <template id="fieldLabelTemplate">
+      <div class="comment">Hello</div>
+      <div class="comment">World</div>
+    </template>
+ 
+    <script>
+        class SimpleElement extends HTMLElement {
+    	  constructor() {
+    	    super();
+    	  }
+    	  connectedCallback() {
+    		var t = document.querySelector('#fieldLabelTemplate');
+      		var clone = document.importNode(t.content, true);
+    		this.appendChild(clone);
+    	  }
+        }
+    	window.customElements.define('simple-element', SimpleElement);
+    </script>
+    
+    <template id="my-paragraph">
+      <style>
+        p {
+          color: white;
+          background-color: #666;
+          padding: 5px;
+        }
+      </style>
+      <p>My paragraph</p>
+    </template>
+    
+    <script>
+      customElements.define('my-paragraph',
+      	class extends HTMLElement {
+    	  constructor() {
+      	    super();
+    		let template = document.getElementById('my-paragraph');
+    		let templateContent = template.content;
+
+    		const shadowRoot = this.attachShadow({mode: 'open'})
+    		        .appendChild(templateContent.cloneNode(true));
+    	  }
+    	});
+    </script>
+    
+    <template id="my-select">
+      <input type="text" list="cars" />
+      <datalist id="cars">
+        <option>Volvo</option>
+        <option>Saab</option>
+        <option>Mercedes</option>
+        <option>Audi</option>
+      </datalist>
+    </template>
+    
+    <script>
+      customElements.define('my-select',
+        class extends HTMLElement {
+          constructor() {
+            super();
+        	let template = document.getElementById('my-select');
+        	let templateContent = template.content;
+
+        	const shadowRoot = this.attachShadow({mode: 'open'})
+        	        .appendChild(templateContent.cloneNode(true));
+          }
+        });
+    </script>
+    <style>
+div.selectList {
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 0.75rem;
+  padding: 0.5em;
+  background: cyan;
+  position: relative;
+}
+div.selectList input {
+  font-family: inherit;
+  font-size: inherit;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+div.selectList ul {
+  list-style-type: none;
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  z-index: 100;
+  background: yellow;
+}
+div.selectList ul li {
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0 0.5em;
+}
+div.selectList ul li:hover {
+  background: #BFDDF5;  /* 0078D7 */
+}
+    </style>
+  </head>
+  <body>
+    <div class="text">
+      <label for="name">Your name:</label>
+      <input id="name" aria-describedby="tp1"/>
+      <howto-tooltip id="tp1">Ideally your name is Batman</howto-tooltip>
+      <br>
+      <label for="cheese">Favourite type of cheese: </label>
+      <input id="cheese" aria-describedby="tp2"/>
+      <howto-tooltip id="tp2">Help I am trapped inside a tooltip message</howto-tooltip>
+    </div>
+    <simple-element></simple-element>
+    <my-paragraph></my-paragraph>
+    <my-select></my-select>
+    <hr>
+          <input type="text" list="carsx" />
+          <hr><br>
+    <div class="selectList">
+      <input type="text">
+      <ul>
+        <li>Volvo</li>
+        <li>Saab</li>
+        <li>Mercedes</li>
+        <li>Audi</li>
+      </ul>
+      <p>The qucik brown fox</p>
+    </div>
+    <p>The qucik brown fox</p>
+  </body>
+</html>

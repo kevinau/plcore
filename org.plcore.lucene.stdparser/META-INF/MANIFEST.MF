@@ -7,14 +7,11 @@ Automatic-Module-Name: org.plcore.lucene.stdparser
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: Kevin Holloway
 Import-Package: org.apache.lucene.analysis,
- org.apache.lucene.analysis.standard,
  org.apache.lucene.search,
  org.apache.lucene.util,
  org.osgi.service.component;version="1.2.0",
  org.osgi.service.component.annotations;version="1.3.0",
- org.plcore.lucene,
  org.plcore.osgi
-Service-Component: OSGI-INF/org.plcore.lucene.stdparser.ClassicLuceneParser.xml
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/lucene-queries-7.3.1.jar,
  lib/lucene-queryparser-7.3.1.jar,

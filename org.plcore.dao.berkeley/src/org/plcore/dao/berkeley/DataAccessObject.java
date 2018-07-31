@@ -11,6 +11,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.plcore.dao.IDataAccessObject;
 import org.plcore.dao.ITransaction;
 import org.plcore.entity.EntityLife;
@@ -30,13 +32,20 @@ import com.sleepycat.persist.model.PrimaryKey;
            property="store.target = (name=DefaultDataStore)")
 public class DataAccessObject<T> implements IDataAccessObject<T> {
 
+  private static final String EVENT_PREFIX = "org/plcore/dao/DataAccessObject/";
+  
   ////private final Logger logger = LoggerFactory.getLogger(DataAccessObject.class);
   
   @Reference(name = "store")
   private DataStore dataStore;
   
+  @Reference
+  private EventAdmin eventAdmin;
+
   @Configurable(name = "class", required = true)
   private Class<T> entityClass;
+  
+  private String daoName;
   
   private Field idField;
   private boolean idSequence;
@@ -75,6 +84,8 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
   void activate (ComponentContext context) {
     ComponentConfiguration.load(this, context);
 
+    daoName = (String)context.getProperties().get("name");
+  
     idField = null;
     idSequence = false;
     for (Field field : entityClass.getDeclaredFields()) {
@@ -169,6 +180,14 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
     }
     
     index.put(value);
+    ////System.out.println("added ======= " + value);
+    Map<String, Object> props = new HashMap<>();
+    props.put("name", daoName);
+    props.put("value", value);
+    System.out.println(">>>>>>>>>>> add:: " + value);
+    Event event = new Event(EVENT_PREFIX + "ADDED", props);
+    eventAdmin.postEvent(event);
+
     return value;
   }
 
@@ -245,6 +264,12 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
         }
       }
       index.delete(key);
+      
+      Map<String, Object> props = new HashMap<>();
+      props.put("name", daoName);
+      props.put("value", value);
+      Event event = new Event(EVENT_PREFIX + "REMOVED", props);
+      eventAdmin.postEvent(event);
     } catch (SecurityException | IllegalArgumentException |
              IllegalAccessException | DatabaseException ex) {
       throw new RuntimeException(ex);
@@ -277,6 +302,12 @@ public class DataAccessObject<T> implements IDataAccessObject<T> {
       PrimaryIndex<Object, T> index1 = getPrimaryIndex();
       index1.put(newValue);
       transaction.commit();
+      
+      Map<String, Object> props = new HashMap<>();
+      props.put("name", daoName);
+      props.put("value", newValue);
+      Event event = new Event(EVENT_PREFIX + "CHANGED", props);
+      eventAdmin.postEvent(event);
       ////logger.info("update " + key + ": " + newValue);
       return newValue;
     } catch (SecurityException | IllegalArgumentException |

@@ -54,14 +54,15 @@ public class ASX200Loader implements IFileProcessor {
     }
     
     IEntityModel entityModel = modelFactory.buildEntityModel(ASXSector.class);
-    entityModel.setNew();
-    IItemModel name = entityModel.selectItemModel("name");
 
     Collections.sort(sectors);
     int loaded = 0;
     
     try (ITransaction<ASXSector> tran = daoSector.getTransaction()) {
       for (String sectorName : sectors) {
+        entityModel.setNew();
+        IItemModel name = entityModel.selectItemModel("name");
+
         name.setValueFromSource(sectorName);
         List<ReportableError> errors = entityModel.getErrors();
         if (errors.size() == 0) {
@@ -105,6 +106,8 @@ public class ASX200Loader implements IFileProcessor {
         // First data line
         line = reader.readNext();
         while (line != null) {
+          entityModel.syncValue(new ASXCompany(), true);
+          
           code.setValueFromSource(line[0]);
           company.setValueFromSource(line[1]);
           sector.setValueFromSource(line[2]);

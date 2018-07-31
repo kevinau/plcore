@@ -1,0 +1,157 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="default-styles.css">
+    <style type="text/css">
+      html, body {
+        height: 100%;
+        width: 100%;
+      }
+      header {
+        height: 48px;
+        background: white;
+        z-index: 200;
+      }
+      
+      a#menuButton {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 100;
+      }
+      a#menuButton svg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 100;
+        transform: scale(2.0);
+        transform-origin: 24px 0;
+        width: 24px;
+        height: 24px;
+        fill: #000;
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out;
+      }
+      a#menuButton svg.close {
+        opacity: 0;
+        background: rgb(179, 210, 52);;
+      }
+      a#menuButton.open svg.menu {
+        opacity: 0;
+      }
+      a#menuButton.open svg.close {
+        opacity: 1;
+      }
+      
+      nav, main {
+        padding: 1em;
+        box-sizing: border-box;
+      }
+      main {
+        width: 100%;
+        height: calc(100% - 48px);
+      }
+
+
+      /*
+       * Off-canvas layout styles.
+       */
+      nav {
+        width: auto;
+        height: auto;
+        transform:scaleY(0);
+        transform-origin:top;
+        position: absolute;
+        right: 0;
+        transition: transform 0.3s ease;
+      }
+      nav.open {
+        transform:scaleY(1);
+      }
+
+      /* If there is enough space (> 600px), we keep the drawer open all the time. */
+      @media (min-width: 600px) {
+
+        a#menuButton {
+          display: none;
+        }
+        
+        /* We open the drawer. */
+        nav {
+          position:relative;
+          display: none;
+          xxxtransform: translate(0, 0);
+        }
+
+        /* We use Flexbox on the parent. */
+        body {
+          display: flex;
+          flex-flow: row nowrap;
+        }
+
+        main {
+          width: auto;
+          /* Flex-grow streches the main content to fill all available space. */
+          flex-grow: 1;
+        }
+      }
+
+      /* If there is space (> 600px), we keep the drawer open by default. */
+      @media (min-width: 600px) {
+        main > #menuButton:after {
+          content: 'The drawer stays open if width > 600px';
+        }
+        main p, nav p {
+          text-decoration: line-through;
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+    <header>
+      <span>PennyLedger</span>
+      <a id="menuButton">
+        <svg class="menu">
+          <use xlink:href="icons.svg#menu"></use>
+        </svg>
+        <svg class="close">
+          <use xlink:href="icons.svg#close"></use>
+        </svg>
+      </a>
+    </header>
+    <nav id="drawer" class="lime">
+      <div>Menu item one</div>
+      <div>Menu item two</div>
+      <div>Menu item three</div>
+    </nav>
+
+    <main class="light_blue">
+      <p>Click on the menu icon to open the drawer</p>
+    </main>
+
+    <script>
+      /*
+       * Open the drawer when the menu icon is clicked.
+       */
+      var menuButton = document.querySelector('#menuButton');
+      var main = document.querySelector('main');
+      var drawer = document.querySelector('#drawer');
+
+      menuButton.addEventListener('click', function(e) {
+        drawer.classList.toggle('open');
+        menuButton.classList.toggle('open');
+        e.stopPropagation();
+      });
+      main.addEventListener('click', function() {
+        drawer.classList.remove('open');
+        menuButton.classList.remove('open');
+      });
+
+    </script>
+  </body>
+</html>

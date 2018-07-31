@@ -65,7 +65,7 @@ public abstract class DateFactory {
   }
 
   
-  private static String mmyyDateFormat (int year, int month) {
+  public static String mmyyDateFormat (int year, int month) {
     StringBuilder buffer = new StringBuilder(5);
     if (month < 10) {
       buffer.append('0');
@@ -81,7 +81,7 @@ public abstract class DateFactory {
   }
 
   
-  private static String mmDateFormat (int month) {
+  public static String mmDateFormat (int month) {
     StringBuilder buffer = new StringBuilder(2);
     if (month < 10) {
       buffer.append('0');
@@ -91,7 +91,7 @@ public abstract class DateFactory {
   }
 
   
-  private static String yyDateFormat (int year) {
+  public static String yyDateFormat (int year) {
     StringBuilder buffer = new StringBuilder(2);
     year = year % 100;
     if (year < 10) {
@@ -514,7 +514,9 @@ public abstract class DateFactory {
     int month = NOTPARSED;
     int year = NOTPARSED;
     char firstPunctuation;
+    @SuppressWarnings("unused")
     String message;
+    @SuppressWarnings("unused")
     String completion;
     
     private void validateDayMonthYear () {

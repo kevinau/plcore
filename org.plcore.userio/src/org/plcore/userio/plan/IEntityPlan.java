@@ -36,12 +36,26 @@ public interface IEntityPlan<T> extends IEmbeddedPlan<T> {
    */
   public IItemPlan<VersionTime> getVersionPlan();
   
+
+  /**
+   * Does this entity have a version field?
+   */
   public boolean hasVersion ();
   
+
+  /**
+   * Get the "version" value of an entity instance.  The version value is a Timestamp.
+   */
   public Timestamp getVersion(Object instance);
   
+  
+  /**
+   * Set the "version" value of an entity instance.  The version value is a Timestamp.
+   */
   public void setVersion(Object instance, Timestamp version);
 
+  
+  
   public IItemPlan<?>[] getKeyItems(int index);
   
   @Override
@@ -56,6 +70,9 @@ public interface IEntityPlan<T> extends IEmbeddedPlan<T> {
 
   //public List<IItemPlan<?>> getDescriptionPlans();
   
+  /**
+   * Get the "description" of an entity instance.
+   */
   public String getDescription(Object instance);
 
 }
